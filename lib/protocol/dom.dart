@@ -355,16 +355,19 @@ class DOMApi {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
+  /// [includeShadowDOM] Include all shadow roots. Equals to false if not specified.
   /// Returns: Outer HTML markup.
   Future<String> getOuterHTML({
     NodeId? nodeId,
     BackendNodeId? backendNodeId,
     runtime.RemoteObjectId? objectId,
+    bool? includeShadowDOM,
   }) async {
     var result = await _client.send('DOM.getOuterHTML', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
       if (objectId != null) 'objectId': objectId,
+      if (includeShadowDOM != null) 'includeShadowDOM': includeShadowDOM,
     });
     return result['outerHTML'] as String;
   }
@@ -747,9 +750,9 @@ class DOMApi {
 
   /// Returns the query container of the given node based on container query
   /// conditions: containerName, physical and logical axes, and whether it queries
-  /// scroll-state. If no axes are provided and queriesScrollState is false, the
-  /// style container is returned, which is the direct parent or the closest
-  /// element with a matching container-name.
+  /// scroll-state or anchored elements. If no axes are provided and
+  /// queriesScrollState is false, the style container is returned, which is the
+  /// direct parent or the closest element with a matching container-name.
   /// Returns: The container node for the given node, or null if not found.
   Future<NodeId> getContainerForNode(
     NodeId nodeId, {
@@ -757,6 +760,7 @@ class DOMApi {
     PhysicalAxes? physicalAxes,
     LogicalAxes? logicalAxes,
     bool? queriesScrollState,
+    bool? queriesAnchored,
   }) async {
     var result = await _client.send('DOM.getContainerForNode', {
       'nodeId': nodeId,
@@ -764,6 +768,7 @@ class DOMApi {
       if (physicalAxes != null) 'physicalAxes': physicalAxes,
       if (logicalAxes != null) 'logicalAxes': logicalAxes,
       if (queriesScrollState != null) 'queriesScrollState': queriesScrollState,
+      if (queriesAnchored != null) 'queriesAnchored': queriesAnchored,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -798,6 +803,22 @@ class DOMApi {
       if (anchorSpecifier != null) 'anchorSpecifier': anchorSpecifier,
     });
     return NodeId.fromJson(result['nodeId'] as int);
+  }
+
+  /// When enabling, this API force-opens the popover identified by nodeId
+  /// and keeps it open until disabled.
+  /// [nodeId] Id of the popover HTMLElement
+  /// [enable] If true, opens the popover and keeps it open. If false, closes the
+  /// popover if it was previously force-opened.
+  /// Returns: List of popovers that were closed in order to respect popover stacking order.
+  Future<List<NodeId>> forceShowPopover(NodeId nodeId, bool enable) async {
+    var result = await _client.send('DOM.forceShowPopover', {
+      'nodeId': nodeId,
+      'enable': enable,
+    });
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
   }
 }
 

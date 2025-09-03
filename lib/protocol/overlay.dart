@@ -1331,7 +1331,6 @@ enum InspectMode {
   searchForNode('searchForNode'),
   searchForUaShadowDom('searchForUAShadowDOM'),
   captureAreaScreenshot('captureAreaScreenshot'),
-  showDistances('showDistances'),
   none('none');
 
   final String value;

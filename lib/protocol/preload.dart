@@ -292,7 +292,8 @@ class RuleSet {
 
 enum RuleSetErrorType {
   sourceIsNotJsonObject('SourceIsNotJsonObject'),
-  invalidRulesSkipped('InvalidRulesSkipped');
+  invalidRulesSkipped('InvalidRulesSkipped'),
+  invalidRulesetLevelTag('InvalidRulesetLevelTag');
 
   final String value;
 
@@ -547,7 +548,8 @@ enum PrerenderFinalStatus {
   otherPrerenderedPageActivated('OtherPrerenderedPageActivated'),
   v8OptimizerDisabled('V8OptimizerDisabled'),
   prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
-  browsingDataRemoved('BrowsingDataRemoved');
+  browsingDataRemoved('BrowsingDataRemoved'),
+  prerenderHostReused('PrerenderHostReused');
 
   final String value;
 

@@ -3506,7 +3506,7 @@
             "commands": [
                 {
                     "name": "setPermission",
-                    "description": "Set permission settings for given origin.",
+                    "description": "Set permission settings for given requesting and embedding origins.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -3521,7 +3521,13 @@
                         },
                         {
                             "name": "origin",
-                            "description": "Origin the permission applies to, all origins if not specified.",
+                            "description": "Requesting origin the permission applies to, all origins if not specified.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "embeddingOrigin",
+                            "description": "Embedding origin the permission applies to. It is ignored unless the requesting origin is\npresent and valid. If the requesting origin is provided but the embedding origin isn't, the\nrequesting origin is used as the embedding origin.",
                             "optional": true,
                             "type": "string"
                         },
@@ -16925,6 +16931,18 @@
                     ]
                 },
                 {
+                    "name": "setIPProtectionProxyBypassEnabled",
+                    "description": "Sets bypass IP Protection Proxy boolean.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "description": "Whether IP Proxy is being bypassed by devtools; false by default.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "name": "setAcceptedEncodings",
                     "description": "Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.",
                     "experimental": true,
@@ -17162,6 +17180,13 @@
                         {
                             "name": "reportDirectSocketTraffic",
                             "description": "Whether DirectSocket chunk send/receive events should be reported.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "enableDurableMessages",
+                            "description": "Enable storing response bodies outside of renderer, so that these survive\na cross-process navigation. Requires maxTotalBufferSize to be set.\nCurrently defaults to false.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -21716,9 +21741,9 @@
                         "IndexedDBEvent",
                         "Dummy",
                         "JsNetworkRequestReceivedCacheControlNoStoreResource",
-                        "WebRTCSticky",
-                        "WebTransportSticky",
-                        "WebSocketSticky",
+                        "WebRTCUsedWithCCNS",
+                        "WebTransportUsedWithCCNS",
+                        "WebSocketUsedWithCCNS",
                         "SmartCard",
                         "LiveMediaStreamTrack",
                         "UnloadHandler",

@@ -189,6 +189,24 @@ class BrowserApi {
     });
   }
 
+  /// Set size of the browser contents resizing browser window as necessary.
+  /// [windowId] Browser window id.
+  /// [width] The window contents width in DIP. Assumes current width if omitted.
+  /// Must be specified if 'height' is omitted.
+  /// [height] The window contents height in DIP. Assumes current height if omitted.
+  /// Must be specified if 'width' is omitted.
+  Future<void> setContentsSize(
+    WindowID windowId, {
+    int? width,
+    int? height,
+  }) async {
+    await _client.send('Browser.setContentsSize', {
+      'windowId': windowId,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+    });
+  }
+
   /// Set dock tile details, platform-specific.
   /// [image] Png encoded image.
   Future<void> setDockTile({String? badgeLabel, String? image}) async {

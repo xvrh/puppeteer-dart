@@ -469,6 +469,14 @@ class EmulationApi {
     });
   }
 
+  /// Override the value of navigator.connection.saveData
+  /// [dataSaverEnabled] Override value. Omitting the parameter disables the override.
+  Future<void> setDataSaverOverride({bool? dataSaverEnabled}) async {
+    await _client.send('Emulation.setDataSaverOverride', {
+      if (dataSaverEnabled != null) 'dataSaverEnabled': dataSaverEnabled,
+    });
+  }
+
   /// [hardwareConcurrency] Hardware concurrency to report
   Future<void> setHardwareConcurrencyOverride(int hardwareConcurrency) async {
     await _client.send('Emulation.setHardwareConcurrencyOverride', {

@@ -182,8 +182,7 @@ class PageApi {
       .where((event) => event.name == 'Page.windowOpen')
       .map((event) => WindowOpenEvent.fromJson(event.parameters));
 
-  /// Issued for every compilation cache generated. Is only available
-  /// if Page.setGenerateCompilationCache is enabled.
+  /// Issued for every compilation cache generated.
   Stream<CompilationCacheProducedEvent> get onCompilationCacheProduced =>
       _client.onEvent
           .where((event) => event.name == 'Page.compilationCacheProduced')
@@ -1588,7 +1587,15 @@ class NavigateResult {
   /// User friendly error message, present if and only if navigation has failed.
   final String? errorText;
 
-  NavigateResult({required this.frameId, this.loaderId, this.errorText});
+  /// Whether the navigation resulted in a download.
+  final bool? isDownload;
+
+  NavigateResult({
+    required this.frameId,
+    this.loaderId,
+    this.errorText,
+    this.isDownload,
+  });
 
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return NavigateResult(
@@ -1598,6 +1605,9 @@ class NavigateResult {
           : null,
       errorText: json.containsKey('errorText')
           ? json['errorText'] as String
+          : null,
+      isDownload: json.containsKey('isDownload')
+          ? json['isDownload'] as bool
           : null,
     );
   }
@@ -1825,6 +1835,7 @@ enum PermissionsPolicyFeature {
   accelerometer('accelerometer'),
   allScreensCapture('all-screens-capture'),
   ambientLightSensor('ambient-light-sensor'),
+  ariaNotify('aria-notify'),
   attributionReporting('attribution-reporting'),
   autoplay('autoplay'),
   bluetooth('bluetooth'),
@@ -3692,6 +3703,7 @@ enum BackForwardCacheNotRestoredReason {
   broadcastChannel('BroadcastChannel'),
   webXr('WebXR'),
   sharedWorker('SharedWorker'),
+  sharedWorkerMessage('SharedWorkerMessage'),
   webLocks('WebLocks'),
   webHid('WebHID'),
   webShare('WebShare'),
