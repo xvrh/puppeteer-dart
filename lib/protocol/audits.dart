@@ -1099,6 +1099,25 @@ enum SRIMessageSignatureError {
   String toString() => value.toString();
 }
 
+enum UnencodedDigestError {
+  malformedDictionary('MalformedDictionary'),
+  unknownAlgorithm('UnknownAlgorithm'),
+  incorrectDigestType('IncorrectDigestType'),
+  incorrectDigestLength('IncorrectDigestLength');
+
+  final String value;
+
+  const UnencodedDigestError(this.value);
+
+  factory UnencodedDigestError.fromJson(String value) =>
+      UnencodedDigestError.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Details for issues around "Attribution Reporting API" usage.
 /// Explainer: https://github.com/WICG/attribution-reporting-api
 class AttributionReportingIssueDetails {
@@ -1276,6 +1295,27 @@ class SRIMessageSignatureIssueDetails {
       'integrityAssertions': [...integrityAssertions],
       'request': request.toJson(),
     };
+  }
+}
+
+class UnencodedDigestIssueDetails {
+  final UnencodedDigestError error;
+
+  final AffectedRequest request;
+
+  UnencodedDigestIssueDetails({required this.error, required this.request});
+
+  factory UnencodedDigestIssueDetails.fromJson(Map<String, dynamic> json) {
+    return UnencodedDigestIssueDetails(
+      error: UnencodedDigestError.fromJson(json['error'] as String),
+      request: AffectedRequest.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'error': error.toJson(), 'request': request.toJson()};
   }
 }
 
@@ -1748,19 +1788,20 @@ class PartitioningBlobURLIssueDetails {
   }
 }
 
-enum SelectElementAccessibilityIssueReason {
+enum ElementAccessibilityIssueReason {
   disallowedSelectChild('DisallowedSelectChild'),
   disallowedOptGroupChild('DisallowedOptGroupChild'),
   nonPhrasingContentOptionChild('NonPhrasingContentOptionChild'),
   interactiveContentOptionChild('InteractiveContentOptionChild'),
-  interactiveContentLegendChild('InteractiveContentLegendChild');
+  interactiveContentLegendChild('InteractiveContentLegendChild'),
+  interactiveContentSummaryDescendant('InteractiveContentSummaryDescendant');
 
   final String value;
 
-  const SelectElementAccessibilityIssueReason(this.value);
+  const ElementAccessibilityIssueReason(this.value);
 
-  factory SelectElementAccessibilityIssueReason.fromJson(String value) =>
-      SelectElementAccessibilityIssueReason.values.firstWhere(
+  factory ElementAccessibilityIssueReason.fromJson(String value) =>
+      ElementAccessibilityIssueReason.values.firstWhere(
         (e) => e.value == value,
       );
 
@@ -1770,30 +1811,26 @@ enum SelectElementAccessibilityIssueReason {
   String toString() => value.toString();
 }
 
-/// This issue warns about errors in the select element content model.
-class SelectElementAccessibilityIssueDetails {
+/// This issue warns about errors in the select or summary element content model.
+class ElementAccessibilityIssueDetails {
   final dom.BackendNodeId nodeId;
 
-  final SelectElementAccessibilityIssueReason
-  selectElementAccessibilityIssueReason;
+  final ElementAccessibilityIssueReason elementAccessibilityIssueReason;
 
   final bool hasDisallowedAttributes;
 
-  SelectElementAccessibilityIssueDetails({
+  ElementAccessibilityIssueDetails({
     required this.nodeId,
-    required this.selectElementAccessibilityIssueReason,
+    required this.elementAccessibilityIssueReason,
     required this.hasDisallowedAttributes,
   });
 
-  factory SelectElementAccessibilityIssueDetails.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return SelectElementAccessibilityIssueDetails(
+  factory ElementAccessibilityIssueDetails.fromJson(Map<String, dynamic> json) {
+    return ElementAccessibilityIssueDetails(
       nodeId: dom.BackendNodeId.fromJson(json['nodeId'] as int),
-      selectElementAccessibilityIssueReason:
-          SelectElementAccessibilityIssueReason.fromJson(
-            json['selectElementAccessibilityIssueReason'] as String,
-          ),
+      elementAccessibilityIssueReason: ElementAccessibilityIssueReason.fromJson(
+        json['elementAccessibilityIssueReason'] as String,
+      ),
       hasDisallowedAttributes:
           json['hasDisallowedAttributes'] as bool? ?? false,
     );
@@ -1802,8 +1839,8 @@ class SelectElementAccessibilityIssueDetails {
   Map<String, dynamic> toJson() {
     return {
       'nodeId': nodeId.toJson(),
-      'selectElementAccessibilityIssueReason':
-          selectElementAccessibilityIssueReason.toJson(),
+      'elementAccessibilityIssueReason': elementAccessibilityIssueReason
+          .toJson(),
       'hasDisallowedAttributes': hasDisallowedAttributes,
     };
   }
@@ -1999,8 +2036,9 @@ enum InspectorIssueCode {
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   propertyRuleIssue('PropertyRuleIssue'),
   sharedDictionaryIssue('SharedDictionaryIssue'),
-  selectElementAccessibilityIssue('SelectElementAccessibilityIssue'),
+  elementAccessibilityIssue('ElementAccessibilityIssue'),
   sriMessageSignatureIssue('SRIMessageSignatureIssue'),
+  unencodedDigestIssue('UnencodedDigestIssue'),
   userReidentificationIssue('UserReidentificationIssue');
 
   final String value;
@@ -2064,10 +2102,11 @@ class InspectorIssueDetails {
 
   final SharedDictionaryIssueDetails? sharedDictionaryIssueDetails;
 
-  final SelectElementAccessibilityIssueDetails?
-  selectElementAccessibilityIssueDetails;
+  final ElementAccessibilityIssueDetails? elementAccessibilityIssueDetails;
 
   final SRIMessageSignatureIssueDetails? sriMessageSignatureIssueDetails;
+
+  final UnencodedDigestIssueDetails? unencodedDigestIssueDetails;
 
   final UserReidentificationIssueDetails? userReidentificationIssueDetails;
 
@@ -2093,8 +2132,9 @@ class InspectorIssueDetails {
     this.propertyRuleIssueDetails,
     this.federatedAuthUserInfoRequestIssueDetails,
     this.sharedDictionaryIssueDetails,
-    this.selectElementAccessibilityIssueDetails,
+    this.elementAccessibilityIssueDetails,
     this.sriMessageSignatureIssueDetails,
+    this.unencodedDigestIssueDetails,
     this.userReidentificationIssueDetails,
   });
 
@@ -2218,17 +2258,22 @@ class InspectorIssueDetails {
               json['sharedDictionaryIssueDetails'] as Map<String, dynamic>,
             )
           : null,
-      selectElementAccessibilityIssueDetails:
-          json.containsKey('selectElementAccessibilityIssueDetails')
-          ? SelectElementAccessibilityIssueDetails.fromJson(
-              json['selectElementAccessibilityIssueDetails']
-                  as Map<String, dynamic>,
+      elementAccessibilityIssueDetails:
+          json.containsKey('elementAccessibilityIssueDetails')
+          ? ElementAccessibilityIssueDetails.fromJson(
+              json['elementAccessibilityIssueDetails'] as Map<String, dynamic>,
             )
           : null,
       sriMessageSignatureIssueDetails:
           json.containsKey('sriMessageSignatureIssueDetails')
           ? SRIMessageSignatureIssueDetails.fromJson(
               json['sriMessageSignatureIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      unencodedDigestIssueDetails:
+          json.containsKey('unencodedDigestIssueDetails')
+          ? UnencodedDigestIssueDetails.fromJson(
+              json['unencodedDigestIssueDetails'] as Map<String, dynamic>,
             )
           : null,
       userReidentificationIssueDetails:
@@ -2293,12 +2338,14 @@ class InspectorIssueDetails {
             federatedAuthUserInfoRequestIssueDetails!.toJson(),
       if (sharedDictionaryIssueDetails != null)
         'sharedDictionaryIssueDetails': sharedDictionaryIssueDetails!.toJson(),
-      if (selectElementAccessibilityIssueDetails != null)
-        'selectElementAccessibilityIssueDetails':
-            selectElementAccessibilityIssueDetails!.toJson(),
+      if (elementAccessibilityIssueDetails != null)
+        'elementAccessibilityIssueDetails': elementAccessibilityIssueDetails!
+            .toJson(),
       if (sriMessageSignatureIssueDetails != null)
         'sriMessageSignatureIssueDetails': sriMessageSignatureIssueDetails!
             .toJson(),
+      if (unencodedDigestIssueDetails != null)
+        'unencodedDigestIssueDetails': unencodedDigestIssueDetails!.toJson(),
       if (userReidentificationIssueDetails != null)
         'userReidentificationIssueDetails': userReidentificationIssueDetails!
             .toJson(),

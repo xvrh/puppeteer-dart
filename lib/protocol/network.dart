@@ -3333,6 +3333,10 @@ class ResponseData {
   /// Security details for the request.
   final SecurityDetails? securityDetails;
 
+  /// Indicates whether the request was sent through IP Protection proxies. If
+  /// set to true, the request used the IP Protection privacy feature.
+  final bool? isIpProtectionUsed;
+
   ResponseData({
     required this.url,
     required this.status,
@@ -3359,6 +3363,7 @@ class ResponseData {
     this.alternateProtocolUsage,
     required this.securityState,
     this.securityDetails,
+    this.isIpProtectionUsed,
   });
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
@@ -3429,6 +3434,9 @@ class ResponseData {
               json['securityDetails'] as Map<String, dynamic>,
             )
           : null,
+      isIpProtectionUsed: json.containsKey('isIpProtectionUsed')
+          ? json['isIpProtectionUsed'] as bool
+          : null,
     );
   }
 
@@ -3463,6 +3471,7 @@ class ResponseData {
       if (alternateProtocolUsage != null)
         'alternateProtocolUsage': alternateProtocolUsage!.toJson(),
       if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
+      if (isIpProtectionUsed != null) 'isIpProtectionUsed': isIpProtectionUsed,
     };
   }
 }
@@ -4831,8 +4840,8 @@ enum PrivateNetworkRequestPolicy {
 }
 
 enum IPAddressSpace {
+  loopback('Loopback'),
   local('Local'),
-  private('Private'),
   public('Public'),
   unknown('Unknown');
 

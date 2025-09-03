@@ -87,10 +87,6 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.enable');
   }
 
-  Future<void> inspectWorker(String versionId) async {
-    await _client.send('ServiceWorker.inspectWorker', {'versionId': versionId});
-  }
-
   Future<void> setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', {
       'forceUpdateOnPageLoad': forceUpdateOnPageLoad,

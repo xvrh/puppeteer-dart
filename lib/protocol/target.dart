@@ -335,6 +335,16 @@ class TargetApi {
       'locations': [...locations],
     });
   }
+
+  /// Opens a DevTools window for the target.
+  /// [targetId] This can be the page or tab target ID.
+  /// Returns: The targetId of DevTools page target.
+  Future<TargetID> openDevTools(TargetID targetId) async {
+    var result = await _client.send('Target.openDevTools', {
+      'targetId': targetId,
+    });
+    return TargetID.fromJson(result['targetId'] as String);
+  }
 }
 
 class AttachedToTargetEvent {

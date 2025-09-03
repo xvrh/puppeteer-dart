@@ -248,6 +248,12 @@ class CSSApi {
     return GetMatchedStylesForNodeResult.fromJson(result);
   }
 
+  /// Returns the values of the default UA-defined environment variables used in env()
+  Future<Map<String, dynamic>> getEnvironmentVariables() async {
+    var result = await _client.send('CSS.getEnvironmentVariables');
+    return result['environmentVariables'] as Map<String, dynamic>;
+  }
+
   /// Returns all media queries parsed by the rendering engine.
   Future<List<CSSMedia>> getMediaQueries() async {
     var result = await _client.send('CSS.getMediaQueries');
@@ -1832,6 +1838,9 @@ class CSSContainerQuery {
   /// true if the query contains scroll-state() queries.
   final bool? queriesScrollState;
 
+  /// true if the query contains anchored() queries.
+  final bool? queriesAnchored;
+
   CSSContainerQuery({
     required this.text,
     this.range,
@@ -1840,6 +1849,7 @@ class CSSContainerQuery {
     this.physicalAxes,
     this.logicalAxes,
     this.queriesScrollState,
+    this.queriesAnchored,
   });
 
   factory CSSContainerQuery.fromJson(Map<String, dynamic> json) {
@@ -1861,6 +1871,9 @@ class CSSContainerQuery {
       queriesScrollState: json.containsKey('queriesScrollState')
           ? json['queriesScrollState'] as bool
           : null,
+      queriesAnchored: json.containsKey('queriesAnchored')
+          ? json['queriesAnchored'] as bool
+          : null,
     );
   }
 
@@ -1873,6 +1886,7 @@ class CSSContainerQuery {
       if (physicalAxes != null) 'physicalAxes': physicalAxes!.toJson(),
       if (logicalAxes != null) 'logicalAxes': logicalAxes!.toJson(),
       if (queriesScrollState != null) 'queriesScrollState': queriesScrollState,
+      if (queriesAnchored != null) 'queriesAnchored': queriesAnchored,
     };
   }
 }
