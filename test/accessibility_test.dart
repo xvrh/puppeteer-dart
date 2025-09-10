@@ -100,7 +100,9 @@ void main() {
               AXNode(
                 role: 'StaticText',
                 name: 'hi',
-                children: [AXNode(role: 'InlineTextBox', name: 'hi', children: [])],
+                children: [
+                  AXNode(role: 'InlineTextBox', name: 'hi', children: []),
+                ],
               ),
             ],
           ),
@@ -177,7 +179,13 @@ void main() {
             AXNode(
               role: 'StaticText',
               name: 'Edit this image: ',
-              children: [AXNode(role: 'InlineTextBox', name: 'Edit this image: ', children: [])],
+              children: [
+                AXNode(
+                  role: 'InlineTextBox',
+                  name: 'Edit this image: ',
+                  children: [],
+                ),
+              ],
             ),
             AXNode(role: 'image', name: 'my fake image'),
           ],
@@ -200,7 +208,13 @@ void main() {
               AXNode(
                 role: 'StaticText',
                 name: 'Edit this image: ',
-                children: [AXNode(role: 'InlineTextBox', name: 'Edit this image: ', children: [])],
+                children: [
+                  AXNode(
+                    role: 'InlineTextBox',
+                    name: 'Edit this image: ',
+                    children: [],
+                  ),
+                ],
               ),
             ],
             multiLine: true,
@@ -354,7 +368,13 @@ void main() {
                       AXNode(
                         role: 'StaticText',
                         name: 'My Button',
-                        children: [AXNode(role: 'InlineTextBox', name: 'My Button', children: [])],
+                        children: [
+                          AXNode(
+                            role: 'InlineTextBox',
+                            name: 'My Button',
+                            children: [],
+                          ),
+                        ],
                       ),
                     ],
                   ),
