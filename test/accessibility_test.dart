@@ -55,7 +55,8 @@ void main() {
         role: 'RootWebArea',
         name: 'Accessibility Test',
         children: [
-          AXNode(role: 'heading', name: 'Inputs', level: 1),
+          AXNode(role: 'InlineTextBox', name: 'Hello World'),
+          AXNode(role: 'heading', name: 'Inputs', level: 1, children: []),
           AXNode(role: 'textbox', name: 'Empty input', focused: true),
           AXNode(role: 'textbox', name: 'readonly input', readonly: true),
           AXNode(role: 'textbox', name: 'disabled input', disabled: true),
@@ -99,7 +100,9 @@ void main() {
               AXNode(
                 role: 'StaticText',
                 name: 'hi',
-                children: [AXNode(role: 'InlineTextBox', children: [])],
+                children: [
+                  AXNode(role: 'InlineTextBox', name: 'hi', children: []),
+                ],
               ),
             ],
           ),
@@ -176,7 +179,13 @@ void main() {
             AXNode(
               role: 'StaticText',
               name: 'Edit this image: ',
-              children: [AXNode(role: 'InlineTextBox', children: [])],
+              children: [
+                AXNode(
+                  role: 'InlineTextBox',
+                  name: 'Edit this image: ',
+                  children: [],
+                ),
+              ],
             ),
             AXNode(role: 'image', name: 'my fake image'),
           ],
@@ -199,7 +208,13 @@ void main() {
               AXNode(
                 role: 'StaticText',
                 name: 'Edit this image: ',
-                children: [AXNode(role: 'InlineTextBox', children: [])],
+                children: [
+                  AXNode(
+                    role: 'InlineTextBox',
+                    name: 'Edit this image: ',
+                    children: [],
+                  ),
+                ],
               ),
             ],
             multiLine: true,
@@ -353,7 +368,13 @@ void main() {
                       AXNode(
                         role: 'StaticText',
                         name: 'My Button',
-                        children: [AXNode(role: 'InlineTextBox', children: [])],
+                        children: [
+                          AXNode(
+                            role: 'InlineTextBox',
+                            name: 'My Button',
+                            children: [],
+                          ),
+                        ],
                       ),
                     ],
                   ),
