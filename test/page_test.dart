@@ -470,7 +470,7 @@ void main() {
           args: [server.emptyPage],
         ),
       ]);
-      expect(message.text, contains('Access-Control-Allow-Origin'));
+      expect(message.text, contains('CORS policy'));
       expect(message.type, equals(ConsoleMessageType.error));
     });
     test('should have location when fetch fails', () async {
