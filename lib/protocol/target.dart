@@ -463,6 +463,9 @@ class TargetInfo {
   /// Frame id of originating window (is only set if target has an opener).
   final page.FrameId? openerFrameId;
 
+  /// Id of the parent frame, only present for the "iframe" targets.
+  final page.FrameId? parentFrameId;
+
   final browser.BrowserContextID? browserContextId;
 
   /// Provides additional details for specific target types. For example, for
@@ -478,6 +481,7 @@ class TargetInfo {
     this.openerId,
     required this.canAccessOpener,
     this.openerFrameId,
+    this.parentFrameId,
     this.browserContextId,
     this.subtype,
   });
@@ -495,6 +499,9 @@ class TargetInfo {
       canAccessOpener: json['canAccessOpener'] as bool? ?? false,
       openerFrameId: json.containsKey('openerFrameId')
           ? page.FrameId.fromJson(json['openerFrameId'] as String)
+          : null,
+      parentFrameId: json.containsKey('parentFrameId')
+          ? page.FrameId.fromJson(json['parentFrameId'] as String)
           : null,
       browserContextId: json.containsKey('browserContextId')
           ? browser.BrowserContextID.fromJson(
@@ -515,6 +522,7 @@ class TargetInfo {
       'canAccessOpener': canAccessOpener,
       if (openerId != null) 'openerId': openerId!.toJson(),
       if (openerFrameId != null) 'openerFrameId': openerFrameId!.toJson(),
+      if (parentFrameId != null) 'parentFrameId': parentFrameId!.toJson(),
       if (browserContextId != null)
         'browserContextId': browserContextId!.toJson(),
       if (subtype != null) 'subtype': subtype,

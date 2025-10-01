@@ -1,7 +1,8 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'dom.dart' as dom;
 
-/// This domain allows detailed inspection of media elements
+/// This domain allows detailed inspection of media elements.
 class MediaApi {
   final Client _client;
 
@@ -32,14 +33,13 @@ class MediaApi {
       .map((event) => PlayerErrorsRaisedEvent.fromJson(event.parameters));
 
   /// Called whenever a player is created, or when a new agent joins and receives
-  /// a list of active players. If an agent is restored, it will receive the full
-  /// list of player ids and all events again.
-  Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent
-      .where((event) => event.name == 'Media.playersCreated')
+  /// a list of active players. If an agent is restored, it will receive one
+  /// event for each active player.
+  Stream<Player> get onPlayerCreated => _client.onEvent
+      .where((event) => event.name == 'Media.playerCreated')
       .map(
-        (event) => (event.parameters['players'] as List)
-            .map((e) => PlayerId.fromJson(e as String))
-            .toList(),
+        (event) =>
+            Player.fromJson(event.parameters['player'] as Map<String, dynamic>),
       );
 
   /// Enables the Media domain
@@ -297,6 +297,30 @@ class PlayerError {
       'stack': stack.map((e) => e.toJson()).toList(),
       'cause': cause.map((e) => e.toJson()).toList(),
       'data': data,
+    };
+  }
+}
+
+class Player {
+  final PlayerId playerId;
+
+  final dom.BackendNodeId? domNodeId;
+
+  Player({required this.playerId, this.domNodeId});
+
+  factory Player.fromJson(Map<String, dynamic> json) {
+    return Player(
+      playerId: PlayerId.fromJson(json['playerId'] as String),
+      domNodeId: json.containsKey('domNodeId')
+          ? dom.BackendNodeId.fromJson(json['domNodeId'] as int)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'playerId': playerId.toJson(),
+      if (domNodeId != null) 'domNodeId': domNodeId!.toJson(),
     };
   }
 }

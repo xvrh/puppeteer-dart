@@ -67,10 +67,6 @@ class DevTools {
   AuditsApi get audits => _audits ??= AuditsApi(client);
   AuditsApi? _audits;
 
-  /// Defines commands and events for browser extensions.
-  ExtensionsApi get extensions => _extensions ??= ExtensionsApi(client);
-  ExtensionsApi? _extensions;
-
   /// Defines commands and events for Autofill.
   AutofillApi get autofill => _autofill ??= AutofillApi(client);
   AutofillApi? _autofill;
@@ -79,6 +75,12 @@ class DevTools {
   BackgroundServiceApi get backgroundService =>
       _backgroundService ??= BackgroundServiceApi(client);
   BackgroundServiceApi? _backgroundService;
+
+  /// This domain allows configuring virtual Bluetooth devices to test
+  /// the web-bluetooth API.
+  BluetoothEmulationApi get bluetoothEmulation =>
+      _bluetoothEmulation ??= BluetoothEmulationApi(client);
+  BluetoothEmulationApi? _bluetoothEmulation;
 
   /// The Browser domain defines methods and events for browser managing.
   BrowserApi get browser => _browser ??= BrowserApi(client);
@@ -116,13 +118,6 @@ class DevTools {
   DOMDebuggerApi get domDebugger => _domDebugger ??= DOMDebuggerApi(client);
   DOMDebuggerApi? _domDebugger;
 
-  /// EventBreakpoints permits setting JavaScript breakpoints on operations and events
-  /// occurring in native code invoked from JavaScript. Once breakpoint is hit, it is
-  /// reported through Debugger domain, similarly to regular breakpoints being hit.
-  EventBreakpointsApi get eventBreakpoints =>
-      _eventBreakpoints ??= EventBreakpointsApi(client);
-  EventBreakpointsApi? _eventBreakpoints;
-
   /// This domain facilitates obtaining document snapshots with DOM, layout, and style information.
   DOMSnapshotApi get domSnapshot => _domSnapshot ??= DOMSnapshotApi(client);
   DOMSnapshotApi? _domSnapshot;
@@ -130,6 +125,9 @@ class DevTools {
   /// Query and modify DOM storage.
   DOMStorageApi get domStorage => _domStorage ??= DOMStorageApi(client);
   DOMStorageApi? _domStorage;
+
+  DeviceAccessApi get deviceAccess => _deviceAccess ??= DeviceAccessApi(client);
+  DeviceAccessApi? _deviceAccess;
 
   DeviceOrientationApi get deviceOrientation =>
       _deviceOrientation ??= DeviceOrientationApi(client);
@@ -139,6 +137,28 @@ class DevTools {
   EmulationApi get emulation => _emulation ??= EmulationApi(client);
   EmulationApi? _emulation;
 
+  /// EventBreakpoints permits setting JavaScript breakpoints on operations and events
+  /// occurring in native code invoked from JavaScript. Once breakpoint is hit, it is
+  /// reported through Debugger domain, similarly to regular breakpoints being hit.
+  EventBreakpointsApi get eventBreakpoints =>
+      _eventBreakpoints ??= EventBreakpointsApi(client);
+  EventBreakpointsApi? _eventBreakpoints;
+
+  /// Defines commands and events for browser extensions.
+  ExtensionsApi get extensions => _extensions ??= ExtensionsApi(client);
+  ExtensionsApi? _extensions;
+
+  /// This domain allows interacting with the FedCM dialog.
+  FedCmApi get fedCm => _fedCm ??= FedCmApi(client);
+  FedCmApi? _fedCm;
+
+  /// A domain for letting clients substitute browser's network layer with client code.
+  FetchApi get fetch => _fetch ??= FetchApi(client);
+  FetchApi? _fetch;
+
+  FileSystemApi get fileSystem => _fileSystem ??= FileSystemApi(client);
+  FileSystemApi? _fileSystem;
+
   /// This domain provides experimental commands only supported in headless mode.
   HeadlessExperimentalApi get headlessExperimental =>
       _headlessExperimental ??= HeadlessExperimentalApi(client);
@@ -147,9 +167,6 @@ class DevTools {
   /// Input/Output operations for streams produced by DevTools.
   IOApi get io => _io ??= IOApi(client);
   IOApi? _io;
-
-  FileSystemApi get fileSystem => _fileSystem ??= FileSystemApi(client);
-  FileSystemApi? _fileSystem;
 
   IndexedDBApi get indexedDb => _indexedDb ??= IndexedDBApi(client);
   IndexedDBApi? _indexedDb;
@@ -167,6 +184,10 @@ class DevTools {
   LogApi get log => _log ??= LogApi(client);
   LogApi? _log;
 
+  /// This domain allows detailed inspection of media elements.
+  MediaApi get media => _media ??= MediaApi(client);
+  MediaApi? _media;
+
   MemoryApi get memory => _memory ??= MemoryApi(client);
   MemoryApi? _memory;
 
@@ -178,6 +199,10 @@ class DevTools {
   /// This domain provides various functionality related to drawing atop the inspected page.
   OverlayApi get overlay => _overlay ??= OverlayApi(client);
   OverlayApi? _overlay;
+
+  /// This domain allows interacting with the browser to control PWAs.
+  PWAApi get pwa => _pwa ??= PWAApi(client);
+  PWAApi? _pwa;
 
   /// Actions and events related to the inspected page belong to the page domain.
   PageApi get page => _page ??= PageApi(client);
@@ -192,7 +217,9 @@ class DevTools {
       _performanceTimeline ??= PerformanceTimelineApi(client);
   PerformanceTimelineApi? _performanceTimeline;
 
-  /// Security
+  PreloadApi get preload => _preload ??= PreloadApi(client);
+  PreloadApi? _preload;
+
   SecurityApi get security => _security ??= SecurityApi(client);
   SecurityApi? _security;
 
@@ -218,10 +245,6 @@ class DevTools {
   TracingApi get tracing => _tracing ??= TracingApi(client);
   TracingApi? _tracing;
 
-  /// A domain for letting clients substitute browser's network layer with client code.
-  FetchApi get fetch => _fetch ??= FetchApi(client);
-  FetchApi? _fetch;
-
   /// This domain allows inspection of Web Audio API.
   /// https://webaudio.github.io/web-audio-api/
   WebAudioApi get webAudio => _webAudio ??= WebAudioApi(client);
@@ -231,30 +254,6 @@ class DevTools {
   /// API.
   WebAuthnApi get webAuthn => _webAuthn ??= WebAuthnApi(client);
   WebAuthnApi? _webAuthn;
-
-  /// This domain allows detailed inspection of media elements
-  MediaApi get media => _media ??= MediaApi(client);
-  MediaApi? _media;
-
-  DeviceAccessApi get deviceAccess => _deviceAccess ??= DeviceAccessApi(client);
-  DeviceAccessApi? _deviceAccess;
-
-  PreloadApi get preload => _preload ??= PreloadApi(client);
-  PreloadApi? _preload;
-
-  /// This domain allows interacting with the FedCM dialog.
-  FedCmApi get fedCm => _fedCm ??= FedCmApi(client);
-  FedCmApi? _fedCm;
-
-  /// This domain allows interacting with the browser to control PWAs.
-  PWAApi get pwa => _pwa ??= PWAApi(client);
-  PWAApi? _pwa;
-
-  /// This domain allows configuring virtual Bluetooth devices to test
-  /// the web-bluetooth API.
-  BluetoothEmulationApi get bluetoothEmulation =>
-      _bluetoothEmulation ??= BluetoothEmulationApi(client);
-  BluetoothEmulationApi? _bluetoothEmulation;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

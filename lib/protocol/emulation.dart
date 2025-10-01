@@ -519,6 +519,57 @@ class EmulationApi {
       'difference': difference,
     });
   }
+
+  /// Returns device's screen configuration.
+  Future<List<ScreenInfo>> getScreenInfos() async {
+    var result = await _client.send('Emulation.getScreenInfos');
+    return (result['screenInfos'] as List)
+        .map((e) => ScreenInfo.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Add a new screen to the device. Only supported in headless mode.
+  /// [left] Offset of the left edge of the screen in pixels.
+  /// [top] Offset of the top edge of the screen in pixels.
+  /// [width] The width of the screen in pixels.
+  /// [height] The height of the screen in pixels.
+  /// [workAreaInsets] Specifies the screen's work area. Default is entire screen.
+  /// [devicePixelRatio] Specifies the screen's device pixel ratio. Default is 1.
+  /// [rotation] Specifies the screen's rotation angle. Available values are 0, 90, 180 and 270. Default is 0.
+  /// [colorDepth] Specifies the screen's color depth in bits. Default is 24.
+  /// [label] Specifies the descriptive label for the screen. Default is none.
+  /// [isInternal] Indicates whether the screen is internal to the device or external, attached to the device. Default is false.
+  Future<ScreenInfo> addScreen(
+    int left,
+    int top,
+    int width,
+    int height, {
+    WorkAreaInsets? workAreaInsets,
+    num? devicePixelRatio,
+    int? rotation,
+    int? colorDepth,
+    String? label,
+    bool? isInternal,
+  }) async {
+    var result = await _client.send('Emulation.addScreen', {
+      'left': left,
+      'top': top,
+      'width': width,
+      'height': height,
+      if (workAreaInsets != null) 'workAreaInsets': workAreaInsets,
+      if (devicePixelRatio != null) 'devicePixelRatio': devicePixelRatio,
+      if (rotation != null) 'rotation': rotation,
+      if (colorDepth != null) 'colorDepth': colorDepth,
+      if (label != null) 'label': label,
+      if (isInternal != null) 'isInternal': isInternal,
+    });
+    return ScreenInfo.fromJson(result['screenInfo'] as Map<String, dynamic>);
+  }
+
+  /// Remove screen from the device. Only supported in headless mode.
+  Future<void> removeScreen(ScreenId screenId) async {
+    await _client.send('Emulation.removeScreen', {'screenId': screenId});
+  }
 }
 
 class SafeAreaInsets {
@@ -1076,6 +1127,161 @@ class PressureMetadata {
 
   Map<String, dynamic> toJson() {
     return {if (available != null) 'available': available};
+  }
+}
+
+class WorkAreaInsets {
+  /// Work area top inset in pixels. Default is 0;
+  final int? top;
+
+  /// Work area left inset in pixels. Default is 0;
+  final int? left;
+
+  /// Work area bottom inset in pixels. Default is 0;
+  final int? bottom;
+
+  /// Work area right inset in pixels. Default is 0;
+  final int? right;
+
+  WorkAreaInsets({this.top, this.left, this.bottom, this.right});
+
+  factory WorkAreaInsets.fromJson(Map<String, dynamic> json) {
+    return WorkAreaInsets(
+      top: json.containsKey('top') ? json['top'] as int : null,
+      left: json.containsKey('left') ? json['left'] as int : null,
+      bottom: json.containsKey('bottom') ? json['bottom'] as int : null,
+      right: json.containsKey('right') ? json['right'] as int : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (top != null) 'top': top,
+      if (left != null) 'left': left,
+      if (bottom != null) 'bottom': bottom,
+      if (right != null) 'right': right,
+    };
+  }
+}
+
+extension type ScreenId(String value) {
+  factory ScreenId.fromJson(String value) => ScreenId(value);
+
+  String toJson() => value;
+}
+
+/// Screen information similar to the one returned by window.getScreenDetails() method,
+/// see https://w3c.github.io/window-management/#screendetailed.
+class ScreenInfo {
+  /// Offset of the left edge of the screen.
+  final int left;
+
+  /// Offset of the top edge of the screen.
+  final int top;
+
+  /// Width of the screen.
+  final int width;
+
+  /// Height of the screen.
+  final int height;
+
+  /// Offset of the left edge of the available screen area.
+  final int availLeft;
+
+  /// Offset of the top edge of the available screen area.
+  final int availTop;
+
+  /// Width of the available screen area.
+  final int availWidth;
+
+  /// Height of the available screen area.
+  final int availHeight;
+
+  /// Specifies the screen's device pixel ratio.
+  final num devicePixelRatio;
+
+  /// Specifies the screen's orientation.
+  final ScreenOrientation orientation;
+
+  /// Specifies the screen's color depth in bits.
+  final int colorDepth;
+
+  /// Indicates whether the device has multiple screens.
+  final bool isExtended;
+
+  /// Indicates whether the screen is internal to the device or external, attached to the device.
+  final bool isInternal;
+
+  /// Indicates whether the screen is set as the the operating system primary screen.
+  final bool isPrimary;
+
+  /// Specifies the descriptive label for the screen.
+  final String label;
+
+  /// Specifies the unique identifier of the screen.
+  final ScreenId id;
+
+  ScreenInfo({
+    required this.left,
+    required this.top,
+    required this.width,
+    required this.height,
+    required this.availLeft,
+    required this.availTop,
+    required this.availWidth,
+    required this.availHeight,
+    required this.devicePixelRatio,
+    required this.orientation,
+    required this.colorDepth,
+    required this.isExtended,
+    required this.isInternal,
+    required this.isPrimary,
+    required this.label,
+    required this.id,
+  });
+
+  factory ScreenInfo.fromJson(Map<String, dynamic> json) {
+    return ScreenInfo(
+      left: json['left'] as int,
+      top: json['top'] as int,
+      width: json['width'] as int,
+      height: json['height'] as int,
+      availLeft: json['availLeft'] as int,
+      availTop: json['availTop'] as int,
+      availWidth: json['availWidth'] as int,
+      availHeight: json['availHeight'] as int,
+      devicePixelRatio: json['devicePixelRatio'] as num,
+      orientation: ScreenOrientation.fromJson(
+        json['orientation'] as Map<String, dynamic>,
+      ),
+      colorDepth: json['colorDepth'] as int,
+      isExtended: json['isExtended'] as bool? ?? false,
+      isInternal: json['isInternal'] as bool? ?? false,
+      isPrimary: json['isPrimary'] as bool? ?? false,
+      label: json['label'] as String,
+      id: ScreenId.fromJson(json['id'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'left': left,
+      'top': top,
+      'width': width,
+      'height': height,
+      'availLeft': availLeft,
+      'availTop': availTop,
+      'availWidth': availWidth,
+      'availHeight': availHeight,
+      'devicePixelRatio': devicePixelRatio,
+      'orientation': orientation.toJson(),
+      'colorDepth': colorDepth,
+      'isExtended': isExtended,
+      'isInternal': isInternal,
+      'isPrimary': isPrimary,
+      'label': label,
+      'id': id.toJson(),
+    };
   }
 }
 

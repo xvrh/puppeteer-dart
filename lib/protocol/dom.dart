@@ -1202,6 +1202,7 @@ enum PseudoType {
   before('before'),
   after('after'),
   pickerIcon('picker-icon'),
+  interestHint('interest-hint'),
   marker('marker'),
   backdrop('backdrop'),
   column('column'),

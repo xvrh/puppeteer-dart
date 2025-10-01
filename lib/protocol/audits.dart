@@ -1968,7 +1968,8 @@ class PropertyRuleIssueDetails {
 
 enum UserReidentificationIssueType {
   blockedFrameNavigation('BlockedFrameNavigation'),
-  blockedSubresource('BlockedSubresource');
+  blockedSubresource('BlockedSubresource'),
+  noisedCanvasReadback('NoisedCanvasReadback');
 
   final String value;
 
@@ -1991,13 +1992,25 @@ class UserReidentificationIssueDetails {
   /// Applies to BlockedFrameNavigation and BlockedSubresource issue types.
   final AffectedRequest? request;
 
-  UserReidentificationIssueDetails({required this.type, this.request});
+  /// Applies to NoisedCanvasReadback issue type.
+  final SourceCodeLocation? sourceCodeLocation;
+
+  UserReidentificationIssueDetails({
+    required this.type,
+    this.request,
+    this.sourceCodeLocation,
+  });
 
   factory UserReidentificationIssueDetails.fromJson(Map<String, dynamic> json) {
     return UserReidentificationIssueDetails(
       type: UserReidentificationIssueType.fromJson(json['type'] as String),
       request: json.containsKey('request')
           ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
+      sourceCodeLocation: json.containsKey('sourceCodeLocation')
+          ? SourceCodeLocation.fromJson(
+              json['sourceCodeLocation'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
@@ -2006,6 +2019,8 @@ class UserReidentificationIssueDetails {
     return {
       'type': type.toJson(),
       if (request != null) 'request': request!.toJson(),
+      if (sourceCodeLocation != null)
+        'sourceCodeLocation': sourceCodeLocation!.toJson(),
     };
   }
 }
