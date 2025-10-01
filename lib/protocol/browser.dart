@@ -19,21 +19,26 @@ class BrowserApi {
       .where((event) => event.name == 'Browser.downloadProgress')
       .map((event) => DownloadProgressEvent.fromJson(event.parameters));
 
-  /// Set permission settings for given origin.
+  /// Set permission settings for given requesting and embedding origins.
   /// [permission] Descriptor of permission to override.
   /// [setting] Setting of the permission.
-  /// [origin] Origin the permission applies to, all origins if not specified.
+  /// [origin] Requesting origin the permission applies to, all origins if not specified.
+  /// [embeddingOrigin] Embedding origin the permission applies to. It is ignored unless the requesting origin is
+  /// present and valid. If the requesting origin is provided but the embedding origin isn't, the
+  /// requesting origin is used as the embedding origin.
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
     PermissionDescriptor permission,
     PermissionSetting setting, {
     String? origin,
+    String? embeddingOrigin,
     BrowserContextID? browserContextId,
   }) async {
     await _client.send('Browser.setPermission', {
       'permission': permission,
       'setting': setting,
       if (origin != null) 'origin': origin,
+      if (embeddingOrigin != null) 'embeddingOrigin': embeddingOrigin,
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }

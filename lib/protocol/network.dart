@@ -352,6 +352,14 @@ class NetworkApi {
         ),
       );
 
+  /// Returns enum representing if IP Proxy of requests is available
+  /// or reason it is not active.
+  /// Returns: Whether IP proxy is available
+  Future<IpProxyStatus> getIPProtectionProxyStatus() async {
+    var result = await _client.send('Network.getIPProtectionProxyStatus');
+    return IpProxyStatus.fromJson(result['status'] as String);
+  }
+
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
   Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
@@ -508,11 +516,15 @@ class NetworkApi {
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
   /// [reportDirectSocketTraffic] Whether DirectSocket chunk send/receive events should be reported.
+  /// [enableDurableMessages] Enable storing response bodies outside of renderer, so that these survive
+  /// a cross-process navigation. Requires maxTotalBufferSize to be set.
+  /// Currently defaults to false.
   Future<void> enable({
     int? maxTotalBufferSize,
     int? maxResourceBufferSize,
     int? maxPostDataSize,
     bool? reportDirectSocketTraffic,
+    bool? enableDurableMessages,
   }) async {
     await _client.send('Network.enable', {
       if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
@@ -521,6 +533,8 @@ class NetworkApi {
       if (maxPostDataSize != null) 'maxPostDataSize': maxPostDataSize,
       if (reportDirectSocketTraffic != null)
         'reportDirectSocketTraffic': reportDirectSocketTraffic,
+      if (enableDurableMessages != null)
+        'enableDurableMessages': enableDurableMessages,
     });
   }
 
@@ -2979,6 +2993,30 @@ enum BlockedReason {
 
   factory BlockedReason.fromJson(String value) =>
       BlockedReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Sets Controls for IP Proxy of requests.
+/// Page reload is required before the new behavior will be observed.
+enum IpProxyStatus {
+  available('Available'),
+  featureNotEnabled('FeatureNotEnabled'),
+  maskedDomainListNotEnabled('MaskedDomainListNotEnabled'),
+  maskedDomainListNotPopulated('MaskedDomainListNotPopulated'),
+  authTokensUnavailable('AuthTokensUnavailable'),
+  unavailable('Unavailable'),
+  bypassedByDevTools('BypassedByDevTools');
+
+  final String value;
+
+  const IpProxyStatus(this.value);
+
+  factory IpProxyStatus.fromJson(String value) =>
+      IpProxyStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

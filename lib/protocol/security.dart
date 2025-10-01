@@ -2,7 +2,6 @@ import 'dart:async';
 import '../src/connection.dart';
 import 'network.dart' as network;
 
-/// Security
 class SecurityApi {
   final Client _client;
 

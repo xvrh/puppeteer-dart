@@ -156,18 +156,13 @@ class CSSApi {
   }
 
   /// Returns the computed style for a DOM node identified by `nodeId`.
-  /// Returns: Computed style for the specified DOM node.
-  Future<List<CSSComputedStyleProperty>> getComputedStyleForNode(
+  Future<GetComputedStyleForNodeResult> getComputedStyleForNode(
     dom.NodeId nodeId,
   ) async {
     var result = await _client.send('CSS.getComputedStyleForNode', {
       'nodeId': nodeId,
     });
-    return (result['computedStyle'] as List)
-        .map(
-          (e) => CSSComputedStyleProperty.fromJson(e as Map<String, dynamic>),
-        )
-        .toList();
+    return GetComputedStyleForNodeResult.fromJson(result);
   }
 
   /// Resolve the specified values in the context of the provided element.
@@ -179,8 +174,7 @@ class CSSApi {
   /// to the provided property syntax, the value is parsed using combined
   /// syntax as if null `propertyName` was provided. If the value cannot be
   /// resolved even then, return the provided value without any changes.
-  /// [values] Substitution functions (var()/env()/attr()) and cascade-dependent
-  /// keywords (revert/revert-layer) do not work.
+  /// [values] Cascade-dependent keywords (revert/revert-layer) do not work.
   /// [nodeId] Id of the node in whose context the expression is evaluated
   /// [propertyName] Only longhands and custom property names are accepted.
   /// [pseudoType] Pseudo element type, only works for pseudo elements that generate
@@ -560,6 +554,33 @@ class GetBackgroundColorsResult {
       computedFontWeight: json.containsKey('computedFontWeight')
           ? json['computedFontWeight'] as String
           : null,
+    );
+  }
+}
+
+class GetComputedStyleForNodeResult {
+  /// Computed style for the specified DOM node.
+  final List<CSSComputedStyleProperty> computedStyle;
+
+  /// A list of non-standard "extra fields" which blink stores alongside each
+  /// computed style.
+  final ComputedStyleExtraFields extraFields;
+
+  GetComputedStyleForNodeResult({
+    required this.computedStyle,
+    required this.extraFields,
+  });
+
+  factory GetComputedStyleForNodeResult.fromJson(Map<String, dynamic> json) {
+    return GetComputedStyleForNodeResult(
+      computedStyle: (json['computedStyle'] as List)
+          .map(
+            (e) => CSSComputedStyleProperty.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+      extraFields: ComputedStyleExtraFields.fromJson(
+        json['extraFields'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1511,6 +1532,25 @@ class CSSComputedStyleProperty {
 
   Map<String, dynamic> toJson() {
     return {'name': name, 'value': value};
+  }
+}
+
+class ComputedStyleExtraFields {
+  /// Returns whether or not this node is being rendered with base appearance,
+  /// which happens when it has its appearance property set to base/base-select
+  /// or it is in the subtree of an element being rendered with base appearance.
+  final bool isAppearanceBase;
+
+  ComputedStyleExtraFields({required this.isAppearanceBase});
+
+  factory ComputedStyleExtraFields.fromJson(Map<String, dynamic> json) {
+    return ComputedStyleExtraFields(
+      isAppearanceBase: json['isAppearanceBase'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'isAppearanceBase': isAppearanceBase};
   }
 }
 
