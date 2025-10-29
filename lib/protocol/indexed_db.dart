@@ -92,30 +92,30 @@ class IndexedDBApi {
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  /// [indexName] Index name, empty string for object store data requests.
+  /// [indexName] Index name. If not specified, it performs an object store data request.
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   /// [keyRange] Key range.
   Future<RequestDataResult> requestData(
     String databaseName,
     String objectStoreName,
-    String indexName,
     int skipCount,
     int pageSize, {
     String? securityOrigin,
     String? storageKey,
     storage.StorageBucket? storageBucket,
+    String? indexName,
     KeyRange? keyRange,
   }) async {
     var result = await _client.send('IndexedDB.requestData', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-      'indexName': indexName,
       'skipCount': skipCount,
       'pageSize': pageSize,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
       if (storageBucket != null) 'storageBucket': storageBucket,
+      if (indexName != null) 'indexName': indexName,
       if (keyRange != null) 'keyRange': keyRange,
     });
     return RequestDataResult.fromJson(result);

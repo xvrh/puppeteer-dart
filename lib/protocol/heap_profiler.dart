@@ -100,6 +100,7 @@ class HeapProfilerApi {
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
   /// default value is 32768 bytes.
+  /// [stackDepth] Maximum stack depth. The default value is 128.
   /// [includeObjectsCollectedByMajorGC] By default, the sampling heap profiler reports only objects which are
   /// still alive when the profile is returned via getSamplingProfile or
   /// stopSampling, which is useful for determining what functions contribute
@@ -116,11 +117,13 @@ class HeapProfilerApi {
   /// for minimal GC activity.
   Future<void> startSampling({
     num? samplingInterval,
+    num? stackDepth,
     bool? includeObjectsCollectedByMajorGC,
     bool? includeObjectsCollectedByMinorGC,
   }) async {
     await _client.send('HeapProfiler.startSampling', {
       if (samplingInterval != null) 'samplingInterval': samplingInterval,
+      if (stackDepth != null) 'stackDepth': stackDepth,
       if (includeObjectsCollectedByMajorGC != null)
         'includeObjectsCollectedByMajorGC': includeObjectsCollectedByMajorGC,
       if (includeObjectsCollectedByMinorGC != null)

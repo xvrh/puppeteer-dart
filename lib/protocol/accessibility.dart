@@ -435,7 +435,8 @@ class AXValue {
 /// - from 'live' to 'root': attributes which apply to nodes in live regions
 /// - from 'autocomplete' to 'valuetext': attributes which apply to widgets
 /// - from 'checked' to 'selected': states which apply to widgets
-/// - from 'activedescendant' to 'owns' - relationships between elements other than parent/child/sibling.
+/// - from 'activedescendant' to 'owns': relationships between elements other than parent/child/sibling
+/// - from 'activeFullscreenElement' to 'uninteresting': reasons why this noode is hidden
 enum AXPropertyName {
   actions('actions'),
   busy('busy'),
@@ -478,6 +479,23 @@ enum AXPropertyName {
   labelledby('labelledby'),
   owns('owns'),
   url('url'),
+  activeFullscreenElement('activeFullscreenElement'),
+  activeModalDialog('activeModalDialog'),
+  activeAriaModalDialog('activeAriaModalDialog'),
+  ariaHiddenElement('ariaHiddenElement'),
+  ariaHiddenSubtree('ariaHiddenSubtree'),
+  emptyAlt('emptyAlt'),
+  emptyText('emptyText'),
+  inertElement('inertElement'),
+  inertSubtree('inertSubtree'),
+  labelContainer('labelContainer'),
+  labelFor('labelFor'),
+  notRendered('notRendered'),
+  notVisible('notVisible'),
+  presentationalRole('presentationalRole'),
+  probablyPresentational('probablyPresentational'),
+  inactiveCarouselTabContent('inactiveCarouselTabContent'),
+  uninteresting('uninteresting'),
   uninteresting('uninteresting'),
   ariaHiddenElement('ariaHiddenElement'),
   ariaHiddenSubtree('ariaHiddenSubtree'),
