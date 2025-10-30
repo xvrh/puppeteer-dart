@@ -151,11 +151,22 @@ class StorageApi {
       );
 
   /// Returns a storage key given a frame id.
+  /// Deprecated. Please use Storage.getStorageKey instead.
+  @Deprecated('use Storage.getStorageKey instead')
   Future<SerializedStorageKey> getStorageKeyForFrame(
     page.FrameId frameId,
   ) async {
     var result = await _client.send('Storage.getStorageKeyForFrame', {
       'frameId': frameId,
+    });
+    return SerializedStorageKey.fromJson(result['storageKey'] as String);
+  }
+
+  /// Returns storage key for the given frame. If no frame ID is provided,
+  /// the storage key of the target executing this command is returned.
+  Future<SerializedStorageKey> getStorageKey({page.FrameId? frameId}) async {
+    var result = await _client.send('Storage.getStorageKey', {
+      if (frameId != null) 'frameId': frameId,
     });
     return SerializedStorageKey.fromJson(result['storageKey'] as String);
   }

@@ -1099,7 +1099,8 @@ enum RemoteObjectSubtype {
   arraybuffer('arraybuffer'),
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
-  wasmvalue('wasmvalue');
+  wasmvalue('wasmvalue'),
+  trustedtype('trustedtype');
 
   final String value;
 
@@ -1247,7 +1248,8 @@ enum ObjectPreviewSubtype {
   arraybuffer('arraybuffer'),
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
-  wasmvalue('wasmvalue');
+  wasmvalue('wasmvalue'),
+  trustedtype('trustedtype');
 
   final String value;
 
@@ -1354,7 +1356,8 @@ enum PropertyPreviewSubtype {
   arraybuffer('arraybuffer'),
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
-  wasmvalue('wasmvalue');
+  wasmvalue('wasmvalue'),
+  trustedtype('trustedtype');
 
   final String value;
 

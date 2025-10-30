@@ -207,7 +207,7 @@
                 },
                 {
                     "id": "AXPropertyName",
-                    "description": "Values of AXProperty name:\n- from 'busy' to 'roledescription': states which apply to every AX node\n- from 'live' to 'root': attributes which apply to nodes in live regions\n- from 'autocomplete' to 'valuetext': attributes which apply to widgets\n- from 'checked' to 'selected': states which apply to widgets\n- from 'activedescendant' to 'owns' - relationships between elements other than parent/child/sibling.",
+                    "description": "Values of AXProperty name:\n- from 'busy' to 'roledescription': states which apply to every AX node\n- from 'live' to 'root': attributes which apply to nodes in live regions\n- from 'autocomplete' to 'valuetext': attributes which apply to widgets\n- from 'checked' to 'selected': states which apply to widgets\n- from 'activedescendant' to 'owns': relationships between elements other than parent/child/sibling\n- from 'activeFullscreenElement' to 'uninteresting': reasons why this noode is hidden",
                     "type": "string",
                     "enum": [
                         "actions",
@@ -250,7 +250,24 @@
                         "flowto",
                         "labelledby",
                         "owns",
-                        "url"
+                        "url",
+                        "activeFullscreenElement",
+                        "activeModalDialog",
+                        "activeAriaModalDialog",
+                        "ariaHiddenElement",
+                        "ariaHiddenSubtree",
+                        "emptyAlt",
+                        "emptyText",
+                        "inertElement",
+                        "inertSubtree",
+                        "labelContainer",
+                        "labelFor",
+                        "notRendered",
+                        "notVisible",
+                        "presentationalRole",
+                        "probablyPresentational",
+                        "inactiveCarouselTabContent",
+                        "uninteresting"
                     ]
                 },
                 {
@@ -1546,8 +1563,10 @@
                         "WriteErrorInsufficientResources",
                         "WriteErrorInvalidMatchField",
                         "WriteErrorInvalidStructuredHeader",
+                        "WriteErrorInvalidTTLField",
                         "WriteErrorNavigationRequest",
                         "WriteErrorNoMatchField",
+                        "WriteErrorNonIntegerTTLField",
                         "WriteErrorNonListMatchDestField",
                         "WriteErrorNonSecureContext",
                         "WriteErrorNonStringIdField",
@@ -2454,7 +2473,7 @@
                     "properties": [
                         {
                             "name": "name",
-                            "description": "address field name, for example GIVEN_NAME.",
+                            "description": "address field name, for example GIVEN_NAME.\nThe full list of supported field names:\nhttps://source.chromium.org/chromium/chromium/src/+/main:components/autofill/core/browser/field_types.cc;l=38",
                             "type": "string"
                         },
                         {
@@ -2602,8 +2621,15 @@
                         },
                         {
                             "name": "card",
-                            "description": "Credit card information to fill out the form. Credit card data is not saved.",
+                            "description": "Credit card information to fill out the form. Credit card data is not saved.  Mutually exclusive with `address`.",
+                            "optional": true,
                             "$ref": "CreditCard"
+                        },
+                        {
+                            "name": "address",
+                            "description": "Address to fill out the form. Address data is not saved. Mutually exclusive with `card`.",
+                            "optional": true,
+                            "$ref": "Address"
                         }
                     ]
                 },
@@ -4314,6 +4340,13 @@
                             "name": "style",
                             "description": "Associated style declaration.",
                             "$ref": "CSSStyle"
+                        },
+                        {
+                            "name": "originTreeScopeNodeId",
+                            "description": "The BackendNodeId of the DOM node that constitutes the origin tree scope of this rule.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
                         },
                         {
                             "name": "media",
@@ -6997,6 +7030,12 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "affectedByStartingStyles",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -8526,6 +8565,23 @@
                         {
                             "name": "isScrollable",
                             "description": "If the node is scrollable.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "affectedByStartingStylesFlagUpdated",
+                    "description": "Fired when a node's starting styles changes.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "The id of the node.",
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "affectedByStartingStyles",
+                            "description": "If the node has starting styles.",
                             "type": "boolean"
                         }
                     ]
@@ -12811,7 +12867,8 @@
                         },
                         {
                             "name": "indexName",
-                            "description": "Index name, empty string for object store data requests.",
+                            "description": "Index name. If not specified, it performs an object store data request.",
+                            "optional": true,
                             "type": "string"
                         },
                         {
@@ -15163,6 +15220,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "isAdRelated",
+                            "description": "True when the resource request is ad-related.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -15879,7 +15943,7 @@
                         },
                         {
                             "name": "expires",
-                            "description": "Cookie expiration date as the number of seconds since the UNIX epoch.",
+                            "description": "Cookie expiration date as the number of seconds since the UNIX epoch.\nThe value is set to -1 if the expiry date is not set.\nThe value can be null for values that cannot be represented in\nJSON (\u00b1Inf).",
                             "type": "number"
                         },
                         {
@@ -16481,6 +16545,57 @@
                     ]
                 },
                 {
+                    "id": "NetworkConditions",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "urlPattern",
+                            "description": "Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string\nsyntax (https://urlpattern.spec.whatwg.org/). If the pattern is empty, all requests are matched (including p2p\nconnections).",
+                            "type": "string"
+                        },
+                        {
+                            "name": "latency",
+                            "description": "Minimum latency from request sent to response headers received (ms).",
+                            "type": "number"
+                        },
+                        {
+                            "name": "downloadThroughput",
+                            "description": "Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "uploadThroughput",
+                            "description": "Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "connectionType",
+                            "description": "Connection type if known.",
+                            "optional": true,
+                            "$ref": "ConnectionType"
+                        },
+                        {
+                            "name": "packetLoss",
+                            "description": "WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "packetQueueLength",
+                            "description": "WebRTC packet queue length (packet). 0 removes any queue length limitations.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "packetReordering",
+                            "description": "WebRTC packetReordering feature.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "id": "DirectSocketDnsQueryType",
                     "experimental": true,
                     "type": "string",
@@ -16931,6 +17046,18 @@
                     ]
                 },
                 {
+                    "name": "setIPProtectionProxyBypassEnabled",
+                    "description": "Sets bypass IP Protection Proxy boolean.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "description": "Whether IP Proxy is being bypassed by devtools; false by default.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "name": "setAcceptedEncodings",
                     "description": "Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.",
                     "experimental": true,
@@ -17090,7 +17217,8 @@
                 },
                 {
                     "name": "emulateNetworkConditions",
-                    "description": "Activates emulation of network conditions.",
+                    "description": "Activates emulation of network conditions. This command is deprecated in favor of the emulateNetworkConditionsByRule\nand overrideNetworkState commands, which can be used together to the same effect.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "offline",
@@ -17138,6 +17266,69 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "emulateNetworkConditionsByRule",
+                    "description": "Activates emulation of network conditions for individual requests using URL match patterns.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "offline",
+                            "description": "True to emulate internet disconnection.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "matchedNetworkConditions",
+                            "description": "Configure conditions for matching requests. If multiple entries match a request, the first entry wins.  Global\nconditions can be configured by leaving the urlPattern for the conditions empty. These global conditions are\nalso applied for throttling of p2p connections.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "NetworkConditions"
+                            }
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "ruleIds",
+                            "description": "An id for each entry in matchedNetworkConditions. The id will be included in the requestWillBeSentExtraInfo for\nrequests affected by a rule.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "overrideNetworkState",
+                    "description": "Override the state of navigator.onLine and navigator.connection.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "offline",
+                            "description": "True to emulate internet disconnection.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "latency",
+                            "description": "Minimum latency from request sent to response headers received (ms).",
+                            "type": "number"
+                        },
+                        {
+                            "name": "downloadThroughput",
+                            "description": "Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "uploadThroughput",
+                            "description": "Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "connectionType",
+                            "description": "Connection type if known.",
+                            "optional": true,
+                            "$ref": "ConnectionType"
                         }
                     ]
                 },
@@ -18585,6 +18776,12 @@
                             "description": "Whether the site has partitioned cookies stored in a partition different than the current one.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "appliedNetworkConditionsId",
+                            "description": "The network conditions id if this request was affected by network conditions configured via\nemulateNetworkConditionsByRule.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -20067,7 +20264,7 @@
                 },
                 {
                     "name": "install",
-                    "description": "Installs the given manifest identity, optionally using the given installUrlOrBundleUrl\n\nIWA-specific install description:\nmanifestId corresponds to isolated-app:// + web_package::SignedWebBundleId\n\nFile installation mode:\nThe installUrlOrBundleUrl can be either file:// or http(s):// pointing\nto a signed web bundle (.swbn). In this case SignedWebBundleId must correspond to\nThe .swbn file's signing key.\n\nDev proxy installation mode:\ninstallUrlOrBundleUrl must be http(s):// that serves dev mode IWA.\nweb_package::SignedWebBundleId must be of type dev proxy.\n\nThe advantage of dev proxy mode is that all changes to IWA\nautomatically will be reflected in the running app without\nreinstallation.\n\nTo generate bundle id for proxy mode:\n1. Generate 32 random bytes.\n2. Add a specific suffix 0x00 at the end.\n3. Encode the entire sequence using Base32 without padding.\n\nIf Chrome is not in IWA dev\nmode, the installation will fail, regardless of the state of the allowlist.",
+                    "description": "Installs the given manifest identity, optionally using the given installUrlOrBundleUrl\n\nIWA-specific install description:\nmanifestId corresponds to isolated-app:// + web_package::SignedWebBundleId\n\nFile installation mode:\nThe installUrlOrBundleUrl can be either file:// or http(s):// pointing\nto a signed web bundle (.swbn). In this case SignedWebBundleId must correspond to\nThe .swbn file's signing key.\n\nDev proxy installation mode:\ninstallUrlOrBundleUrl must be http(s):// that serves dev mode IWA.\nweb_package::SignedWebBundleId must be of type dev proxy.\n\nThe advantage of dev proxy mode is that all changes to IWA\nautomatically will be reflected in the running app without\nreinstallation.\n\nTo generate bundle id for proxy mode:\n1. Generate 32 random bytes.\n2. Add a specific suffix at the end following the documentation\n   https://github.com/WICG/isolated-web-apps/blob/main/Scheme.md#suffix\n3. Encode the entire sequence using Base32 without padding.\n\nIf Chrome is not in IWA dev\nmode, the installation will fail, regardless of the state of the allowlist.",
                     "parameters": [
                         {
                             "name": "manifestId",
@@ -20355,6 +20552,7 @@
                         "digital-credentials-create",
                         "digital-credentials-get",
                         "direct-sockets",
+                        "direct-sockets-multicast",
                         "direct-sockets-private",
                         "display-capture",
                         "document-domain",
@@ -21705,8 +21903,10 @@
                         "WebXR",
                         "SharedWorker",
                         "SharedWorkerMessage",
+                        "SharedWorkerWithNoActiveClient",
                         "WebLocks",
                         "WebHID",
+                        "WebBluetooth",
                         "WebShare",
                         "RequestedStorageAccessGrant",
                         "WebNfc",
@@ -24001,6 +24201,12 @@
                             "deprecated": true,
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "tag",
+                            "description": "For more details, see:\nhttps://github.com/WICG/nav-speculation/blob/main/speculation-rules-tags.md",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -26183,10 +26389,29 @@
             "commands": [
                 {
                     "name": "getStorageKeyForFrame",
-                    "description": "Returns a storage key given a frame id.",
+                    "description": "Returns a storage key given a frame id.\nDeprecated. Please use Storage.getStorageKey instead.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "frameId",
+                            "$ref": "Page.FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "storageKey",
+                            "$ref": "SerializedStorageKey"
+                        }
+                    ]
+                },
+                {
+                    "name": "getStorageKey",
+                    "description": "Returns storage key for the given frame. If no frame ID is provided,\nthe storage key of the target executing this command is returned.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "optional": true,
                             "$ref": "Page.FrameId"
                         }
                     ],
@@ -31133,6 +31358,12 @@
                             "type": "number"
                         },
                         {
+                            "name": "stackDepth",
+                            "description": "Maximum stack depth. The default value is 128.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
                             "name": "includeObjectsCollectedByMajorGC",
                             "description": "By default, the sampling heap profiler reports only objects which are\nstill alive when the profile is returned via getSamplingProfile or\nstopSampling, which is useful for determining what functions contribute\nthe most to steady-state memory usage. This flag instructs the sampling\nheap profiler to also include information about objects discarded by\nmajor GC, which will show which functions cause large temporary memory\nusage or long GC pauses.",
                             "optional": true,
@@ -31794,7 +32025,8 @@
                                 "arraybuffer",
                                 "dataview",
                                 "webassemblymemory",
-                                "wasmvalue"
+                                "wasmvalue",
+                                "trustedtype"
                             ]
                         },
                         {
@@ -31912,7 +32144,8 @@
                                 "arraybuffer",
                                 "dataview",
                                 "webassemblymemory",
-                                "wasmvalue"
+                                "wasmvalue",
+                                "trustedtype"
                             ]
                         },
                         {
@@ -32007,7 +32240,8 @@
                                 "arraybuffer",
                                 "dataview",
                                 "webassemblymemory",
-                                "wasmvalue"
+                                "wasmvalue",
+                                "trustedtype"
                             ]
                         }
                     ]
