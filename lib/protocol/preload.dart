@@ -249,6 +249,10 @@ class RuleSet {
   /// `errorMessage` is null iff `errorType` is null.
   final RuleSetErrorType? errorType;
 
+  /// For more details, see:
+  /// https://github.com/WICG/nav-speculation/blob/main/speculation-rules-tags.md
+  final String? tag;
+
   RuleSet({
     required this.id,
     required this.loaderId,
@@ -257,6 +261,7 @@ class RuleSet {
     this.url,
     this.requestId,
     this.errorType,
+    this.tag,
   });
 
   factory RuleSet.fromJson(Map<String, dynamic> json) {
@@ -274,6 +279,7 @@ class RuleSet {
       errorType: json.containsKey('errorType')
           ? RuleSetErrorType.fromJson(json['errorType'] as String)
           : null,
+      tag: json.containsKey('tag') ? json['tag'] as String : null,
     );
   }
 
@@ -286,6 +292,7 @@ class RuleSet {
       if (url != null) 'url': url,
       if (requestId != null) 'requestId': requestId!.toJson(),
       if (errorType != null) 'errorType': errorType!.toJson(),
+      if (tag != null) 'tag': tag,
     };
   }
 }

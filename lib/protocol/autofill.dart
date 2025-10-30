@@ -18,16 +18,19 @@ class AutofillApi {
   /// If the field and related form cannot be autofilled, returns an error.
   /// [fieldId] Identifies a field that serves as an anchor for autofill.
   /// [frameId] Identifies the frame that field belongs to.
-  /// [card] Credit card information to fill out the form. Credit card data is not saved.
+  /// [card] Credit card information to fill out the form. Credit card data is not saved.  Mutually exclusive with `address`.
+  /// [address] Address to fill out the form. Address data is not saved. Mutually exclusive with `card`.
   Future<void> trigger(
-    dom.BackendNodeId fieldId,
-    CreditCard card, {
+    dom.BackendNodeId fieldId, {
     page.FrameId? frameId,
+    CreditCard? card,
+    Address? address,
   }) async {
     await _client.send('Autofill.trigger', {
       'fieldId': fieldId,
-      'card': card,
       if (frameId != null) 'frameId': frameId,
+      if (card != null) 'card': card,
+      if (address != null) 'address': address,
     });
   }
 
@@ -116,6 +119,8 @@ class CreditCard {
 
 class AddressField {
   /// address field name, for example GIVEN_NAME.
+  /// The full list of supported field names:
+  /// https://source.chromium.org/chromium/chromium/src/+/main:components/autofill/core/browser/field_types.cc;l=38
   final String name;
 
   /// address field value, for example Jon Doe.

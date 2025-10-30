@@ -360,6 +360,14 @@ class NetworkApi {
     return IpProxyStatus.fromJson(result['status'] as String);
   }
 
+  /// Sets bypass IP Protection Proxy boolean.
+  /// [enabled] Whether IP Proxy is being bypassed by devtools; false by default.
+  Future<void> setIPProtectionProxyBypassEnabled(bool enabled) async {
+    await _client.send('Network.setIPProtectionProxyBypassEnabled', {
+      'enabled': enabled,
+    });
+  }
+
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
   Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
@@ -480,7 +488,8 @@ class NetworkApi {
     await _client.send('Network.disable');
   }
 
-  /// Activates emulation of network conditions.
+  /// Activates emulation of network conditions. This command is deprecated in favor of the emulateNetworkConditionsByRule
+  /// and overrideNetworkState commands, which can be used together to the same effect.
   /// [offline] True to emulate internet disconnection.
   /// [latency] Minimum latency from request sent to response headers received (ms).
   /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
@@ -489,6 +498,7 @@ class NetworkApi {
   /// [packetLoss] WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets.
   /// [packetQueueLength] WebRTC packet queue length (packet). 0 removes any queue length limitations.
   /// [packetReordering] WebRTC packetReordering feature.
+  @Deprecated('This command is deprecated')
   Future<void> emulateNetworkConditions(
     bool offline,
     num latency,
@@ -508,6 +518,46 @@ class NetworkApi {
       if (packetLoss != null) 'packetLoss': packetLoss,
       if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
       if (packetReordering != null) 'packetReordering': packetReordering,
+    });
+  }
+
+  /// Activates emulation of network conditions for individual requests using URL match patterns.
+  /// [offline] True to emulate internet disconnection.
+  /// [matchedNetworkConditions] Configure conditions for matching requests. If multiple entries match a request, the first entry wins.  Global
+  /// conditions can be configured by leaving the urlPattern for the conditions empty. These global conditions are
+  /// also applied for throttling of p2p connections.
+  /// Returns: An id for each entry in matchedNetworkConditions. The id will be included in the requestWillBeSentExtraInfo for
+  /// requests affected by a rule.
+  Future<List<String>> emulateNetworkConditionsByRule(
+    bool offline,
+    List<NetworkConditions> matchedNetworkConditions,
+  ) async {
+    var result = await _client.send('Network.emulateNetworkConditionsByRule', {
+      'offline': offline,
+      'matchedNetworkConditions': [...matchedNetworkConditions],
+    });
+    return (result['ruleIds'] as List).map((e) => e as String).toList();
+  }
+
+  /// Override the state of navigator.onLine and navigator.connection.
+  /// [offline] True to emulate internet disconnection.
+  /// [latency] Minimum latency from request sent to response headers received (ms).
+  /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
+  /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
+  /// [connectionType] Connection type if known.
+  Future<void> overrideNetworkState(
+    bool offline,
+    num latency,
+    num downloadThroughput,
+    num uploadThroughput, {
+    ConnectionType? connectionType,
+  }) async {
+    await _client.send('Network.overrideNetworkState', {
+      'offline': offline,
+      'latency': latency,
+      'downloadThroughput': downloadThroughput,
+      'uploadThroughput': uploadThroughput,
+      if (connectionType != null) 'connectionType': connectionType,
     });
   }
 
@@ -1857,6 +1907,10 @@ class RequestWillBeSentExtraInfoEvent {
   /// Whether the site has partitioned cookies stored in a partition different than the current one.
   final bool? siteHasCookieInOtherPartition;
 
+  /// The network conditions id if this request was affected by network conditions configured via
+  /// emulateNetworkConditionsByRule.
+  final String? appliedNetworkConditionsId;
+
   RequestWillBeSentExtraInfoEvent({
     required this.requestId,
     required this.associatedCookies,
@@ -1864,6 +1918,7 @@ class RequestWillBeSentExtraInfoEvent {
     required this.connectTiming,
     this.clientSecurityState,
     this.siteHasCookieInOtherPartition,
+    this.appliedNetworkConditionsId,
   });
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
@@ -1884,6 +1939,9 @@ class RequestWillBeSentExtraInfoEvent {
       siteHasCookieInOtherPartition:
           json.containsKey('siteHasCookieInOtherPartition')
           ? json['siteHasCookieInOtherPartition'] as bool
+          : null,
+      appliedNetworkConditionsId: json.containsKey('appliedNetworkConditionsId')
+          ? json['appliedNetworkConditionsId'] as String
           : null,
     );
   }
@@ -2646,6 +2704,9 @@ class RequestData {
   /// request corresponding to the main frame.
   final bool? isSameSite;
 
+  /// True when the resource request is ad-related.
+  final bool? isAdRelated;
+
   RequestData({
     required this.url,
     this.urlFragment,
@@ -2659,6 +2720,7 @@ class RequestData {
     this.isLinkPreload,
     this.trustTokenParams,
     this.isSameSite,
+    this.isAdRelated,
   });
 
   factory RequestData.fromJson(Map<String, dynamic> json) {
@@ -2699,6 +2761,9 @@ class RequestData {
       isSameSite: json.containsKey('isSameSite')
           ? json['isSameSite'] as bool
           : null,
+      isAdRelated: json.containsKey('isAdRelated')
+          ? json['isAdRelated'] as bool
+          : null,
     );
   }
 
@@ -2719,6 +2784,7 @@ class RequestData {
       if (trustTokenParams != null)
         'trustTokenParams': trustTokenParams!.toJson(),
       if (isSameSite != null) 'isSameSite': isSameSite,
+      if (isAdRelated != null) 'isAdRelated': isAdRelated,
     };
   }
 }
@@ -3795,6 +3861,9 @@ class Cookie {
   final String path;
 
   /// Cookie expiration date as the number of seconds since the UNIX epoch.
+  /// The value is set to -1 if the expiry date is not set.
+  /// The value can be null for values that cannot be represented in
+  /// JSON (±Inf).
   final num expires;
 
   /// Cookie size.
@@ -4683,6 +4752,79 @@ enum ContentEncoding {
 
   @override
   String toString() => value.toString();
+}
+
+class NetworkConditions {
+  /// Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string
+  /// syntax (https://urlpattern.spec.whatwg.org/). If the pattern is empty, all requests are matched (including p2p
+  /// connections).
+  final String urlPattern;
+
+  /// Minimum latency from request sent to response headers received (ms).
+  final num latency;
+
+  /// Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
+  final num downloadThroughput;
+
+  /// Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
+  final num uploadThroughput;
+
+  /// Connection type if known.
+  final ConnectionType? connectionType;
+
+  /// WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets.
+  final num? packetLoss;
+
+  /// WebRTC packet queue length (packet). 0 removes any queue length limitations.
+  final int? packetQueueLength;
+
+  /// WebRTC packetReordering feature.
+  final bool? packetReordering;
+
+  NetworkConditions({
+    required this.urlPattern,
+    required this.latency,
+    required this.downloadThroughput,
+    required this.uploadThroughput,
+    this.connectionType,
+    this.packetLoss,
+    this.packetQueueLength,
+    this.packetReordering,
+  });
+
+  factory NetworkConditions.fromJson(Map<String, dynamic> json) {
+    return NetworkConditions(
+      urlPattern: json['urlPattern'] as String,
+      latency: json['latency'] as num,
+      downloadThroughput: json['downloadThroughput'] as num,
+      uploadThroughput: json['uploadThroughput'] as num,
+      connectionType: json.containsKey('connectionType')
+          ? ConnectionType.fromJson(json['connectionType'] as String)
+          : null,
+      packetLoss: json.containsKey('packetLoss')
+          ? json['packetLoss'] as num
+          : null,
+      packetQueueLength: json.containsKey('packetQueueLength')
+          ? json['packetQueueLength'] as int
+          : null,
+      packetReordering: json.containsKey('packetReordering')
+          ? json['packetReordering'] as bool
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'urlPattern': urlPattern,
+      'latency': latency,
+      'downloadThroughput': downloadThroughput,
+      'uploadThroughput': uploadThroughput,
+      if (connectionType != null) 'connectionType': connectionType!.toJson(),
+      if (packetLoss != null) 'packetLoss': packetLoss,
+      if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
+      if (packetReordering != null) 'packetReordering': packetReordering,
+    };
+  }
 }
 
 enum DirectSocketDnsQueryType {

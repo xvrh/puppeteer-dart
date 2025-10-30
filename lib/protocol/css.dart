@@ -1259,6 +1259,9 @@ class CSSRule {
   /// Associated style declaration.
   final CSSStyle style;
 
+  /// The BackendNodeId of the DOM node that constitutes the origin tree scope of this rule.
+  final dom.BackendNodeId? originTreeScopeNodeId;
+
   /// Media list array (for rules involving media queries). The array enumerates media queries
   /// starting with the innermost one, going outwards.
   final List<CSSMedia>? media;
@@ -1292,6 +1295,7 @@ class CSSRule {
     this.nestingSelectors,
     required this.origin,
     required this.style,
+    this.originTreeScopeNodeId,
     this.media,
     this.containerQueries,
     this.supports,
@@ -1314,6 +1318,9 @@ class CSSRule {
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+      originTreeScopeNodeId: json.containsKey('originTreeScopeNodeId')
+          ? dom.BackendNodeId.fromJson(json['originTreeScopeNodeId'] as int)
+          : null,
       media: json.containsKey('media')
           ? (json['media'] as List)
                 .map((e) => CSSMedia.fromJson(e as Map<String, dynamic>))
@@ -1363,6 +1370,8 @@ class CSSRule {
       'style': style.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (nestingSelectors != null) 'nestingSelectors': [...?nestingSelectors],
+      if (originTreeScopeNodeId != null)
+        'originTreeScopeNodeId': originTreeScopeNodeId!.toJson(),
       if (media != null) 'media': media!.map((e) => e.toJson()).toList(),
       if (containerQueries != null)
         'containerQueries': containerQueries!.map((e) => e.toJson()).toList(),

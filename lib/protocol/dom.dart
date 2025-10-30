@@ -83,6 +83,15 @@ class DOMApi {
       .where((event) => event.name == 'DOM.scrollableFlagUpdated')
       .map((event) => ScrollableFlagUpdatedEvent.fromJson(event.parameters));
 
+  /// Fired when a node's starting styles changes.
+  Stream<AffectedByStartingStylesFlagUpdatedEvent>
+  get onAffectedByStartingStylesFlagUpdated => _client.onEvent
+      .where((event) => event.name == 'DOM.affectedByStartingStylesFlagUpdated')
+      .map(
+        (event) =>
+            AffectedByStartingStylesFlagUpdatedEvent.fromJson(event.parameters),
+      );
+
   /// Called when a pseudo element is removed from an element.
   Stream<PseudoElementRemovedEvent> get onPseudoElementRemoved => _client
       .onEvent
@@ -1010,6 +1019,29 @@ class ScrollableFlagUpdatedEvent {
   }
 }
 
+class AffectedByStartingStylesFlagUpdatedEvent {
+  /// The id of the node.
+  final dom.NodeId nodeId;
+
+  /// If the node has starting styles.
+  final bool affectedByStartingStyles;
+
+  AffectedByStartingStylesFlagUpdatedEvent({
+    required this.nodeId,
+    required this.affectedByStartingStyles,
+  });
+
+  factory AffectedByStartingStylesFlagUpdatedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return AffectedByStartingStylesFlagUpdatedEvent(
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+      affectedByStartingStyles:
+          json['affectedByStartingStyles'] as bool? ?? false,
+    );
+  }
+}
+
 class PseudoElementRemovedEvent {
   /// Pseudo element's parent element id.
   final NodeId parentId;
@@ -1439,6 +1471,8 @@ class Node {
 
   final bool? isScrollable;
 
+  final bool? affectedByStartingStyles;
+
   Node({
     required this.nodeId,
     this.parentId,
@@ -1471,6 +1505,7 @@ class Node {
     this.compatibilityMode,
     this.assignedSlot,
     this.isScrollable,
+    this.affectedByStartingStyles,
   });
 
   factory Node.fromJson(Map<String, dynamic> json) {
@@ -1556,6 +1591,9 @@ class Node {
       isScrollable: json.containsKey('isScrollable')
           ? json['isScrollable'] as bool
           : null,
+      affectedByStartingStyles: json.containsKey('affectedByStartingStyles')
+          ? json['affectedByStartingStyles'] as bool
+          : null,
     );
   }
 
@@ -1597,6 +1635,8 @@ class Node {
         'compatibilityMode': compatibilityMode!.toJson(),
       if (assignedSlot != null) 'assignedSlot': assignedSlot!.toJson(),
       if (isScrollable != null) 'isScrollable': isScrollable,
+      if (affectedByStartingStyles != null)
+        'affectedByStartingStyles': affectedByStartingStyles,
     };
   }
 }
