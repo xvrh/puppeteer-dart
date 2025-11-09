@@ -8,7 +8,7 @@ This is a port of the [Puppeteer Node.JS library](https://pptr.dev/) in the [Dar
 [![Build Status](https://github.com/xvrh/puppeteer-dart/workflows/Build/badge.svg?branch=master)](https://github.com/xvrh/puppeteer-dart)
 [![codecov](https://codecov.io/gh/xvrh/puppeteer-dart/graph/badge.svg?token=jC9QyD7GaJ)](https://codecov.io/gh/xvrh/puppeteer-dart)
 
-<a href="https://www.buymeacoffee.com/xvrh" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217"></a>
+<a href="https://buymeacoffee.com/xvrh" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217"></a>
 
 ###### What can I do?
 

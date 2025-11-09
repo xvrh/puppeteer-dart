@@ -495,15 +495,7 @@ enum AXPropertyName {
   presentationalRole('presentationalRole'),
   probablyPresentational('probablyPresentational'),
   inactiveCarouselTabContent('inactiveCarouselTabContent'),
-  uninteresting('uninteresting'),
-  uninteresting('uninteresting'),
-  ariaHiddenElement('ariaHiddenElement'),
-  ariaHiddenSubtree('ariaHiddenSubtree'),
-  notRendered('notRendered'),
-  notVisible('notVisible'),
-  labelFor('labelFor'),
-  presentationalRole('presentationalRole'),
-  emptyAlt('emptyAlt');
+  uninteresting('uninteresting');
 
   final String value;
 

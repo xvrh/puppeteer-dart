@@ -40,8 +40,6 @@ void main() {
       .expand((f) => f.domains)
       .toList();
 
-  _applyTemporaryFixes(domains);
-
   for (var domain in domains) {
     var types = domain.types;
     var commandsJson = domain.commands;
@@ -841,26 +839,4 @@ String? deprecatedDocumentation(String? description) {
     return split[1].trim();
   }
   return null;
-}
-
-void _applyTemporaryFixes(List<Domain> domains) {
-  var accessibilityDomain = domains.firstWhere(
-    (e) => e.name == 'Accessibility',
-  );
-  var axPropertyName = accessibilityDomain.types.firstWhere(
-    (e) => e.id == 'AXPropertyName',
-  );
-  var axPropertyNameEnums = axPropertyName.enums!;
-  var newAxPropertyNames = const [
-    'uninteresting',
-    'ariaHiddenElement',
-    'ariaHiddenSubtree',
-    'notRendered',
-    'notVisible',
-    'labelFor',
-    'presentationalRole',
-    'emptyAlt',
-  ];
-  assert(!newAxPropertyNames.any((e) => axPropertyNameEnums.contains(e)));
-  axPropertyNameEnums.addAll(newAxPropertyNames);
 }
