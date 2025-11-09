@@ -89,7 +89,14 @@ class NetworkManager {
   Future<void> setOfflineMode(bool value) async {
     if (_offline == value) return;
     _offline = value;
-    await _network.emulateNetworkConditions(_offline, 0, -1, -1);
+    await _network.emulateNetworkConditionsByRule(_offline, [
+      NetworkConditions(
+        urlPattern: '',
+        latency: 0,
+        downloadThroughput: -1,
+        uploadThroughput: -1,
+      ),
+    ]);
   }
 
   Future<void> setUserAgent(String userAgent) {

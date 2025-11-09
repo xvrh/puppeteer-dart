@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:puppeteer/protocol/network.dart' show NetworkConditions;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
@@ -127,12 +128,14 @@ void main() {
       final startingContext = browser.browserContexts.length;
       var context = await browser.createIncognitoBrowserContext();
       var page = await context.newPage();
-      await page.devTools.network.emulateNetworkConditions(
-        false,
-        1000,
-        1000000,
-        1000000,
-      );
+      await page.devTools.network.emulateNetworkConditionsByRule(false, [
+        NetworkConditions(
+          urlPattern: '',
+          latency: 1000,
+          downloadThroughput: 1000000,
+          uploadThroughput: 1000000,
+        ),
+      ]);
       await page.goto('https://www.naver.com');
       await page.goto('https://www.naver.com');
       await context.close();
