@@ -19,33 +19,35 @@ class BrowserApi {
       .where((event) => event.name == 'Browser.downloadProgress')
       .map((event) => DownloadProgressEvent.fromJson(event.parameters));
 
-  /// Set permission settings for given requesting and embedding origins.
+  /// Set permission settings for given embedding and embedded origins.
   /// [permission] Descriptor of permission to override.
   /// [setting] Setting of the permission.
-  /// [origin] Requesting origin the permission applies to, all origins if not specified.
-  /// [embeddingOrigin] Embedding origin the permission applies to. It is ignored unless the requesting origin is
-  /// present and valid. If the requesting origin is provided but the embedding origin isn't, the
-  /// requesting origin is used as the embedding origin.
+  /// [origin] Embedding origin the permission applies to, all origins if not specified.
+  /// [embeddedOrigin] Embedded origin the permission applies to. It is ignored unless the embedding origin is
+  /// present and valid. If the embedding origin is provided but the embedded origin isn't, the
+  /// embedding origin is used as the embedded origin.
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
     PermissionDescriptor permission,
     PermissionSetting setting, {
     String? origin,
-    String? embeddingOrigin,
+    String? embeddedOrigin,
     BrowserContextID? browserContextId,
   }) async {
     await _client.send('Browser.setPermission', {
       'permission': permission,
       'setting': setting,
       if (origin != null) 'origin': origin,
-      if (embeddingOrigin != null) 'embeddingOrigin': embeddingOrigin,
+      if (embeddedOrigin != null) 'embeddedOrigin': embeddedOrigin,
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 
-  /// Grant specific permissions to the given origin and reject all others.
+  /// Grant specific permissions to the given origin and reject all others. Deprecated. Use
+  /// setPermission instead.
   /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
+  @Deprecated('This command is deprecated')
   Future<void> grantPermissions(
     List<PermissionType> permissions, {
     String? origin,

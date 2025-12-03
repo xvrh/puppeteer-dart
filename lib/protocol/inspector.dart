@@ -20,6 +20,11 @@ class InspectorApi {
     (event) => event.name == 'Inspector.targetReloadedAfterCrash',
   );
 
+  /// Fired on worker targets when main worker script and any imported scripts have been evaluated.
+  Stream<void> get onWorkerScriptLoaded => _client.onEvent.where(
+    (event) => event.name == 'Inspector.workerScriptLoaded',
+  );
+
   /// Disables inspector domain notifications.
   Future<void> disable() async {
     await _client.send('Inspector.disable');
