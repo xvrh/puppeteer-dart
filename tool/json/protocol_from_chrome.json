@@ -3532,7 +3532,7 @@
             "commands": [
                 {
                     "name": "setPermission",
-                    "description": "Set permission settings for given requesting and embedding origins.",
+                    "description": "Set permission settings for given embedding and embedded origins.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -3547,13 +3547,13 @@
                         },
                         {
                             "name": "origin",
-                            "description": "Requesting origin the permission applies to, all origins if not specified.",
+                            "description": "Embedding origin the permission applies to, all origins if not specified.",
                             "optional": true,
                             "type": "string"
                         },
                         {
-                            "name": "embeddingOrigin",
-                            "description": "Embedding origin the permission applies to. It is ignored unless the requesting origin is\npresent and valid. If the requesting origin is provided but the embedding origin isn't, the\nrequesting origin is used as the embedding origin.",
+                            "name": "embeddedOrigin",
+                            "description": "Embedded origin the permission applies to. It is ignored unless the embedding origin is\npresent and valid. If the embedding origin is provided but the embedded origin isn't, the\nembedding origin is used as the embedded origin.",
                             "optional": true,
                             "type": "string"
                         },
@@ -3567,8 +3567,9 @@
                 },
                 {
                     "name": "grantPermissions",
-                    "description": "Grant specific permissions to the given origin and reject all others.",
+                    "description": "Grant specific permissions to the given origin and reject all others. Deprecated. Use\nsetPermission instead.",
                     "experimental": true,
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "permissions",
@@ -13803,6 +13804,11 @@
                 {
                     "name": "targetReloadedAfterCrash",
                     "description": "Fired when debugging target has reloaded after crash"
+                },
+                {
+                    "name": "workerScriptLoaded",
+                    "description": "Fired on worker targets when main worker script and any imported scripts have been evaluated.",
+                    "experimental": true
                 }
             ]
         },
@@ -15863,6 +15869,7 @@
                                 "preload",
                                 "SignedExchange",
                                 "preflight",
+                                "FedCM",
                                 "other"
                             ]
                         },
@@ -16551,7 +16558,7 @@
                     "properties": [
                         {
                             "name": "urlPattern",
-                            "description": "Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string\nsyntax (https://urlpattern.spec.whatwg.org/). If the pattern is empty, all requests are matched (including p2p\nconnections).",
+                            "description": "Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string\nsyntax (https://urlpattern.spec.whatwg.org/) and must be absolute. If the pattern is empty, all requests are\nmatched (including p2p connections).",
                             "type": "string"
                         },
                         {
@@ -16591,6 +16598,23 @@
                             "name": "packetReordering",
                             "description": "WebRTC packetReordering feature.",
                             "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "id": "BlockPattern",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "urlPattern",
+                            "description": "URL pattern to match. Patterns use the URLPattern constructor string syntax\n(https://urlpattern.spec.whatwg.org/) and must be absolute. Example: `*://*:*/*.css`.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "block",
+                            "description": "Whether or not to block the pattern. If false, a matching request will not be blocked even if it matches a later\n`BlockPattern`.",
                             "type": "boolean"
                         }
                     ]
@@ -17271,7 +17295,7 @@
                 },
                 {
                     "name": "emulateNetworkConditionsByRule",
-                    "description": "Activates emulation of network conditions for individual requests using URL match patterns.",
+                    "description": "Activates emulation of network conditions for individual requests using URL match patterns. Unlike the deprecated\nNetwork.emulateNetworkConditions this method does not affect `navigator` state. Use Network.overrideNetworkState to\nexplicitly modify `navigator` behavior.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -17572,8 +17596,19 @@
                     "experimental": true,
                     "parameters": [
                         {
+                            "name": "urlPatterns",
+                            "description": "Patterns to match in the order in which they are given. These patterns\nalso take precedence over any wildcard patterns defined in `urls`.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "BlockPattern"
+                            }
+                        },
+                        {
                             "name": "urls",
                             "description": "URL patterns to block. Wildcards ('*') are allowed.",
+                            "deprecated": true,
+                            "optional": true,
                             "type": "array",
                             "items": {
                                 "type": "string"
@@ -18922,94 +18957,6 @@
                     "name": "policyUpdated",
                     "description": "Fired once security policy has been updated.",
                     "experimental": true
-                },
-                {
-                    "name": "subresourceWebBundleMetadataReceived",
-                    "description": "Fired once when parsing the .wbn file has succeeded.\nThe event contains the information about the web bundle contents.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "requestId",
-                            "description": "Request identifier. Used to match this information to another event.",
-                            "$ref": "RequestId"
-                        },
-                        {
-                            "name": "urls",
-                            "description": "A list of URLs of resources in the subresource Web Bundle.",
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "subresourceWebBundleMetadataError",
-                    "description": "Fired once when parsing the .wbn file has failed.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "requestId",
-                            "description": "Request identifier. Used to match this information to another event.",
-                            "$ref": "RequestId"
-                        },
-                        {
-                            "name": "errorMessage",
-                            "description": "Error message",
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "name": "subresourceWebBundleInnerResponseParsed",
-                    "description": "Fired when handling requests for resources within a .wbn file.\nNote: this will only be fired for resources that are requested by the webpage.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "innerRequestId",
-                            "description": "Request identifier of the subresource request",
-                            "$ref": "RequestId"
-                        },
-                        {
-                            "name": "innerRequestURL",
-                            "description": "URL of the subresource resource.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "bundleRequestId",
-                            "description": "Bundle request identifier. Used to match this information to another event.\nThis made be absent in case when the instrumentation was enabled only\nafter webbundle was parsed.",
-                            "optional": true,
-                            "$ref": "RequestId"
-                        }
-                    ]
-                },
-                {
-                    "name": "subresourceWebBundleInnerResponseError",
-                    "description": "Fired when request for resources within a .wbn file failed.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "innerRequestId",
-                            "description": "Request identifier of the subresource request",
-                            "$ref": "RequestId"
-                        },
-                        {
-                            "name": "innerRequestURL",
-                            "description": "URL of the subresource resource.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "errorMessage",
-                            "description": "Error message",
-                            "type": "string"
-                        },
-                        {
-                            "name": "bundleRequestId",
-                            "description": "Bundle request identifier. Used to match this information to another event.\nThis made be absent in case when the instrumentation was enabled only\nafter webbundle was parsed.",
-                            "optional": true,
-                            "$ref": "RequestId"
-                        }
-                    ]
                 },
                 {
                     "name": "reportingApiReportAdded",
@@ -24225,7 +24172,8 @@
                     "type": "string",
                     "enum": [
                         "Prefetch",
-                        "Prerender"
+                        "Prerender",
+                        "PrerenderUntilScript"
                     ]
                 },
                 {

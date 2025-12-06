@@ -320,7 +320,8 @@ enum RuleSetErrorType {
 /// isn't being used by clients).
 enum SpeculationAction {
   prefetch('Prefetch'),
-  prerender('Prerender');
+  prerender('Prerender'),
+  prerenderUntilScript('PrerenderUntilScript');
 
   final String value;
 

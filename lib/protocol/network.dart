@@ -271,57 +271,6 @@ class NetworkApi {
   Stream<void> get onPolicyUpdated =>
       _client.onEvent.where((event) => event.name == 'Network.policyUpdated');
 
-  /// Fired once when parsing the .wbn file has succeeded.
-  /// The event contains the information about the web bundle contents.
-  Stream<SubresourceWebBundleMetadataReceivedEvent>
-  get onSubresourceWebBundleMetadataReceived => _client.onEvent
-      .where(
-        (event) => event.name == 'Network.subresourceWebBundleMetadataReceived',
-      )
-      .map(
-        (event) => SubresourceWebBundleMetadataReceivedEvent.fromJson(
-          event.parameters,
-        ),
-      );
-
-  /// Fired once when parsing the .wbn file has failed.
-  Stream<SubresourceWebBundleMetadataErrorEvent>
-  get onSubresourceWebBundleMetadataError => _client.onEvent
-      .where(
-        (event) => event.name == 'Network.subresourceWebBundleMetadataError',
-      )
-      .map(
-        (event) =>
-            SubresourceWebBundleMetadataErrorEvent.fromJson(event.parameters),
-      );
-
-  /// Fired when handling requests for resources within a .wbn file.
-  /// Note: this will only be fired for resources that are requested by the webpage.
-  Stream<SubresourceWebBundleInnerResponseParsedEvent>
-  get onSubresourceWebBundleInnerResponseParsed => _client.onEvent
-      .where(
-        (event) =>
-            event.name == 'Network.subresourceWebBundleInnerResponseParsed',
-      )
-      .map(
-        (event) => SubresourceWebBundleInnerResponseParsedEvent.fromJson(
-          event.parameters,
-        ),
-      );
-
-  /// Fired when request for resources within a .wbn file failed.
-  Stream<SubresourceWebBundleInnerResponseErrorEvent>
-  get onSubresourceWebBundleInnerResponseError => _client.onEvent
-      .where(
-        (event) =>
-            event.name == 'Network.subresourceWebBundleInnerResponseError',
-      )
-      .map(
-        (event) => SubresourceWebBundleInnerResponseErrorEvent.fromJson(
-          event.parameters,
-        ),
-      );
-
   /// Is sent whenever a new report is added.
   /// And after 'enableReportingApi' for all existing reports.
   Stream<ReportingApiReport> get onReportingApiReportAdded => _client.onEvent
@@ -521,7 +470,9 @@ class NetworkApi {
     });
   }
 
-  /// Activates emulation of network conditions for individual requests using URL match patterns.
+  /// Activates emulation of network conditions for individual requests using URL match patterns. Unlike the deprecated
+  /// Network.emulateNetworkConditions this method does not affect `navigator` state. Use Network.overrideNetworkState to
+  /// explicitly modify `navigator` behavior.
   /// [offline] True to emulate internet disconnection.
   /// [matchedNetworkConditions] Configure conditions for matching requests. If multiple entries match a request, the first entry wins.  Global
   /// conditions can be configured by leaving the urlPattern for the conditions empty. These global conditions are
@@ -700,10 +651,15 @@ class NetworkApi {
   }
 
   /// Blocks URLs from loading.
-  /// [urls] URL patterns to block. Wildcards ('*') are allowed.
-  Future<void> setBlockedURLs(List<String> urls) async {
+  /// [urlPatterns] Patterns to match in the order in which they are given. These patterns
+  /// also take precedence over any wildcard patterns defined in `urls`.
+  Future<void> setBlockedURLs({
+    List<BlockPattern>? urlPatterns,
+    @Deprecated('This parameter is deprecated') List<String>? urls,
+  }) async {
     await _client.send('Network.setBlockedURLs', {
-      'urls': [...urls],
+      if (urlPatterns != null) 'urlPatterns': [...urlPatterns],
+      if (urls != null) 'urls': [...urls],
     });
   }
 
@@ -2103,117 +2059,6 @@ class TrustTokenOperationDoneEvent {
           : null,
       issuedTokenCount: json.containsKey('issuedTokenCount')
           ? json['issuedTokenCount'] as int
-          : null,
-    );
-  }
-}
-
-class SubresourceWebBundleMetadataReceivedEvent {
-  /// Request identifier. Used to match this information to another event.
-  final RequestId requestId;
-
-  /// A list of URLs of resources in the subresource Web Bundle.
-  final List<String> urls;
-
-  SubresourceWebBundleMetadataReceivedEvent({
-    required this.requestId,
-    required this.urls,
-  });
-
-  factory SubresourceWebBundleMetadataReceivedEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return SubresourceWebBundleMetadataReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId'] as String),
-      urls: (json['urls'] as List).map((e) => e as String).toList(),
-    );
-  }
-}
-
-class SubresourceWebBundleMetadataErrorEvent {
-  /// Request identifier. Used to match this information to another event.
-  final RequestId requestId;
-
-  /// Error message
-  final String errorMessage;
-
-  SubresourceWebBundleMetadataErrorEvent({
-    required this.requestId,
-    required this.errorMessage,
-  });
-
-  factory SubresourceWebBundleMetadataErrorEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return SubresourceWebBundleMetadataErrorEvent(
-      requestId: RequestId.fromJson(json['requestId'] as String),
-      errorMessage: json['errorMessage'] as String,
-    );
-  }
-}
-
-class SubresourceWebBundleInnerResponseParsedEvent {
-  /// Request identifier of the subresource request
-  final RequestId innerRequestId;
-
-  /// URL of the subresource resource.
-  final String innerRequestURL;
-
-  /// Bundle request identifier. Used to match this information to another event.
-  /// This made be absent in case when the instrumentation was enabled only
-  /// after webbundle was parsed.
-  final RequestId? bundleRequestId;
-
-  SubresourceWebBundleInnerResponseParsedEvent({
-    required this.innerRequestId,
-    required this.innerRequestURL,
-    this.bundleRequestId,
-  });
-
-  factory SubresourceWebBundleInnerResponseParsedEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return SubresourceWebBundleInnerResponseParsedEvent(
-      innerRequestId: RequestId.fromJson(json['innerRequestId'] as String),
-      innerRequestURL: json['innerRequestURL'] as String,
-      bundleRequestId: json.containsKey('bundleRequestId')
-          ? RequestId.fromJson(json['bundleRequestId'] as String)
-          : null,
-    );
-  }
-}
-
-class SubresourceWebBundleInnerResponseErrorEvent {
-  /// Request identifier of the subresource request
-  final RequestId innerRequestId;
-
-  /// URL of the subresource resource.
-  final String innerRequestURL;
-
-  /// Error message
-  final String errorMessage;
-
-  /// Bundle request identifier. Used to match this information to another event.
-  /// This made be absent in case when the instrumentation was enabled only
-  /// after webbundle was parsed.
-  final RequestId? bundleRequestId;
-
-  SubresourceWebBundleInnerResponseErrorEvent({
-    required this.innerRequestId,
-    required this.innerRequestURL,
-    required this.errorMessage,
-    this.bundleRequestId,
-  });
-
-  factory SubresourceWebBundleInnerResponseErrorEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return SubresourceWebBundleInnerResponseErrorEvent(
-      innerRequestId: RequestId.fromJson(json['innerRequestId'] as String),
-      innerRequestURL: json['innerRequestURL'] as String,
-      errorMessage: json['errorMessage'] as String,
-      bundleRequestId: json.containsKey('bundleRequestId')
-          ? RequestId.fromJson(json['bundleRequestId'] as String)
           : null,
     );
   }
@@ -3801,6 +3646,7 @@ enum InitiatorType {
   preload('preload'),
   signedExchange('SignedExchange'),
   preflight('preflight'),
+  fedCm('FedCM'),
   other('other');
 
   final String value;
@@ -4756,8 +4602,8 @@ enum ContentEncoding {
 
 class NetworkConditions {
   /// Only matching requests will be affected by these conditions. Patterns use the URLPattern constructor string
-  /// syntax (https://urlpattern.spec.whatwg.org/). If the pattern is empty, all requests are matched (including p2p
-  /// connections).
+  /// syntax (https://urlpattern.spec.whatwg.org/) and must be absolute. If the pattern is empty, all requests are
+  /// matched (including p2p connections).
   final String urlPattern;
 
   /// Minimum latency from request sent to response headers received (ms).
@@ -4824,6 +4670,29 @@ class NetworkConditions {
       if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
       if (packetReordering != null) 'packetReordering': packetReordering,
     };
+  }
+}
+
+class BlockPattern {
+  /// URL pattern to match. Patterns use the URLPattern constructor string syntax
+  /// (https://urlpattern.spec.whatwg.org/) and must be absolute. Example: `*://*:*/*.css`.
+  final String urlPattern;
+
+  /// Whether or not to block the pattern. If false, a matching request will not be blocked even if it matches a later
+  /// `BlockPattern`.
+  final bool block;
+
+  BlockPattern({required this.urlPattern, required this.block});
+
+  factory BlockPattern.fromJson(Map<String, dynamic> json) {
+    return BlockPattern(
+      urlPattern: json['urlPattern'] as String,
+      block: json['block'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'urlPattern': urlPattern, 'block': block};
   }
 }
 
