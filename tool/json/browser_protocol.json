@@ -1755,7 +1755,10 @@
                         "FormLabelForMatchesNonExistingIdError",
                         "FormInputHasWrongButWellIntendedAutocompleteValueError",
                         "ResponseWasBlockedByORB",
-                        "NavigationEntryMarkedSkippable"
+                        "NavigationEntryMarkedSkippable",
+                        "AutofillAndManualTextPolicyControlledFeaturesInfo",
+                        "AutofillPolicyControlledFeatureInfo",
+                        "ManualTextPolicyControlledFeatureInfo"
                     ]
                 },
                 {
@@ -6893,8 +6896,7 @@
                         "details-content",
                         "picker",
                         "permission-icon",
-                        "overscroll-area-parent",
-                        "overscroll-client-area"
+                        "overscroll-area-parent"
                     ]
                 },
                 {
