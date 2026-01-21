@@ -39,19 +39,21 @@ class CSSApi {
       );
 
   /// Fired whenever a stylesheet is changed as a result of the client operation.
-  Stream<StyleSheetId> get onStyleSheetChanged => _client.onEvent
+  Stream<dom.StyleSheetId> get onStyleSheetChanged => _client.onEvent
       .where((event) => event.name == 'CSS.styleSheetChanged')
       .map(
-        (event) =>
-            StyleSheetId.fromJson(event.parameters['styleSheetId'] as String),
+        (event) => dom.StyleSheetId.fromJson(
+          event.parameters['styleSheetId'] as String,
+        ),
       );
 
   /// Fired whenever an active document stylesheet is removed.
-  Stream<StyleSheetId> get onStyleSheetRemoved => _client.onEvent
+  Stream<dom.StyleSheetId> get onStyleSheetRemoved => _client.onEvent
       .where((event) => event.name == 'CSS.styleSheetRemoved')
       .map(
-        (event) =>
-            StyleSheetId.fromJson(event.parameters['styleSheetId'] as String),
+        (event) => dom.StyleSheetId.fromJson(
+          event.parameters['styleSheetId'] as String,
+        ),
       );
 
   Stream<dom.NodeId> get onComputedStyleUpdated => _client.onEvent
@@ -68,7 +70,7 @@ class CSSApi {
   /// incorrect results if the declaration contains a var() for example.
   /// Returns: The newly created rule.
   Future<CSSRule> addRule(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     String ruleText,
     SourceRange location, {
     dom.NodeId? nodeForPropertySyntaxValidation,
@@ -85,7 +87,7 @@ class CSSApi {
 
   /// Returns all class names from specified stylesheet.
   /// Returns: Class name list.
-  Future<List<String>> collectClassNames(StyleSheetId styleSheetId) async {
+  Future<List<String>> collectClassNames(dom.StyleSheetId styleSheetId) async {
     var result = await _client.send('CSS.collectClassNames', {
       'styleSheetId': styleSheetId,
     });
@@ -99,7 +101,7 @@ class CSSApi {
   /// for the frame's document if it exists or creates a new stylesheet
   /// (default: false).
   /// Returns: Identifier of the created "via-inspector" stylesheet.
-  Future<StyleSheetId> createStyleSheet(
+  Future<dom.StyleSheetId> createStyleSheet(
     page.FrameId frameId, {
     bool? force,
   }) async {
@@ -107,7 +109,7 @@ class CSSApi {
       'frameId': frameId,
       if (force != null) 'force': force,
     });
-    return StyleSheetId.fromJson(result['styleSheetId'] as String);
+    return dom.StyleSheetId.fromJson(result['styleSheetId'] as String);
   }
 
   /// Disables the CSS agent for the given page.
@@ -272,7 +274,7 @@ class CSSApi {
 
   /// Returns the current textual content for a stylesheet.
   /// Returns: The stylesheet text.
-  Future<String> getStyleSheetText(StyleSheetId styleSheetId) async {
+  Future<String> getStyleSheetText(dom.StyleSheetId styleSheetId) async {
     var result = await _client.send('CSS.getStyleSheetText', {
       'styleSheetId': styleSheetId,
     });
@@ -291,7 +293,7 @@ class CSSApi {
   /// Given a CSS selector text and a style sheet ID, getLocationForSelector
   /// returns an array of locations of the CSS selector in the style sheet.
   Future<List<SourceRange>> getLocationForSelector(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     String selectorText,
   ) async {
     var result = await _client.send('CSS.getLocationForSelector', {
@@ -356,7 +358,7 @@ class CSSApi {
   /// Modifies the property rule property name.
   /// Returns: The resulting key text after modification.
   Future<Value> setPropertyRulePropertyName(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String propertyName,
   ) async {
@@ -371,7 +373,7 @@ class CSSApi {
   /// Modifies the keyframe rule key text.
   /// Returns: The resulting key text after modification.
   Future<Value> setKeyframeKey(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String keyText,
   ) async {
@@ -386,7 +388,7 @@ class CSSApi {
   /// Modifies the rule selector.
   /// Returns: The resulting CSS media rule after modification.
   Future<CSSMedia> setMediaText(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String text,
   ) async {
@@ -401,7 +403,7 @@ class CSSApi {
   /// Modifies the expression of a container query.
   /// Returns: The resulting CSS container query rule after modification.
   Future<CSSContainerQuery> setContainerQueryText(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String text,
   ) async {
@@ -418,7 +420,7 @@ class CSSApi {
   /// Modifies the expression of a supports at-rule.
   /// Returns: The resulting CSS Supports rule after modification.
   Future<CSSSupports> setSupportsText(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String text,
   ) async {
@@ -433,7 +435,7 @@ class CSSApi {
   /// Modifies the expression of a scope at-rule.
   /// Returns: The resulting CSS Scope rule after modification.
   Future<CSSScope> setScopeText(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String text,
   ) async {
@@ -448,7 +450,7 @@ class CSSApi {
   /// Modifies the rule selector.
   /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     SourceRange range,
     String selector,
   ) async {
@@ -465,7 +467,7 @@ class CSSApi {
   /// Sets the new stylesheet text.
   /// Returns: URL of source map associated with script (if any).
   Future<String> setStyleSheetText(
-    StyleSheetId styleSheetId,
+    dom.StyleSheetId styleSheetId,
     String text,
   ) async {
     var result = await _client.send('CSS.setStyleSheetText', {
@@ -683,8 +685,8 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS property registrations matching this node.
   final List<CSSPropertyRegistration>? cssPropertyRegistrations;
 
-  /// A font-palette-values rule matching this node.
-  final CSSFontPaletteValuesRule? cssFontPaletteValuesRule;
+  /// A list of simple @rules matching this node or its pseudo-elements.
+  final List<CSSAtRule>? cssAtRules;
 
   /// Id of the first parent element that does not have display: contents.
   final dom.NodeId? parentLayoutNodeId;
@@ -704,7 +706,7 @@ class GetMatchedStylesForNodeResult {
     this.activePositionFallbackIndex,
     this.cssPropertyRules,
     this.cssPropertyRegistrations,
-    this.cssFontPaletteValuesRule,
+    this.cssAtRules,
     this.parentLayoutNodeId,
     this.cssFunctionRules,
   });
@@ -779,10 +781,10 @@ class GetMatchedStylesForNodeResult {
                 )
                 .toList()
           : null,
-      cssFontPaletteValuesRule: json.containsKey('cssFontPaletteValuesRule')
-          ? CSSFontPaletteValuesRule.fromJson(
-              json['cssFontPaletteValuesRule'] as Map<String, dynamic>,
-            )
+      cssAtRules: json.containsKey('cssAtRules')
+          ? (json['cssAtRules'] as List)
+                .map((e) => CSSAtRule.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
       parentLayoutNodeId: json.containsKey('parentLayoutNodeId')
           ? dom.NodeId.fromJson(json['parentLayoutNodeId'] as int)
@@ -812,12 +814,6 @@ class TakeCoverageDeltaResult {
       timestamp: json['timestamp'] as num,
     );
   }
-}
-
-extension type StyleSheetId(String value) {
-  factory StyleSheetId.fromJson(String value) => StyleSheetId(value);
-
-  String toJson() => value;
 }
 
 /// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent
@@ -1105,7 +1101,7 @@ class SelectorList {
 /// CSS stylesheet metainformation.
 class CSSStyleSheetHeader {
   /// The stylesheet identifier.
-  final StyleSheetId styleSheetId;
+  final dom.StyleSheetId styleSheetId;
 
   /// Owner frame identifier.
   final page.FrameId frameId;
@@ -1188,7 +1184,7 @@ class CSSStyleSheetHeader {
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      styleSheetId: dom.StyleSheetId.fromJson(json['styleSheetId'] as String),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
       sourceURL: json['sourceURL'] as String,
       sourceMapURL: json.containsKey('sourceMapURL')
@@ -1245,7 +1241,7 @@ class CSSStyleSheetHeader {
 class CSSRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Rule selector data.
   final SelectorList selectorList;
@@ -1308,7 +1304,7 @@ class CSSRule {
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       selectorList: SelectorList.fromJson(
         json['selectorList'] as Map<String, dynamic>,
@@ -1415,7 +1411,7 @@ enum CSSRuleType {
 class RuleUsage {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId styleSheetId;
+  final dom.StyleSheetId styleSheetId;
 
   /// Offset of the start of the rule (including selector) from the beginning of the stylesheet.
   final num startOffset;
@@ -1435,7 +1431,7 @@ class RuleUsage {
 
   factory RuleUsage.fromJson(Map<String, dynamic> json) {
     return RuleUsage(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      styleSheetId: dom.StyleSheetId.fromJson(json['styleSheetId'] as String),
       startOffset: json['startOffset'] as num,
       endOffset: json['endOffset'] as num,
       used: json['used'] as bool? ?? false,
@@ -1567,7 +1563,7 @@ class ComputedStyleExtraFields {
 class CSSStyle {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// CSS properties in the style.
   final List<CSSProperty> cssProperties;
@@ -1592,7 +1588,7 @@ class CSSStyle {
   factory CSSStyle.fromJson(Map<String, dynamic> json) {
     return CSSStyle(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       cssProperties: (json['cssProperties'] as List)
           .map((e) => CSSProperty.fromJson(e as Map<String, dynamic>))
@@ -1719,7 +1715,7 @@ class CSSMedia {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Array of media queries.
   final List<MediaQuery>? mediaList;
@@ -1744,7 +1740,7 @@ class CSSMedia {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       mediaList: json.containsKey('mediaList')
           ? (json['mediaList'] as List)
@@ -1873,7 +1869,7 @@ class CSSContainerQuery {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Optional name for the container.
   final String? name;
@@ -1908,7 +1904,7 @@ class CSSContainerQuery {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       name: json.containsKey('name') ? json['name'] as String : null,
       physicalAxes: json.containsKey('physicalAxes')
@@ -1953,7 +1949,7 @@ class CSSSupports {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   CSSSupports({
     required this.text,
@@ -1970,7 +1966,7 @@ class CSSSupports {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
     );
   }
@@ -1995,7 +1991,7 @@ class CSSScope {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   CSSScope({required this.text, this.range, this.styleSheetId});
 
@@ -2006,7 +2002,7 @@ class CSSScope {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
     );
   }
@@ -2030,7 +2026,7 @@ class CSSLayer {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   CSSLayer({required this.text, this.range, this.styleSheetId});
 
@@ -2041,7 +2037,7 @@ class CSSLayer {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
     );
   }
@@ -2062,7 +2058,7 @@ class CSSStartingStyle {
   final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   CSSStartingStyle({this.range, this.styleSheetId});
 
@@ -2072,7 +2068,7 @@ class CSSStartingStyle {
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
     );
   }
@@ -2295,7 +2291,7 @@ class FontFace {
 class CSSTryRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -2308,7 +2304,7 @@ class CSSTryRule {
   factory CSSTryRule.fromJson(Map<String, dynamic> json) {
     return CSSTryRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
@@ -2331,7 +2327,7 @@ class CSSPositionTryRule {
 
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -2353,7 +2349,7 @@ class CSSPositionTryRule {
     return CSSPositionTryRule(
       name: Value.fromJson(json['name'] as Map<String, dynamic>),
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
@@ -2439,56 +2435,110 @@ class CSSPropertyRegistration {
   }
 }
 
-/// CSS font-palette-values rule representation.
-class CSSFontPaletteValuesRule {
+/// CSS generic @rule representation.
+class CSSAtRule {
+  /// Type of at-rule.
+  final CSSAtRuleType type;
+
+  /// Subsection of font-feature-values, if this is a subsection.
+  final CSSAtRuleSubsection? subsection;
+
+  /// LINT.ThenChange(//third_party/blink/renderer/core/inspector/inspector_style_sheet.cc:FontVariantAlternatesFeatureType,//third_party/blink/renderer/core/inspector/inspector_css_agent.cc:FontVariantAlternatesFeatureType)
+  /// Associated name, if applicable.
+  final Value? name;
+
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
 
-  /// Associated font palette name.
-  final Value fontPaletteName;
-
   /// Associated style declaration.
   final CSSStyle style;
 
-  CSSFontPaletteValuesRule({
+  CSSAtRule({
+    required this.type,
+    this.subsection,
+    this.name,
     this.styleSheetId,
     required this.origin,
-    required this.fontPaletteName,
     required this.style,
   });
 
-  factory CSSFontPaletteValuesRule.fromJson(Map<String, dynamic> json) {
-    return CSSFontPaletteValuesRule(
+  factory CSSAtRule.fromJson(Map<String, dynamic> json) {
+    return CSSAtRule(
+      type: CSSAtRuleType.fromJson(json['type'] as String),
+      subsection: json.containsKey('subsection')
+          ? CSSAtRuleSubsection.fromJson(json['subsection'] as String)
+          : null,
+      name: json.containsKey('name')
+          ? Value.fromJson(json['name'] as Map<String, dynamic>)
+          : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
-      fontPaletteName: Value.fromJson(
-        json['fontPaletteName'] as Map<String, dynamic>,
-      ),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'type': type,
       'origin': origin.toJson(),
-      'fontPaletteName': fontPaletteName.toJson(),
       'style': style.toJson(),
+      if (subsection != null) 'subsection': subsection,
+      if (name != null) 'name': name!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
+}
+
+enum CSSAtRuleType {
+  fontFace('font-face'),
+  fontFeatureValues('font-feature-values'),
+  fontPaletteValues('font-palette-values');
+
+  final String value;
+
+  const CSSAtRuleType(this.value);
+
+  factory CSSAtRuleType.fromJson(String value) =>
+      CSSAtRuleType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum CSSAtRuleSubsection {
+  swash('swash'),
+  annotation('annotation'),
+  ornaments('ornaments'),
+  stylistic('stylistic'),
+  styleset('styleset'),
+  characterVariant('character-variant');
+
+  final String value;
+
+  const CSSAtRuleSubsection(this.value);
+
+  factory CSSAtRuleSubsection.fromJson(String value) =>
+      CSSAtRuleSubsection.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// CSS property at-rule representation.
 class CSSPropertyRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -2509,7 +2559,7 @@ class CSSPropertyRule {
   factory CSSPropertyRule.fromJson(Map<String, dynamic> json) {
     return CSSPropertyRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       propertyName: Value.fromJson(
@@ -2646,7 +2696,7 @@ class CSSFunctionRule {
 
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -2669,7 +2719,7 @@ class CSSFunctionRule {
     return CSSFunctionRule(
       name: Value.fromJson(json['name'] as Map<String, dynamic>),
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       parameters: (json['parameters'] as List)
@@ -2696,7 +2746,7 @@ class CSSFunctionRule {
 class CSSKeyframeRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId? styleSheetId;
+  final dom.StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -2717,7 +2767,7 @@ class CSSKeyframeRule {
   factory CSSKeyframeRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframeRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       keyText: Value.fromJson(json['keyText'] as Map<String, dynamic>),
@@ -2738,7 +2788,7 @@ class CSSKeyframeRule {
 /// A descriptor of operation to mutate style declaration text.
 class StyleDeclarationEdit {
   /// The css style sheet identifier.
-  final StyleSheetId styleSheetId;
+  final dom.StyleSheetId styleSheetId;
 
   /// The range of the style text in the enclosing stylesheet.
   final SourceRange range;
@@ -2754,7 +2804,7 @@ class StyleDeclarationEdit {
 
   factory StyleDeclarationEdit.fromJson(Map<String, dynamic> json) {
     return StyleDeclarationEdit(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      styleSheetId: dom.StyleSheetId.fromJson(json['styleSheetId'] as String),
       range: SourceRange.fromJson(json['range'] as Map<String, dynamic>),
       text: json['text'] as String,
     );

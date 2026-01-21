@@ -1329,18 +1329,23 @@ enum GenericIssueErrorType {
   formEmptyIdAndNameAttributesForInputError(
     'FormEmptyIdAndNameAttributesForInputError',
   ),
-  formAriaLabelledByToNonExistingId('FormAriaLabelledByToNonExistingId'),
+  formAriaLabelledByToNonExistingIdError(
+    'FormAriaLabelledByToNonExistingIdError',
+  ),
   formInputAssignedAutocompleteValueToIdOrNameAttributeError(
     'FormInputAssignedAutocompleteValueToIdOrNameAttributeError',
   ),
-  formLabelHasNeitherForNorNestedInput('FormLabelHasNeitherForNorNestedInput'),
+  formLabelHasNeitherForNorNestedInputError(
+    'FormLabelHasNeitherForNorNestedInputError',
+  ),
   formLabelForMatchesNonExistingIdError(
     'FormLabelForMatchesNonExistingIdError',
   ),
   formInputHasWrongButWellIntendedAutocompleteValueError(
     'FormInputHasWrongButWellIntendedAutocompleteValueError',
   ),
-  responseWasBlockedByOrb('ResponseWasBlockedByORB');
+  responseWasBlockedByOrb('ResponseWasBlockedByORB'),
+  navigationEntryMarkedSkippable('NavigationEntryMarkedSkippable');
 
   final String value;
 
@@ -2027,6 +2032,121 @@ class UserReidentificationIssueDetails {
   }
 }
 
+enum PermissionElementIssueType {
+  invalidType('InvalidType'),
+  fencedFrameDisallowed('FencedFrameDisallowed'),
+  cspFrameAncestorsMissing('CspFrameAncestorsMissing'),
+  permissionsPolicyBlocked('PermissionsPolicyBlocked'),
+  paddingRightUnsupported('PaddingRightUnsupported'),
+  paddingBottomUnsupported('PaddingBottomUnsupported'),
+  insetBoxShadowUnsupported('InsetBoxShadowUnsupported'),
+  requestInProgress('RequestInProgress'),
+  untrustedEvent('UntrustedEvent'),
+  registrationFailed('RegistrationFailed'),
+  typeNotSupported('TypeNotSupported'),
+  invalidTypeActivation('InvalidTypeActivation'),
+  securityChecksFailed('SecurityChecksFailed'),
+  activationDisabled('ActivationDisabled'),
+  geolocationDeprecated('GeolocationDeprecated'),
+  invalidDisplayStyle('InvalidDisplayStyle'),
+  nonOpaqueColor('NonOpaqueColor'),
+  lowContrast('LowContrast'),
+  fontSizeTooSmall('FontSizeTooSmall'),
+  fontSizeTooLarge('FontSizeTooLarge'),
+  invalidSizeValue('InvalidSizeValue');
+
+  final String value;
+
+  const PermissionElementIssueType(this.value);
+
+  factory PermissionElementIssueType.fromJson(String value) =>
+      PermissionElementIssueType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue warns about improper usage of the <permission> element.
+class PermissionElementIssueDetails {
+  final PermissionElementIssueType issueType;
+
+  /// The value of the type attribute.
+  final String? type;
+
+  /// The node ID of the <permission> element.
+  final dom.BackendNodeId? nodeId;
+
+  /// True if the issue is a warning, false if it is an error.
+  final bool? isWarning;
+
+  /// Fields for message construction:
+  /// Used for messages that reference a specific permission name
+  final String? permissionName;
+
+  /// Used for messages about occlusion
+  final String? occluderNodeInfo;
+
+  /// Used for messages about occluder's parent
+  final String? occluderParentNodeInfo;
+
+  /// Used for messages about activation disabled reason
+  final String? disableReason;
+
+  PermissionElementIssueDetails({
+    required this.issueType,
+    this.type,
+    this.nodeId,
+    this.isWarning,
+    this.permissionName,
+    this.occluderNodeInfo,
+    this.occluderParentNodeInfo,
+    this.disableReason,
+  });
+
+  factory PermissionElementIssueDetails.fromJson(Map<String, dynamic> json) {
+    return PermissionElementIssueDetails(
+      issueType: PermissionElementIssueType.fromJson(
+        json['issueType'] as String,
+      ),
+      type: json.containsKey('type') ? json['type'] as String : null,
+      nodeId: json.containsKey('nodeId')
+          ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
+          : null,
+      isWarning: json.containsKey('isWarning')
+          ? json['isWarning'] as bool
+          : null,
+      permissionName: json.containsKey('permissionName')
+          ? json['permissionName'] as String
+          : null,
+      occluderNodeInfo: json.containsKey('occluderNodeInfo')
+          ? json['occluderNodeInfo'] as String
+          : null,
+      occluderParentNodeInfo: json.containsKey('occluderParentNodeInfo')
+          ? json['occluderParentNodeInfo'] as String
+          : null,
+      disableReason: json.containsKey('disableReason')
+          ? json['disableReason'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'issueType': issueType.toJson(),
+      if (type != null) 'type': type,
+      if (nodeId != null) 'nodeId': nodeId!.toJson(),
+      if (isWarning != null) 'isWarning': isWarning,
+      if (permissionName != null) 'permissionName': permissionName,
+      if (occluderNodeInfo != null) 'occluderNodeInfo': occluderNodeInfo,
+      if (occluderParentNodeInfo != null)
+        'occluderParentNodeInfo': occluderParentNodeInfo,
+      if (disableReason != null) 'disableReason': disableReason,
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -2056,7 +2176,8 @@ enum InspectorIssueCode {
   elementAccessibilityIssue('ElementAccessibilityIssue'),
   sriMessageSignatureIssue('SRIMessageSignatureIssue'),
   unencodedDigestIssue('UnencodedDigestIssue'),
-  userReidentificationIssue('UserReidentificationIssue');
+  userReidentificationIssue('UserReidentificationIssue'),
+  permissionElementIssue('PermissionElementIssue');
 
   final String value;
 
@@ -2127,6 +2248,8 @@ class InspectorIssueDetails {
 
   final UserReidentificationIssueDetails? userReidentificationIssueDetails;
 
+  final PermissionElementIssueDetails? permissionElementIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2153,6 +2276,7 @@ class InspectorIssueDetails {
     this.sriMessageSignatureIssueDetails,
     this.unencodedDigestIssueDetails,
     this.userReidentificationIssueDetails,
+    this.permissionElementIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2299,6 +2423,12 @@ class InspectorIssueDetails {
               json['userReidentificationIssueDetails'] as Map<String, dynamic>,
             )
           : null,
+      permissionElementIssueDetails:
+          json.containsKey('permissionElementIssueDetails')
+          ? PermissionElementIssueDetails.fromJson(
+              json['permissionElementIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2365,6 +2495,9 @@ class InspectorIssueDetails {
         'unencodedDigestIssueDetails': unencodedDigestIssueDetails!.toJson(),
       if (userReidentificationIssueDetails != null)
         'userReidentificationIssueDetails': userReidentificationIssueDetails!
+            .toJson(),
+      if (permissionElementIssueDetails != null)
+        'permissionElementIssueDetails': permissionElementIssueDetails!
             .toJson(),
     };
   }

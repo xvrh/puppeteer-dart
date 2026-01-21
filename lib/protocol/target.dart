@@ -336,12 +336,27 @@ class TargetApi {
     });
   }
 
+  /// Gets the targetId of the DevTools page target opened for the given target
+  /// (if any).
+  /// [targetId] Page or tab target ID.
+  /// Returns: The targetId of DevTools page target if exists.
+  Future<TargetID> getDevToolsTarget(TargetID targetId) async {
+    var result = await _client.send('Target.getDevToolsTarget', {
+      'targetId': targetId,
+    });
+    return TargetID.fromJson(result['targetId'] as String);
+  }
+
   /// Opens a DevTools window for the target.
   /// [targetId] This can be the page or tab target ID.
+  /// [panelId] The id of the panel we want DevTools to open initially. Currently
+  /// supported panels are elements, console, network, sources, resources
+  /// and performance.
   /// Returns: The targetId of DevTools page target.
-  Future<TargetID> openDevTools(TargetID targetId) async {
+  Future<TargetID> openDevTools(TargetID targetId, {String? panelId}) async {
     var result = await _client.send('Target.openDevTools', {
       'targetId': targetId,
+      if (panelId != null) 'panelId': panelId,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }

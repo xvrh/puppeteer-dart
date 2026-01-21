@@ -965,6 +965,22 @@ class PageApi {
   Future<void> setPrerenderingAllowed(bool isAllowed) async {
     await _client.send('Page.setPrerenderingAllowed', {'isAllowed': isAllowed});
   }
+
+  /// Get the annotated page content for the main frame.
+  /// This is an experimental command that is subject to change.
+  /// [includeActionableInformation] Whether to include actionable information. Defaults to true.
+  /// Returns: The annotated page content as a base64 encoded protobuf.
+  /// The format is defined by the `AnnotatedPageContent` message in
+  /// components/optimization_guide/proto/features/common_quality_data.proto
+  Future<String> getAnnotatedPageContent({
+    bool? includeActionableInformation,
+  }) async {
+    var result = await _client.send('Page.getAnnotatedPageContent', {
+      if (includeActionableInformation != null)
+        'includeActionableInformation': includeActionableInformation,
+    });
+    return result['content'] as String;
+  }
 }
 
 class FileChooserOpenedEvent {
@@ -1837,6 +1853,7 @@ enum PermissionsPolicyFeature {
   ambientLightSensor('ambient-light-sensor'),
   ariaNotify('aria-notify'),
   attributionReporting('attribution-reporting'),
+  autofill('autofill'),
   autoplay('autoplay'),
   bluetooth('bluetooth'),
   browsingTopics('browsing-topics'),
@@ -1902,6 +1919,7 @@ enum PermissionsPolicyFeature {
   localFonts('local-fonts'),
   localNetworkAccess('local-network-access'),
   magnetometer('magnetometer'),
+  manualText('manual-text'),
   mediaPlaybackWhileNotVisible('media-playback-while-not-visible'),
   microphone('microphone'),
   midi('midi'),
@@ -1909,7 +1927,6 @@ enum PermissionsPolicyFeature {
   otpCredentials('otp-credentials'),
   payment('payment'),
   pictureInPicture('picture-in-picture'),
-  popins('popins'),
   privateAggregation('private-aggregation'),
   privateStateTokenIssuance('private-state-token-issuance'),
   privateStateTokenRedemption('private-state-token-redemption'),
@@ -1920,7 +1937,6 @@ enum PermissionsPolicyFeature {
   runAdAuction('run-ad-auction'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
-  sharedAutofill('shared-autofill'),
   sharedStorage('shared-storage'),
   sharedStorageSelectUrl('shared-storage-select-url'),
   smartCard('smart-card'),

@@ -734,7 +734,8 @@
                         },
                         {
                             "name": "iterations",
-                            "description": "`AnimationEffect`'s iterations.",
+                            "description": "`AnimationEffect`'s iterations. Omitted if the value is infinite.",
+                            "optional": true,
                             "type": "number"
                         },
                         {
@@ -1748,12 +1749,13 @@
                         "FormInputWithNoLabelError",
                         "FormAutocompleteAttributeEmptyError",
                         "FormEmptyIdAndNameAttributesForInputError",
-                        "FormAriaLabelledByToNonExistingId",
+                        "FormAriaLabelledByToNonExistingIdError",
                         "FormInputAssignedAutocompleteValueToIdOrNameAttributeError",
-                        "FormLabelHasNeitherForNorNestedInput",
+                        "FormLabelHasNeitherForNorNestedInputError",
                         "FormLabelForMatchesNonExistingIdError",
                         "FormInputHasWrongButWellIntendedAutocompleteValueError",
-                        "ResponseWasBlockedByORB"
+                        "ResponseWasBlockedByORB",
+                        "NavigationEntryMarkedSkippable"
                     ]
                 },
                 {
@@ -2136,6 +2138,86 @@
                     ]
                 },
                 {
+                    "id": "PermissionElementIssueType",
+                    "type": "string",
+                    "enum": [
+                        "InvalidType",
+                        "FencedFrameDisallowed",
+                        "CspFrameAncestorsMissing",
+                        "PermissionsPolicyBlocked",
+                        "PaddingRightUnsupported",
+                        "PaddingBottomUnsupported",
+                        "InsetBoxShadowUnsupported",
+                        "RequestInProgress",
+                        "UntrustedEvent",
+                        "RegistrationFailed",
+                        "TypeNotSupported",
+                        "InvalidTypeActivation",
+                        "SecurityChecksFailed",
+                        "ActivationDisabled",
+                        "GeolocationDeprecated",
+                        "InvalidDisplayStyle",
+                        "NonOpaqueColor",
+                        "LowContrast",
+                        "FontSizeTooSmall",
+                        "FontSizeTooLarge",
+                        "InvalidSizeValue"
+                    ]
+                },
+                {
+                    "id": "PermissionElementIssueDetails",
+                    "description": "This issue warns about improper usage of the <permission> element.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "issueType",
+                            "$ref": "PermissionElementIssueType"
+                        },
+                        {
+                            "name": "type",
+                            "description": "The value of the type attribute.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "nodeId",
+                            "description": "The node ID of the <permission> element.",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "isWarning",
+                            "description": "True if the issue is a warning, false if it is an error.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "permissionName",
+                            "description": "Fields for message construction:\nUsed for messages that reference a specific permission name",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "occluderNodeInfo",
+                            "description": "Used for messages about occlusion",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "occluderParentNodeInfo",
+                            "description": "Used for messages about occluder's parent",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "disableReason",
+                            "description": "Used for messages about activation disabled reason",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -2165,7 +2247,8 @@
                         "ElementAccessibilityIssue",
                         "SRIMessageSignatureIssue",
                         "UnencodedDigestIssue",
-                        "UserReidentificationIssue"
+                        "UserReidentificationIssue",
+                        "PermissionElementIssue"
                     ]
                 },
                 {
@@ -2303,6 +2386,11 @@
                             "name": "userReidentificationIssueDetails",
                             "optional": true,
                             "$ref": "UserReidentificationIssueDetails"
+                        },
+                        {
+                            "name": "permissionElementIssueDetails",
+                            "optional": true,
+                            "$ref": "PermissionElementIssueDetails"
                         }
                     ]
                 },
@@ -4000,10 +4088,6 @@
             ],
             "types": [
                 {
-                    "id": "StyleSheetId",
-                    "type": "string"
-                },
-                {
                     "id": "StyleSheetOrigin",
                     "description": "Stylesheet type: \"injected\" for stylesheets injected via extension, \"user-agent\" for user-agent\nstylesheets, \"inspector\" for stylesheets created by the inspector (i.e. those holding the \"via\ninspector\" rules), \"regular\" for regular stylesheets.",
                     "type": "string",
@@ -4212,7 +4296,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "The stylesheet identifier.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "frameId",
@@ -4315,7 +4399,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "selectorList",
@@ -4443,7 +4527,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "startOffset",
@@ -4548,7 +4632,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "cssProperties",
@@ -4680,7 +4764,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "mediaList",
@@ -4768,7 +4852,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "name",
@@ -4828,7 +4912,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -4853,7 +4937,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -4878,7 +4962,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -4898,7 +4982,7 @@
                             "name": "styleSheetId",
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -5058,7 +5142,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
@@ -5086,7 +5170,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
@@ -5149,25 +5233,50 @@
                     ]
                 },
                 {
-                    "id": "CSSFontPaletteValuesRule",
-                    "description": "CSS font-palette-values rule representation.",
+                    "id": "CSSAtRule",
+                    "description": "CSS generic @rule representation.",
                     "type": "object",
                     "properties": [
+                        {
+                            "name": "type",
+                            "description": "Type of at-rule.",
+                            "type": "string",
+                            "enum": [
+                                "font-face",
+                                "font-feature-values",
+                                "font-palette-values"
+                            ]
+                        },
+                        {
+                            "name": "subsection",
+                            "description": "Subsection of font-feature-values, if this is a subsection.",
+                            "optional": true,
+                            "type": "string",
+                            "enum": [
+                                "swash",
+                                "annotation",
+                                "ornaments",
+                                "stylistic",
+                                "styleset",
+                                "character-variant"
+                            ]
+                        },
+                        {
+                            "name": "name",
+                            "description": "LINT.ThenChange(//third_party/blink/renderer/core/inspector/inspector_style_sheet.cc:FontVariantAlternatesFeatureType,//third_party/blink/renderer/core/inspector/inspector_css_agent.cc:FontVariantAlternatesFeatureType)\nAssociated name, if applicable.",
+                            "optional": true,
+                            "$ref": "Value"
+                        },
                         {
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
                             "description": "Parent stylesheet's origin.",
                             "$ref": "StyleSheetOrigin"
-                        },
-                        {
-                            "name": "fontPaletteName",
-                            "description": "Associated font palette name.",
-                            "$ref": "Value"
                         },
                         {
                             "name": "style",
@@ -5185,7 +5294,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
@@ -5292,7 +5401,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
@@ -5326,7 +5435,7 @@
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
                             "optional": true,
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "origin",
@@ -5353,7 +5462,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -5376,7 +5485,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "The css style sheet identifier where a new rule should be inserted.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "ruleText",
@@ -5410,7 +5519,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ],
                     "returns": [
@@ -5444,7 +5553,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "Identifier of the created \"via-inspector\" stylesheet.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -5782,10 +5891,13 @@
                             }
                         },
                         {
-                            "name": "cssFontPaletteValuesRule",
-                            "description": "A font-palette-values rule matching this node.",
+                            "name": "cssAtRules",
+                            "description": "A list of simple @rules matching this node or its pseudo-elements.",
                             "optional": true,
-                            "$ref": "CSSFontPaletteValuesRule"
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSAtRule"
+                            }
                         },
                         {
                             "name": "parentLayoutNodeId",
@@ -5856,7 +5968,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ],
                     "returns": [
@@ -5891,7 +6003,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "selectorText",
@@ -5974,7 +6086,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -5999,7 +6111,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6024,7 +6136,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6050,7 +6162,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6076,7 +6188,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6102,7 +6214,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6127,7 +6239,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "range",
@@ -6152,7 +6264,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         },
                         {
                             "name": "text",
@@ -6280,7 +6392,7 @@
                     "parameters": [
                         {
                             "name": "styleSheetId",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -6291,7 +6403,7 @@
                         {
                             "name": "styleSheetId",
                             "description": "Identifier of the removed stylesheet.",
-                            "$ref": "StyleSheetId"
+                            "$ref": "DOM.StyleSheetId"
                         }
                     ]
                 },
@@ -6712,6 +6824,11 @@
                     "type": "integer"
                 },
                 {
+                    "id": "StyleSheetId",
+                    "description": "Unique identifier for a CSS stylesheet.",
+                    "type": "string"
+                },
+                {
                     "id": "BackendNode",
                     "description": "Backend node with a friendly name.",
                     "type": "object",
@@ -6775,7 +6892,9 @@
                         "file-selector-button",
                         "details-content",
                         "picker",
-                        "permission-icon"
+                        "permission-icon",
+                        "overscroll-area-parent",
+                        "overscroll-client-area"
                     ]
                 },
                 {
@@ -7037,6 +7156,15 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "adoptedStyleSheets",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "StyleSheetId"
+                            }
                         }
                     ]
                 },
@@ -8404,6 +8532,27 @@
                             "name": "value",
                             "description": "Attribute value.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "adoptedStyleSheetsModified",
+                    "description": "Fired when `Element`'s adoptedStyleSheets are modified.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the node that has changed.",
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "adoptedStyleSheets",
+                            "description": "New adoptedStyleSheets array.",
+                            "experimental": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "StyleSheetId"
+                            }
                         }
                     ]
                 },
@@ -15408,21 +15557,6 @@
                     ]
                 },
                 {
-                    "id": "IpProxyStatus",
-                    "description": "Sets Controls for IP Proxy of requests.\nPage reload is required before the new behavior will be observed.",
-                    "experimental": true,
-                    "type": "string",
-                    "enum": [
-                        "Available",
-                        "FeatureNotEnabled",
-                        "MaskedDomainListNotEnabled",
-                        "MaskedDomainListNotPopulated",
-                        "AuthTokensUnavailable",
-                        "Unavailable",
-                        "BypassedByDevTools"
-                    ]
-                },
-                {
                     "id": "CorsError",
                     "description": "The reason why request was blocked.",
                     "type": "string",
@@ -15742,13 +15876,6 @@
                             "description": "Security details for the request.",
                             "optional": true,
                             "$ref": "SecurityDetails"
-                        },
-                        {
-                            "name": "isIpProtectionUsed",
-                            "description": "Indicates whether the request was sent through IP Protection proxies. If\nset to true, the request used the IP Protection privacy feature.",
-                            "experimental": true,
-                            "optional": true,
-                            "type": "boolean"
                         }
                     ]
                 },
@@ -16706,6 +16833,22 @@
                             "description": "Expected to be unsigned integer.",
                             "optional": true,
                             "type": "number"
+                        },
+                        {
+                            "name": "multicastLoopback",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "multicastTimeToLive",
+                            "description": "Unsigned int 8.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "multicastAllowAddressSharing",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -16740,8 +16883,6 @@
                         "Allow",
                         "BlockFromInsecureToMorePrivate",
                         "WarnFromInsecureToMorePrivate",
-                        "PreflightBlock",
-                        "PreflightWarn",
                         "PermissionBlock",
                         "PermissionWarn"
                     ]
@@ -17057,30 +17198,6 @@
                 }
             ],
             "commands": [
-                {
-                    "name": "getIPProtectionProxyStatus",
-                    "description": "Returns enum representing if IP Proxy of requests is available\nor reason it is not active.",
-                    "experimental": true,
-                    "returns": [
-                        {
-                            "name": "status",
-                            "description": "Whether IP proxy is available",
-                            "$ref": "IpProxyStatus"
-                        }
-                    ]
-                },
-                {
-                    "name": "setIPProtectionProxyBypassEnabled",
-                    "description": "Sets bypass IP Protection Proxy boolean.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "enabled",
-                            "description": "Whether IP Proxy is being bypassed by devtools; false by default.",
-                            "type": "boolean"
-                        }
-                    ]
-                },
                 {
                     "name": "setAcceptedEncodings",
                     "description": "Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.",
@@ -18637,6 +18754,34 @@
                         {
                             "name": "timestamp",
                             "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directUDPSocketJoinedMulticastGroup",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "IPAddress",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "directUDPSocketLeftMulticastGroup",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "IPAddress",
+                            "type": "string"
                         }
                     ]
                 },
@@ -20459,6 +20604,7 @@
                         "ambient-light-sensor",
                         "aria-notify",
                         "attribution-reporting",
+                        "autofill",
                         "autoplay",
                         "bluetooth",
                         "browsing-topics",
@@ -20524,6 +20670,7 @@
                         "local-fonts",
                         "local-network-access",
                         "magnetometer",
+                        "manual-text",
                         "media-playback-while-not-visible",
                         "microphone",
                         "midi",
@@ -20531,7 +20678,6 @@
                         "otp-credentials",
                         "payment",
                         "picture-in-picture",
-                        "popins",
                         "private-aggregation",
                         "private-state-token-issuance",
                         "private-state-token-redemption",
@@ -20542,7 +20688,6 @@
                         "run-ad-auction",
                         "screen-wake-lock",
                         "serial",
-                        "shared-autofill",
                         "shared-storage",
                         "shared-storage-select-url",
                         "smart-card",
@@ -23277,6 +23422,26 @@
                         {
                             "name": "isAllowed",
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "getAnnotatedPageContent",
+                    "description": "Get the annotated page content for the main frame.\nThis is an experimental command that is subject to change.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "includeActionableInformation",
+                            "description": "Whether to include actionable information. Defaults to true.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "content",
+                            "description": "The annotated page content as a base64 encoded protobuf.\nThe format is defined by the `AnnotatedPageContent` message in\ncomponents/optimization_guide/proto/features/common_quality_data.proto",
+                            "type": "binary"
                         }
                     ]
                 }
@@ -27462,36 +27627,6 @@
                     ]
                 },
                 {
-                    "id": "ImageDecodeAcceleratorCapability",
-                    "description": "Describes a supported image decoding profile with its associated minimum and\nmaximum resolutions and subsampling.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "imageType",
-                            "description": "Image coded, e.g. Jpeg.",
-                            "$ref": "ImageType"
-                        },
-                        {
-                            "name": "maxDimensions",
-                            "description": "Maximum supported dimensions of the image in pixels.",
-                            "$ref": "Size"
-                        },
-                        {
-                            "name": "minDimensions",
-                            "description": "Minimum supported dimensions of the image in pixels.",
-                            "$ref": "Size"
-                        },
-                        {
-                            "name": "subsamplings",
-                            "description": "Optional array of supported subsampling formats, e.g. 4:2:0, if known.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "SubsamplingFormat"
-                            }
-                        }
-                    ]
-                },
-                {
                     "id": "GPUInfo",
                     "description": "Provides information about the GPU(s) on the system.",
                     "type": "object",
@@ -27538,14 +27673,6 @@
                             "type": "array",
                             "items": {
                                 "$ref": "VideoEncodeAcceleratorCapability"
-                            }
-                        },
-                        {
-                            "name": "imageDecoding",
-                            "description": "Supported accelerated image decoding capabilities.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "ImageDecodeAcceleratorCapability"
                             }
                         }
                     ]
@@ -28185,6 +28312,26 @@
                     ]
                 },
                 {
+                    "name": "getDevToolsTarget",
+                    "description": "Gets the targetId of the DevTools page target opened for the given target\n(if any).",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "targetId",
+                            "description": "Page or tab target ID.",
+                            "$ref": "TargetID"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "targetId",
+                            "description": "The targetId of DevTools page target if exists.",
+                            "optional": true,
+                            "$ref": "TargetID"
+                        }
+                    ]
+                },
+                {
                     "name": "openDevTools",
                     "description": "Opens a DevTools window for the target.",
                     "experimental": true,
@@ -28193,6 +28340,12 @@
                             "name": "targetId",
                             "description": "This can be the page or tab target ID.",
                             "$ref": "TargetID"
+                        },
+                        {
+                            "name": "panelId",
+                            "description": "The id of the panel we want DevTools to open initially. Currently\nsupported panels are elements, console, network, sources, resources\nand performance.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ],
                     "returns": [
