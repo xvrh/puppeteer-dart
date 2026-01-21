@@ -21,6 +21,15 @@ class DOMApi {
       .where((event) => event.name == 'DOM.attributeModified')
       .map((event) => AttributeModifiedEvent.fromJson(event.parameters));
 
+  /// Fired when `Element`'s adoptedStyleSheets are modified.
+  Stream<AdoptedStyleSheetsModifiedEvent> get onAdoptedStyleSheetsModified =>
+      _client.onEvent
+          .where((event) => event.name == 'DOM.adoptedStyleSheetsModified')
+          .map(
+            (event) =>
+                AdoptedStyleSheetsModifiedEvent.fromJson(event.parameters),
+          );
+
   /// Fired when `Element`'s attribute is removed.
   Stream<AttributeRemovedEvent> get onAttributeRemoved => _client.onEvent
       .where((event) => event.name == 'DOM.attributeRemoved')
@@ -856,6 +865,28 @@ class AttributeModifiedEvent {
   }
 }
 
+class AdoptedStyleSheetsModifiedEvent {
+  /// Id of the node that has changed.
+  final NodeId nodeId;
+
+  /// New adoptedStyleSheets array.
+  final List<StyleSheetId> adoptedStyleSheets;
+
+  AdoptedStyleSheetsModifiedEvent({
+    required this.nodeId,
+    required this.adoptedStyleSheets,
+  });
+
+  factory AdoptedStyleSheetsModifiedEvent.fromJson(Map<String, dynamic> json) {
+    return AdoptedStyleSheetsModifiedEvent(
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      adoptedStyleSheets: (json['adoptedStyleSheets'] as List)
+          .map((e) => StyleSheetId.fromJson(e as String))
+          .toList(),
+    );
+  }
+}
+
 class AttributeRemovedEvent {
   /// Id of the node that has changed.
   final NodeId nodeId;
@@ -1193,6 +1224,13 @@ extension type BackendNodeId(int value) {
   int toJson() => value;
 }
 
+/// Unique identifier for a CSS stylesheet.
+extension type StyleSheetId(String value) {
+  factory StyleSheetId.fromJson(String value) => StyleSheetId(value);
+
+  String toJson() => value;
+}
+
 /// Backend node with a friendly name.
 class BackendNode {
   /// `Node`'s nodeType.
@@ -1266,7 +1304,9 @@ enum PseudoType {
   fileSelectorButton('file-selector-button'),
   detailsContent('details-content'),
   picker('picker'),
-  permissionIcon('permission-icon');
+  permissionIcon('permission-icon'),
+  overscrollAreaParent('overscroll-area-parent'),
+  overscrollClientArea('overscroll-client-area');
 
   final String value;
 
@@ -1473,6 +1513,8 @@ class Node {
 
   final bool? affectedByStartingStyles;
 
+  final List<StyleSheetId>? adoptedStyleSheets;
+
   Node({
     required this.nodeId,
     this.parentId,
@@ -1506,6 +1548,7 @@ class Node {
     this.assignedSlot,
     this.isScrollable,
     this.affectedByStartingStyles,
+    this.adoptedStyleSheets,
   });
 
   factory Node.fromJson(Map<String, dynamic> json) {
@@ -1594,6 +1637,11 @@ class Node {
       affectedByStartingStyles: json.containsKey('affectedByStartingStyles')
           ? json['affectedByStartingStyles'] as bool
           : null,
+      adoptedStyleSheets: json.containsKey('adoptedStyleSheets')
+          ? (json['adoptedStyleSheets'] as List)
+                .map((e) => StyleSheetId.fromJson(e as String))
+                .toList()
+          : null,
     );
   }
 
@@ -1637,6 +1685,10 @@ class Node {
       if (isScrollable != null) 'isScrollable': isScrollable,
       if (affectedByStartingStyles != null)
         'affectedByStartingStyles': affectedByStartingStyles,
+      if (adoptedStyleSheets != null)
+        'adoptedStyleSheets': adoptedStyleSheets!
+            .map((e) => e.toJson())
+            .toList(),
     };
   }
 }

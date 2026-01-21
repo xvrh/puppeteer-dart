@@ -184,6 +184,26 @@ class NetworkApi {
         (event) => DirectTCPSocketChunkReceivedEvent.fromJson(event.parameters),
       );
 
+  Stream<DirectUDPSocketJoinedMulticastGroupEvent>
+  get onDirectUDPSocketJoinedMulticastGroup => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.directUDPSocketJoinedMulticastGroup',
+      )
+      .map(
+        (event) =>
+            DirectUDPSocketJoinedMulticastGroupEvent.fromJson(event.parameters),
+      );
+
+  Stream<DirectUDPSocketLeftMulticastGroupEvent>
+  get onDirectUDPSocketLeftMulticastGroup => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.directUDPSocketLeftMulticastGroup',
+      )
+      .map(
+        (event) =>
+            DirectUDPSocketLeftMulticastGroupEvent.fromJson(event.parameters),
+      );
+
   /// Fired upon direct_socket.UDPSocket creation.
   Stream<DirectUDPSocketCreatedEvent> get onDirectUDPSocketCreated => _client
       .onEvent
@@ -300,22 +320,6 @@ class NetworkApi {
           event.parameters,
         ),
       );
-
-  /// Returns enum representing if IP Proxy of requests is available
-  /// or reason it is not active.
-  /// Returns: Whether IP proxy is available
-  Future<IpProxyStatus> getIPProtectionProxyStatus() async {
-    var result = await _client.send('Network.getIPProtectionProxyStatus');
-    return IpProxyStatus.fromJson(result['status'] as String);
-  }
-
-  /// Sets bypass IP Protection Proxy boolean.
-  /// [enabled] Whether IP Proxy is being bypassed by devtools; false by default.
-  Future<void> setIPProtectionProxyBypassEnabled(bool enabled) async {
-    await _client.send('Network.setIPProtectionProxyBypassEnabled', {
-      'enabled': enabled,
-    });
-  }
 
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
@@ -1683,6 +1687,46 @@ class DirectTCPSocketChunkReceivedEvent {
   }
 }
 
+class DirectUDPSocketJoinedMulticastGroupEvent {
+  final RequestId identifier;
+
+  final String ipAddress;
+
+  DirectUDPSocketJoinedMulticastGroupEvent({
+    required this.identifier,
+    required this.ipAddress,
+  });
+
+  factory DirectUDPSocketJoinedMulticastGroupEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DirectUDPSocketJoinedMulticastGroupEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      ipAddress: json['IPAddress'] as String,
+    );
+  }
+}
+
+class DirectUDPSocketLeftMulticastGroupEvent {
+  final RequestId identifier;
+
+  final String ipAddress;
+
+  DirectUDPSocketLeftMulticastGroupEvent({
+    required this.identifier,
+    required this.ipAddress,
+  });
+
+  factory DirectUDPSocketLeftMulticastGroupEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DirectUDPSocketLeftMulticastGroupEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      ipAddress: json['IPAddress'] as String,
+    );
+  }
+}
+
 class DirectUDPSocketCreatedEvent {
   final RequestId identifier;
 
@@ -2911,30 +2955,6 @@ enum BlockedReason {
   String toString() => value.toString();
 }
 
-/// Sets Controls for IP Proxy of requests.
-/// Page reload is required before the new behavior will be observed.
-enum IpProxyStatus {
-  available('Available'),
-  featureNotEnabled('FeatureNotEnabled'),
-  maskedDomainListNotEnabled('MaskedDomainListNotEnabled'),
-  maskedDomainListNotPopulated('MaskedDomainListNotPopulated'),
-  authTokensUnavailable('AuthTokensUnavailable'),
-  unavailable('Unavailable'),
-  bypassedByDevTools('BypassedByDevTools');
-
-  final String value;
-
-  const IpProxyStatus(this.value);
-
-  factory IpProxyStatus.fromJson(String value) =>
-      IpProxyStatus.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 /// The reason why request was blocked.
 enum CorsError {
   disallowedByMode('DisallowedByMode'),
@@ -3282,10 +3302,6 @@ class ResponseData {
   /// Security details for the request.
   final SecurityDetails? securityDetails;
 
-  /// Indicates whether the request was sent through IP Protection proxies. If
-  /// set to true, the request used the IP Protection privacy feature.
-  final bool? isIpProtectionUsed;
-
   ResponseData({
     required this.url,
     required this.status,
@@ -3312,7 +3328,6 @@ class ResponseData {
     this.alternateProtocolUsage,
     required this.securityState,
     this.securityDetails,
-    this.isIpProtectionUsed,
   });
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
@@ -3383,9 +3398,6 @@ class ResponseData {
               json['securityDetails'] as Map<String, dynamic>,
             )
           : null,
-      isIpProtectionUsed: json.containsKey('isIpProtectionUsed')
-          ? json['isIpProtectionUsed'] as bool
-          : null,
     );
   }
 
@@ -3420,7 +3432,6 @@ class ResponseData {
       if (alternateProtocolUsage != null)
         'alternateProtocolUsage': alternateProtocolUsage!.toJson(),
       if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
-      if (isIpProtectionUsed != null) 'isIpProtectionUsed': isIpProtectionUsed,
     };
   }
 }
@@ -4784,6 +4795,13 @@ class DirectUDPSocketOptions {
   /// Expected to be unsigned integer.
   final num? receiveBufferSize;
 
+  final bool? multicastLoopback;
+
+  /// Unsigned int 8.
+  final int? multicastTimeToLive;
+
+  final bool? multicastAllowAddressSharing;
+
   DirectUDPSocketOptions({
     this.remoteAddr,
     this.remotePort,
@@ -4792,6 +4810,9 @@ class DirectUDPSocketOptions {
     this.dnsQueryType,
     this.sendBufferSize,
     this.receiveBufferSize,
+    this.multicastLoopback,
+    this.multicastTimeToLive,
+    this.multicastAllowAddressSharing,
   });
 
   factory DirectUDPSocketOptions.fromJson(Map<String, dynamic> json) {
@@ -4817,6 +4838,16 @@ class DirectUDPSocketOptions {
       receiveBufferSize: json.containsKey('receiveBufferSize')
           ? json['receiveBufferSize'] as num
           : null,
+      multicastLoopback: json.containsKey('multicastLoopback')
+          ? json['multicastLoopback'] as bool
+          : null,
+      multicastTimeToLive: json.containsKey('multicastTimeToLive')
+          ? json['multicastTimeToLive'] as int
+          : null,
+      multicastAllowAddressSharing:
+          json.containsKey('multicastAllowAddressSharing')
+          ? json['multicastAllowAddressSharing'] as bool
+          : null,
     );
   }
 
@@ -4829,6 +4860,11 @@ class DirectUDPSocketOptions {
       if (dnsQueryType != null) 'dnsQueryType': dnsQueryType!.toJson(),
       if (sendBufferSize != null) 'sendBufferSize': sendBufferSize,
       if (receiveBufferSize != null) 'receiveBufferSize': receiveBufferSize,
+      if (multicastLoopback != null) 'multicastLoopback': multicastLoopback,
+      if (multicastTimeToLive != null)
+        'multicastTimeToLive': multicastTimeToLive,
+      if (multicastAllowAddressSharing != null)
+        'multicastAllowAddressSharing': multicastAllowAddressSharing,
     };
   }
 }
@@ -4870,8 +4906,6 @@ enum PrivateNetworkRequestPolicy {
   allow('Allow'),
   blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
   warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
-  preflightBlock('PreflightBlock'),
-  preflightWarn('PreflightWarn'),
   permissionBlock('PermissionBlock'),
   permissionWarn('PermissionWarn');
 

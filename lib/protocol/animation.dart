@@ -302,8 +302,8 @@ class AnimationEffect {
   /// `AnimationEffect`'s iteration start.
   final num iterationStart;
 
-  /// `AnimationEffect`'s iterations.
-  final num iterations;
+  /// `AnimationEffect`'s iterations. Omitted if the value is infinite.
+  final num? iterations;
 
   /// `AnimationEffect`'s iteration duration.
   /// Milliseconds for time based animations and
@@ -330,7 +330,7 @@ class AnimationEffect {
     required this.delay,
     required this.endDelay,
     required this.iterationStart,
-    required this.iterations,
+    this.iterations,
     required this.duration,
     required this.direction,
     required this.fill,
@@ -344,7 +344,9 @@ class AnimationEffect {
       delay: json['delay'] as num,
       endDelay: json['endDelay'] as num,
       iterationStart: json['iterationStart'] as num,
-      iterations: json['iterations'] as num,
+      iterations: json.containsKey('iterations')
+          ? json['iterations'] as num
+          : null,
       duration: json['duration'] as num,
       direction: json['direction'] as String,
       fill: json['fill'] as String,
@@ -365,11 +367,11 @@ class AnimationEffect {
       'delay': delay,
       'endDelay': endDelay,
       'iterationStart': iterationStart,
-      'iterations': iterations,
       'duration': duration,
       'direction': direction,
       'fill': fill,
       'easing': easing,
+      if (iterations != null) 'iterations': iterations,
       if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
       if (keyframesRule != null) 'keyframesRule': keyframesRule!.toJson(),
     };

@@ -268,53 +268,6 @@ enum ImageType {
   String toString() => value.toString();
 }
 
-/// Describes a supported image decoding profile with its associated minimum and
-/// maximum resolutions and subsampling.
-class ImageDecodeAcceleratorCapability {
-  /// Image coded, e.g. Jpeg.
-  final ImageType imageType;
-
-  /// Maximum supported dimensions of the image in pixels.
-  final Size maxDimensions;
-
-  /// Minimum supported dimensions of the image in pixels.
-  final Size minDimensions;
-
-  /// Optional array of supported subsampling formats, e.g. 4:2:0, if known.
-  final List<SubsamplingFormat> subsamplings;
-
-  ImageDecodeAcceleratorCapability({
-    required this.imageType,
-    required this.maxDimensions,
-    required this.minDimensions,
-    required this.subsamplings,
-  });
-
-  factory ImageDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
-    return ImageDecodeAcceleratorCapability(
-      imageType: ImageType.fromJson(json['imageType'] as String),
-      maxDimensions: Size.fromJson(
-        json['maxDimensions'] as Map<String, dynamic>,
-      ),
-      minDimensions: Size.fromJson(
-        json['minDimensions'] as Map<String, dynamic>,
-      ),
-      subsamplings: (json['subsamplings'] as List)
-          .map((e) => SubsamplingFormat.fromJson(e as String))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'imageType': imageType.toJson(),
-      'maxDimensions': maxDimensions.toJson(),
-      'minDimensions': minDimensions.toJson(),
-      'subsamplings': subsamplings.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
 /// Provides information about the GPU(s) on the system.
 class GPUInfo {
   /// The graphics devices on the system. Element 0 is the primary GPU.
@@ -335,9 +288,6 @@ class GPUInfo {
   /// Supported accelerated video encoding capabilities.
   final List<VideoEncodeAcceleratorCapability> videoEncoding;
 
-  /// Supported accelerated image decoding capabilities.
-  final List<ImageDecodeAcceleratorCapability> imageDecoding;
-
   GPUInfo({
     required this.devices,
     this.auxAttributes,
@@ -345,7 +295,6 @@ class GPUInfo {
     required this.driverBugWorkarounds,
     required this.videoDecoding,
     required this.videoEncoding,
-    required this.imageDecoding,
   });
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
@@ -376,13 +325,6 @@ class GPUInfo {
             ),
           )
           .toList(),
-      imageDecoding: (json['imageDecoding'] as List)
-          .map(
-            (e) => ImageDecodeAcceleratorCapability.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
-          .toList(),
     );
   }
 
@@ -392,7 +334,6 @@ class GPUInfo {
       'driverBugWorkarounds': [...driverBugWorkarounds],
       'videoDecoding': videoDecoding.map((e) => e.toJson()).toList(),
       'videoEncoding': videoEncoding.map((e) => e.toJson()).toList(),
-      'imageDecoding': imageDecoding.map((e) => e.toJson()).toList(),
       if (auxAttributes != null) 'auxAttributes': auxAttributes,
       if (featureStatus != null) 'featureStatus': featureStatus,
     };
