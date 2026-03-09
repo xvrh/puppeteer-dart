@@ -2115,14 +2115,14 @@ enum PermissionElementIssueType {
   String toString() => value.toString();
 }
 
-/// This issue warns about improper usage of the <permission> element.
+/// This issue warns about improper usage of the `<permission>` element.
 class PermissionElementIssueDetails {
   final PermissionElementIssueType issueType;
 
   /// The value of the type attribute.
   final String? type;
 
-  /// The node ID of the <permission> element.
+  /// The node ID of the `<permission>` element.
   final dom.BackendNodeId? nodeId;
 
   /// True if the issue is a warning, false if it is an error.
