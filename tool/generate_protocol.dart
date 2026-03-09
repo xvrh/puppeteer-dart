@@ -787,7 +787,20 @@ bool isRawType(String? type) => const [
 
 String toComment(String? comment, {int indent = 0}) {
   if (comment != null && comment.isNotEmpty) {
-    comment = comment.replaceAll('<code>', '`').replaceAll('</code>', '`');
+    comment = comment
+        .replaceAll('<code>', '`')
+        .replaceAll('</code>', '`');
+
+    // Escape remaining HTML tags (e.g. <permission>) that would confuse the
+    // linter, but leave already-backtick-escaped spans untouched.
+    comment = comment.replaceAllMapped(
+      RegExp(r'`[^`]*`|(</?[a-zA-Z][^>]*>)'),
+      (match) {
+        final tag = match.group(1);
+        if (tag != null) return '`$tag`';
+        return match.group(0)!;
+      },
+    );
 
     const docStarter = '/// ';
 

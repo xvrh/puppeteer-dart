@@ -321,6 +321,25 @@ class NetworkApi {
         ),
       );
 
+  /// Triggered when the initial set of device bound sessions is added.
+  Stream<List<DeviceBoundSession>> get onDeviceBoundSessionsAdded => _client
+      .onEvent
+      .where((event) => event.name == 'Network.deviceBoundSessionsAdded')
+      .map(
+        (event) => (event.parameters['sessions'] as List)
+            .map((e) => DeviceBoundSession.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+
+  /// Triggered when a device bound session event occurs.
+  Stream<DeviceBoundSessionEventOccurredEvent>
+  get onDeviceBoundSessionEventOccurred => _client.onEvent
+      .where((event) => event.name == 'Network.deviceBoundSessionEventOccurred')
+      .map(
+        (event) =>
+            DeviceBoundSessionEventOccurredEvent.fromJson(event.parameters),
+      );
+
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
   Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
@@ -523,7 +542,9 @@ class NetworkApi {
   /// [reportDirectSocketTraffic] Whether DirectSocket chunk send/receive events should be reported.
   /// [enableDurableMessages] Enable storing response bodies outside of renderer, so that these survive
   /// a cross-process navigation. Requires maxTotalBufferSize to be set.
-  /// Currently defaults to false.
+  /// Currently defaults to false. This field is being deprecated in favor of the dedicated
+  /// configureDurableMessages command, due to the possibility of deadlocks when awaiting
+  /// Network.enable before issuing Runtime.runIfWaitingForDebugger.
   Future<void> enable({
     int? maxTotalBufferSize,
     int? maxResourceBufferSize,
@@ -540,6 +561,22 @@ class NetworkApi {
         'reportDirectSocketTraffic': reportDirectSocketTraffic,
       if (enableDurableMessages != null)
         'enableDurableMessages': enableDurableMessages,
+    });
+  }
+
+  /// Configures storing response bodies outside of renderer, so that these survive
+  /// a cross-process navigation.
+  /// If maxTotalBufferSize is not set, durable messages are disabled.
+  /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
+  /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
+  Future<void> configureDurableMessages({
+    int? maxTotalBufferSize,
+    int? maxResourceBufferSize,
+  }) async {
+    await _client.send('Network.configureDurableMessages', {
+      if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
+      if (maxResourceBufferSize != null)
+        'maxResourceBufferSize': maxResourceBufferSize,
     });
   }
 
@@ -590,12 +627,13 @@ class NetworkApi {
 
   /// Returns post data sent with the request. Returns an error when no data was sent with the request.
   /// [requestId] Identifier of the network request to get content for.
-  /// Returns: Request body string, omitting files from multipart requests
-  Future<String> getRequestPostData(RequestId requestId) async {
+  Future<GetRequestPostDataResult> getRequestPostData(
+    RequestId requestId,
+  ) async {
     var result = await _client.send('Network.getRequestPostData', {
       'requestId': requestId,
     });
-    return result['postData'] as String;
+    return GetRequestPostDataResult.fromJson(result);
   }
 
   /// Returns content served for the given currently intercepted request.
@@ -693,7 +731,6 @@ class NetworkApi {
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
   /// [priority] Cookie Priority type.
-  /// [sameParty] True if cookie is SameParty.
   /// [sourceScheme] Cookie source scheme type.
   /// [sourcePort] Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
   /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
@@ -711,7 +748,6 @@ class NetworkApi {
     CookieSameSite? sameSite,
     TimeSinceEpoch? expires,
     CookiePriority? priority,
-    bool? sameParty,
     CookieSourceScheme? sourceScheme,
     int? sourcePort,
     CookiePartitionKey? partitionKey,
@@ -727,7 +763,6 @@ class NetworkApi {
       if (sameSite != null) 'sameSite': sameSite,
       if (expires != null) 'expires': expires,
       if (priority != null) 'priority': priority,
-      if (sameParty != null) 'sameParty': sameParty,
       if (sourceScheme != null) 'sourceScheme': sourceScheme,
       if (sourcePort != null) 'sourcePort': sourcePort,
       if (partitionKey != null) 'partitionKey': partitionKey,
@@ -814,6 +849,22 @@ class NetworkApi {
   /// [enable] Whether to enable or disable events for the Reporting API
   Future<void> enableReportingApi(bool enable) async {
     await _client.send('Network.enableReportingApi', {'enable': enable});
+  }
+
+  /// Sets up tracking device bound sessions and fetching of initial set of sessions.
+  /// [enable] Whether to enable or disable events.
+  Future<void> enableDeviceBoundSessions(bool enable) async {
+    await _client.send('Network.enableDeviceBoundSessions', {'enable': enable});
+  }
+
+  /// Fetches the schemeful site for a specific origin.
+  /// [origin] The URL origin.
+  /// Returns: The corresponding schemeful site.
+  Future<String> fetchSchemefulSite(String origin) async {
+    var result = await _client.send('Network.fetchSchemefulSite', {
+      'origin': origin,
+    });
+    return result['schemefulSite'] as String;
   }
 
   /// Fetches the resource and returns the content.
@@ -1132,6 +1183,9 @@ class RequestWillBeSentEvent {
   /// Whether the request is initiated by a user gesture. Defaults to false.
   final bool? hasUserGesture;
 
+  /// The render blocking behavior of the request.
+  final RenderBlockingBehavior? renderBlockingBehavior;
+
   RequestWillBeSentEvent({
     required this.requestId,
     required this.loaderId,
@@ -1145,6 +1199,7 @@ class RequestWillBeSentEvent {
     this.type,
     this.frameId,
     this.hasUserGesture,
+    this.renderBlockingBehavior,
   });
 
   factory RequestWillBeSentEvent.fromJson(Map<String, dynamic> json) {
@@ -1170,6 +1225,11 @@ class RequestWillBeSentEvent {
           : null,
       hasUserGesture: json.containsKey('hasUserGesture')
           ? json['hasUserGesture'] as bool
+          : null,
+      renderBlockingBehavior: json.containsKey('renderBlockingBehavior')
+          ? RenderBlockingBehavior.fromJson(
+              json['renderBlockingBehavior'] as String,
+            )
           : null,
     );
   }
@@ -1901,6 +1961,9 @@ class RequestWillBeSentExtraInfoEvent {
   /// Connection timing information for the request.
   final ConnectTiming connectTiming;
 
+  /// How the request site's device bound sessions were used during this request.
+  final List<DeviceBoundSessionWithUsage>? deviceBoundSessionUsages;
+
   /// The client security state set for the request.
   final ClientSecurityState? clientSecurityState;
 
@@ -1916,6 +1979,7 @@ class RequestWillBeSentExtraInfoEvent {
     required this.associatedCookies,
     required this.headers,
     required this.connectTiming,
+    this.deviceBoundSessionUsages,
     this.clientSecurityState,
     this.siteHasCookieInOtherPartition,
     this.appliedNetworkConditionsId,
@@ -1931,6 +1995,15 @@ class RequestWillBeSentExtraInfoEvent {
       connectTiming: ConnectTiming.fromJson(
         json['connectTiming'] as Map<String, dynamic>,
       ),
+      deviceBoundSessionUsages: json.containsKey('deviceBoundSessionUsages')
+          ? (json['deviceBoundSessionUsages'] as List)
+                .map(
+                  (e) => DeviceBoundSessionWithUsage.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
       clientSecurityState: json.containsKey('clientSecurityState')
           ? ClientSecurityState.fromJson(
               json['clientSecurityState'] as Map<String, dynamic>,
@@ -2131,6 +2204,74 @@ class ReportingApiEndpointsChangedForOriginEvent {
   }
 }
 
+class DeviceBoundSessionEventOccurredEvent {
+  /// A unique identifier for this session event.
+  final DeviceBoundSessionEventId eventId;
+
+  /// The site this session event is associated with.
+  final String site;
+
+  /// Whether this event was considered successful.
+  final bool succeeded;
+
+  /// The session ID this event is associated with. May not be populated for
+  /// failed events.
+  final String? sessionId;
+
+  /// The below are the different session event type details. Exactly one is populated.
+  final CreationEventDetails? creationEventDetails;
+
+  final RefreshEventDetails? refreshEventDetails;
+
+  final TerminationEventDetails? terminationEventDetails;
+
+  final ChallengeEventDetails? challengeEventDetails;
+
+  DeviceBoundSessionEventOccurredEvent({
+    required this.eventId,
+    required this.site,
+    required this.succeeded,
+    this.sessionId,
+    this.creationEventDetails,
+    this.refreshEventDetails,
+    this.terminationEventDetails,
+    this.challengeEventDetails,
+  });
+
+  factory DeviceBoundSessionEventOccurredEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DeviceBoundSessionEventOccurredEvent(
+      eventId: DeviceBoundSessionEventId.fromJson(json['eventId'] as String),
+      site: json['site'] as String,
+      succeeded: json['succeeded'] as bool? ?? false,
+      sessionId: json.containsKey('sessionId')
+          ? json['sessionId'] as String
+          : null,
+      creationEventDetails: json.containsKey('creationEventDetails')
+          ? CreationEventDetails.fromJson(
+              json['creationEventDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      refreshEventDetails: json.containsKey('refreshEventDetails')
+          ? RefreshEventDetails.fromJson(
+              json['refreshEventDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      terminationEventDetails: json.containsKey('terminationEventDetails')
+          ? TerminationEventDetails.fromJson(
+              json['terminationEventDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      challengeEventDetails: json.containsKey('challengeEventDetails')
+          ? ChallengeEventDetails.fromJson(
+              json['challengeEventDetails'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+}
+
 class GetResponseBodyResult {
   /// Response body.
   final String body;
@@ -2143,6 +2284,26 @@ class GetResponseBodyResult {
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
       body: json['body'] as String,
+      base64Encoded: json['base64Encoded'] as bool? ?? false,
+    );
+  }
+}
+
+class GetRequestPostDataResult {
+  /// Request body string, omitting files from multipart requests
+  final String postData;
+
+  /// True, if content was sent as base64.
+  final bool base64Encoded;
+
+  GetRequestPostDataResult({
+    required this.postData,
+    required this.base64Encoded,
+  });
+
+  factory GetRequestPostDataResult.fromJson(Map<String, dynamic> json) {
+    return GetRequestPostDataResult(
+      postData: json['postData'] as String,
       base64Encoded: json['base64Encoded'] as bool? ?? false,
     );
   }
@@ -2529,6 +2690,27 @@ enum ResourcePriority {
 
   factory ResourcePriority.fromJson(String value) =>
       ResourcePriority.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// The render blocking behavior of a resource request.
+enum RenderBlockingBehavior {
+  blocking('Blocking'),
+  inBodyParserBlocking('InBodyParserBlocking'),
+  nonBlocking('NonBlocking'),
+  nonBlockingDynamic('NonBlockingDynamic'),
+  potentiallyBlocking('PotentiallyBlocking');
+
+  final String value;
+
+  const RenderBlockingBehavior(this.value);
+
+  factory RenderBlockingBehavior.fromJson(String value) =>
+      RenderBlockingBehavior.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
@@ -2976,27 +3158,14 @@ enum CorsError {
   preflightInvalidAllowCredentials('PreflightInvalidAllowCredentials'),
   preflightMissingAllowExternal('PreflightMissingAllowExternal'),
   preflightInvalidAllowExternal('PreflightInvalidAllowExternal'),
-  preflightMissingAllowPrivateNetwork('PreflightMissingAllowPrivateNetwork'),
-  preflightInvalidAllowPrivateNetwork('PreflightInvalidAllowPrivateNetwork'),
   invalidAllowMethodsPreflightResponse('InvalidAllowMethodsPreflightResponse'),
   invalidAllowHeadersPreflightResponse('InvalidAllowHeadersPreflightResponse'),
   methodDisallowedByPreflightResponse('MethodDisallowedByPreflightResponse'),
   headerDisallowedByPreflightResponse('HeaderDisallowedByPreflightResponse'),
   redirectContainsCredentials('RedirectContainsCredentials'),
-  insecurePrivateNetwork('InsecurePrivateNetwork'),
-  invalidPrivateNetworkAccess('InvalidPrivateNetworkAccess'),
-  unexpectedPrivateNetworkAccess('UnexpectedPrivateNetworkAccess'),
+  insecureLocalNetwork('InsecureLocalNetwork'),
+  invalidLocalNetworkAccess('InvalidLocalNetworkAccess'),
   noCorsRedirectModeNotFollow('NoCorsRedirectModeNotFollow'),
-  preflightMissingPrivateNetworkAccessId(
-    'PreflightMissingPrivateNetworkAccessId',
-  ),
-  preflightMissingPrivateNetworkAccessName(
-    'PreflightMissingPrivateNetworkAccessName',
-  ),
-  privateNetworkAccessPermissionUnavailable(
-    'PrivateNetworkAccessPermissionUnavailable',
-  ),
-  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied'),
   localNetworkAccessPermissionDenied('LocalNetworkAccessPermissionDenied');
 
   final String value;
@@ -3843,10 +4012,6 @@ enum SetCookieBlockedReason {
   schemefulSameSiteUnspecifiedTreatedAsLax(
     'SchemefulSameSiteUnspecifiedTreatedAsLax',
   ),
-  samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
-  samePartyConflictsWithOtherAttributes(
-    'SamePartyConflictsWithOtherAttributes',
-  ),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
   disallowedCharacter('DisallowedCharacter'),
   noCookieContent('NoCookieContent');
@@ -3882,7 +4047,6 @@ enum CookieBlockedReason {
   schemefulSameSiteUnspecifiedTreatedAsLax(
     'SchemefulSameSiteUnspecifiedTreatedAsLax',
   ),
-  samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
   portMismatch('PortMismatch'),
   schemeMismatch('SchemeMismatch'),
@@ -4079,9 +4243,6 @@ class CookieParam {
   /// Cookie Priority.
   final CookiePriority? priority;
 
-  /// True if cookie is SameParty.
-  final bool? sameParty;
-
   /// Cookie source scheme type.
   final CookieSourceScheme? sourceScheme;
 
@@ -4104,7 +4265,6 @@ class CookieParam {
     this.sameSite,
     this.expires,
     this.priority,
-    this.sameParty,
     this.sourceScheme,
     this.sourcePort,
     this.partitionKey,
@@ -4127,9 +4287,6 @@ class CookieParam {
           : null,
       priority: json.containsKey('priority')
           ? CookiePriority.fromJson(json['priority'] as String)
-          : null,
-      sameParty: json.containsKey('sameParty')
-          ? json['sameParty'] as bool
           : null,
       sourceScheme: json.containsKey('sourceScheme')
           ? CookieSourceScheme.fromJson(json['sourceScheme'] as String)
@@ -4157,7 +4314,6 @@ class CookieParam {
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
       if (expires != null) 'expires': expires!.toJson(),
       if (priority != null) 'priority': priority!.toJson(),
-      if (sameParty != null) 'sameParty': sameParty,
       if (sourceScheme != null) 'sourceScheme': sourceScheme!.toJson(),
       if (sourcePort != null) 'sourcePort': sourcePort,
       if (partitionKey != null) 'partitionKey': partitionKey!.toJson(),
@@ -4902,7 +5058,7 @@ class DirectUDPMessage {
   }
 }
 
-enum PrivateNetworkRequestPolicy {
+enum LocalNetworkAccessRequestPolicy {
   allow('Allow'),
   blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
   warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
@@ -4911,10 +5067,12 @@ enum PrivateNetworkRequestPolicy {
 
   final String value;
 
-  const PrivateNetworkRequestPolicy(this.value);
+  const LocalNetworkAccessRequestPolicy(this.value);
 
-  factory PrivateNetworkRequestPolicy.fromJson(String value) =>
-      PrivateNetworkRequestPolicy.values.firstWhere((e) => e.value == value);
+  factory LocalNetworkAccessRequestPolicy.fromJson(String value) =>
+      LocalNetworkAccessRequestPolicy.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -4963,12 +5121,12 @@ class ClientSecurityState {
 
   final IPAddressSpace initiatorIPAddressSpace;
 
-  final PrivateNetworkRequestPolicy privateNetworkRequestPolicy;
+  final LocalNetworkAccessRequestPolicy localNetworkAccessRequestPolicy;
 
   ClientSecurityState({
     required this.initiatorIsSecureContext,
     required this.initiatorIPAddressSpace,
-    required this.privateNetworkRequestPolicy,
+    required this.localNetworkAccessRequestPolicy,
   });
 
   factory ClientSecurityState.fromJson(Map<String, dynamic> json) {
@@ -4978,8 +5136,8 @@ class ClientSecurityState {
       initiatorIPAddressSpace: IPAddressSpace.fromJson(
         json['initiatorIPAddressSpace'] as String,
       ),
-      privateNetworkRequestPolicy: PrivateNetworkRequestPolicy.fromJson(
-        json['privateNetworkRequestPolicy'] as String,
+      localNetworkAccessRequestPolicy: LocalNetworkAccessRequestPolicy.fromJson(
+        json['localNetworkAccessRequestPolicy'] as String,
       ),
     );
   }
@@ -4988,7 +5146,8 @@ class ClientSecurityState {
     return {
       'initiatorIsSecureContext': initiatorIsSecureContext,
       'initiatorIPAddressSpace': initiatorIPAddressSpace.toJson(),
-      'privateNetworkRequestPolicy': privateNetworkRequestPolicy.toJson(),
+      'localNetworkAccessRequestPolicy': localNetworkAccessRequestPolicy
+          .toJson(),
     };
   }
 }
@@ -5320,6 +5479,610 @@ class ReportingApiEndpoint {
   Map<String, dynamic> toJson() {
     return {'url': url, 'groupName': groupName};
   }
+}
+
+/// Unique identifier for a device bound session.
+class DeviceBoundSessionKey {
+  /// The site the session is set up for.
+  final String site;
+
+  /// The id of the session.
+  final String id;
+
+  DeviceBoundSessionKey({required this.site, required this.id});
+
+  factory DeviceBoundSessionKey.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionKey(
+      site: json['site'] as String,
+      id: json['id'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'site': site, 'id': id};
+  }
+}
+
+/// How a device bound session was used during a request.
+class DeviceBoundSessionWithUsage {
+  /// The key for the session.
+  final DeviceBoundSessionKey sessionKey;
+
+  /// How the session was used (or not used).
+  final DeviceBoundSessionWithUsageUsage usage;
+
+  DeviceBoundSessionWithUsage({required this.sessionKey, required this.usage});
+
+  factory DeviceBoundSessionWithUsage.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionWithUsage(
+      sessionKey: DeviceBoundSessionKey.fromJson(
+        json['sessionKey'] as Map<String, dynamic>,
+      ),
+      usage: DeviceBoundSessionWithUsageUsage.fromJson(json['usage'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'sessionKey': sessionKey.toJson(), 'usage': usage};
+  }
+}
+
+enum DeviceBoundSessionWithUsageUsage {
+  notInScope('NotInScope'),
+  inScopeRefreshNotYetNeeded('InScopeRefreshNotYetNeeded'),
+  inScopeRefreshNotAllowed('InScopeRefreshNotAllowed'),
+  proactiveRefreshNotPossible('ProactiveRefreshNotPossible'),
+  proactiveRefreshAttempted('ProactiveRefreshAttempted'),
+  deferred$('Deferred');
+
+  final String value;
+
+  const DeviceBoundSessionWithUsageUsage(this.value);
+
+  factory DeviceBoundSessionWithUsageUsage.fromJson(String value) =>
+      DeviceBoundSessionWithUsageUsage.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// A device bound session's cookie craving.
+class DeviceBoundSessionCookieCraving {
+  /// The name of the craving.
+  final String name;
+
+  /// The domain of the craving.
+  final String domain;
+
+  /// The path of the craving.
+  final String path;
+
+  /// The `Secure` attribute of the craving attributes.
+  final bool secure;
+
+  /// The `HttpOnly` attribute of the craving attributes.
+  final bool httpOnly;
+
+  /// The `SameSite` attribute of the craving attributes.
+  final CookieSameSite? sameSite;
+
+  DeviceBoundSessionCookieCraving({
+    required this.name,
+    required this.domain,
+    required this.path,
+    required this.secure,
+    required this.httpOnly,
+    this.sameSite,
+  });
+
+  factory DeviceBoundSessionCookieCraving.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionCookieCraving(
+      name: json['name'] as String,
+      domain: json['domain'] as String,
+      path: json['path'] as String,
+      secure: json['secure'] as bool? ?? false,
+      httpOnly: json['httpOnly'] as bool? ?? false,
+      sameSite: json.containsKey('sameSite')
+          ? CookieSameSite.fromJson(json['sameSite'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'domain': domain,
+      'path': path,
+      'secure': secure,
+      'httpOnly': httpOnly,
+      if (sameSite != null) 'sameSite': sameSite!.toJson(),
+    };
+  }
+}
+
+/// A device bound session's inclusion URL rule.
+class DeviceBoundSessionUrlRule {
+  /// See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::rule_type`.
+  final DeviceBoundSessionUrlRuleRuleType ruleType;
+
+  /// See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::host_pattern`.
+  final String hostPattern;
+
+  /// See comments on `net::device_bound_sessions::SessionInclusionRules::UrlRule::path_prefix`.
+  final String pathPrefix;
+
+  DeviceBoundSessionUrlRule({
+    required this.ruleType,
+    required this.hostPattern,
+    required this.pathPrefix,
+  });
+
+  factory DeviceBoundSessionUrlRule.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionUrlRule(
+      ruleType: DeviceBoundSessionUrlRuleRuleType.fromJson(
+        json['ruleType'] as String,
+      ),
+      hostPattern: json['hostPattern'] as String,
+      pathPrefix: json['pathPrefix'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ruleType': ruleType,
+      'hostPattern': hostPattern,
+      'pathPrefix': pathPrefix,
+    };
+  }
+}
+
+enum DeviceBoundSessionUrlRuleRuleType {
+  exclude('Exclude'),
+  include('Include');
+
+  final String value;
+
+  const DeviceBoundSessionUrlRuleRuleType(this.value);
+
+  factory DeviceBoundSessionUrlRuleRuleType.fromJson(String value) =>
+      DeviceBoundSessionUrlRuleRuleType.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// A device bound session's inclusion rules.
+class DeviceBoundSessionInclusionRules {
+  /// See comments on `net::device_bound_sessions::SessionInclusionRules::origin_`.
+  final String origin;
+
+  /// Whether the whole site is included. See comments on
+  /// `net::device_bound_sessions::SessionInclusionRules::include_site_` for more
+  /// details; this boolean is true if that value is populated.
+  final bool includeSite;
+
+  /// See comments on `net::device_bound_sessions::SessionInclusionRules::url_rules_`.
+  final List<DeviceBoundSessionUrlRule> urlRules;
+
+  DeviceBoundSessionInclusionRules({
+    required this.origin,
+    required this.includeSite,
+    required this.urlRules,
+  });
+
+  factory DeviceBoundSessionInclusionRules.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionInclusionRules(
+      origin: json['origin'] as String,
+      includeSite: json['includeSite'] as bool? ?? false,
+      urlRules: (json['urlRules'] as List)
+          .map(
+            (e) =>
+                DeviceBoundSessionUrlRule.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin,
+      'includeSite': includeSite,
+      'urlRules': urlRules.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// A device bound session.
+class DeviceBoundSession {
+  /// The site and session ID of the session.
+  final DeviceBoundSessionKey key;
+
+  /// See comments on `net::device_bound_sessions::Session::refresh_url_`.
+  final String refreshUrl;
+
+  /// See comments on `net::device_bound_sessions::Session::inclusion_rules_`.
+  final DeviceBoundSessionInclusionRules inclusionRules;
+
+  /// See comments on `net::device_bound_sessions::Session::cookie_cravings_`.
+  final List<DeviceBoundSessionCookieCraving> cookieCravings;
+
+  /// See comments on `net::device_bound_sessions::Session::expiry_date_`.
+  final network.TimeSinceEpoch expiryDate;
+
+  /// See comments on `net::device_bound_sessions::Session::cached_challenge__`.
+  final String? cachedChallenge;
+
+  /// See comments on `net::device_bound_sessions::Session::allowed_refresh_initiators_`.
+  final List<String> allowedRefreshInitiators;
+
+  DeviceBoundSession({
+    required this.key,
+    required this.refreshUrl,
+    required this.inclusionRules,
+    required this.cookieCravings,
+    required this.expiryDate,
+    this.cachedChallenge,
+    required this.allowedRefreshInitiators,
+  });
+
+  factory DeviceBoundSession.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSession(
+      key: DeviceBoundSessionKey.fromJson(json['key'] as Map<String, dynamic>),
+      refreshUrl: json['refreshUrl'] as String,
+      inclusionRules: DeviceBoundSessionInclusionRules.fromJson(
+        json['inclusionRules'] as Map<String, dynamic>,
+      ),
+      cookieCravings: (json['cookieCravings'] as List)
+          .map(
+            (e) => DeviceBoundSessionCookieCraving.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      expiryDate: network.TimeSinceEpoch.fromJson(json['expiryDate'] as num),
+      cachedChallenge: json.containsKey('cachedChallenge')
+          ? json['cachedChallenge'] as String
+          : null,
+      allowedRefreshInitiators: (json['allowedRefreshInitiators'] as List)
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key.toJson(),
+      'refreshUrl': refreshUrl,
+      'inclusionRules': inclusionRules.toJson(),
+      'cookieCravings': cookieCravings.map((e) => e.toJson()).toList(),
+      'expiryDate': expiryDate.toJson(),
+      'allowedRefreshInitiators': [...allowedRefreshInitiators],
+      if (cachedChallenge != null) 'cachedChallenge': cachedChallenge,
+    };
+  }
+}
+
+/// A unique identifier for a device bound session event.
+extension type DeviceBoundSessionEventId(String value) {
+  factory DeviceBoundSessionEventId.fromJson(String value) =>
+      DeviceBoundSessionEventId(value);
+
+  String toJson() => value;
+}
+
+/// A fetch result for a device bound session creation or refresh.
+enum DeviceBoundSessionFetchResult {
+  success('Success'),
+  keyError('KeyError'),
+  signingError('SigningError'),
+  serverRequestedTermination('ServerRequestedTermination'),
+  invalidSessionId('InvalidSessionId'),
+  invalidChallenge('InvalidChallenge'),
+  tooManyChallenges('TooManyChallenges'),
+  invalidFetcherUrl('InvalidFetcherUrl'),
+  invalidRefreshUrl('InvalidRefreshUrl'),
+  transientHttpError('TransientHttpError'),
+  scopeOriginSameSiteMismatch('ScopeOriginSameSiteMismatch'),
+  refreshUrlSameSiteMismatch('RefreshUrlSameSiteMismatch'),
+  mismatchedSessionId('MismatchedSessionId'),
+  missingScope('MissingScope'),
+  noCredentials('NoCredentials'),
+  subdomainRegistrationWellKnownUnavailable(
+    'SubdomainRegistrationWellKnownUnavailable',
+  ),
+  subdomainRegistrationUnauthorized('SubdomainRegistrationUnauthorized'),
+  subdomainRegistrationWellKnownMalformed(
+    'SubdomainRegistrationWellKnownMalformed',
+  ),
+  sessionProviderWellKnownUnavailable('SessionProviderWellKnownUnavailable'),
+  relyingPartyWellKnownUnavailable('RelyingPartyWellKnownUnavailable'),
+  federatedKeyThumbprintMismatch('FederatedKeyThumbprintMismatch'),
+  invalidFederatedSessionUrl('InvalidFederatedSessionUrl'),
+  invalidFederatedKey('InvalidFederatedKey'),
+  tooManyRelyingOriginLabels('TooManyRelyingOriginLabels'),
+  boundCookieSetForbidden('BoundCookieSetForbidden'),
+  netError('NetError'),
+  proxyError('ProxyError'),
+  emptySessionConfig('EmptySessionConfig'),
+  invalidCredentialsConfig('InvalidCredentialsConfig'),
+  invalidCredentialsType('InvalidCredentialsType'),
+  invalidCredentialsEmptyName('InvalidCredentialsEmptyName'),
+  invalidCredentialsCookie('InvalidCredentialsCookie'),
+  persistentHttpError('PersistentHttpError'),
+  registrationAttemptedChallenge('RegistrationAttemptedChallenge'),
+  invalidScopeOrigin('InvalidScopeOrigin'),
+  scopeOriginContainsPath('ScopeOriginContainsPath'),
+  refreshInitiatorNotString('RefreshInitiatorNotString'),
+  refreshInitiatorInvalidHostPattern('RefreshInitiatorInvalidHostPattern'),
+  invalidScopeSpecification('InvalidScopeSpecification'),
+  missingScopeSpecificationType('MissingScopeSpecificationType'),
+  emptyScopeSpecificationDomain('EmptyScopeSpecificationDomain'),
+  emptyScopeSpecificationPath('EmptyScopeSpecificationPath'),
+  invalidScopeSpecificationType('InvalidScopeSpecificationType'),
+  invalidScopeIncludeSite('InvalidScopeIncludeSite'),
+  missingScopeIncludeSite('MissingScopeIncludeSite'),
+  federatedNotAuthorizedByProvider('FederatedNotAuthorizedByProvider'),
+  federatedNotAuthorizedByRelyingParty('FederatedNotAuthorizedByRelyingParty'),
+  sessionProviderWellKnownMalformed('SessionProviderWellKnownMalformed'),
+  sessionProviderWellKnownHasProviderOrigin(
+    'SessionProviderWellKnownHasProviderOrigin',
+  ),
+  relyingPartyWellKnownMalformed('RelyingPartyWellKnownMalformed'),
+  relyingPartyWellKnownHasRelyingOrigins(
+    'RelyingPartyWellKnownHasRelyingOrigins',
+  ),
+  invalidFederatedSessionProviderSessionMissing(
+    'InvalidFederatedSessionProviderSessionMissing',
+  ),
+  invalidFederatedSessionWrongProviderOrigin(
+    'InvalidFederatedSessionWrongProviderOrigin',
+  ),
+  invalidCredentialsCookieCreationTime('InvalidCredentialsCookieCreationTime'),
+  invalidCredentialsCookieName('InvalidCredentialsCookieName'),
+  invalidCredentialsCookieParsing('InvalidCredentialsCookieParsing'),
+  invalidCredentialsCookieUnpermittedAttribute(
+    'InvalidCredentialsCookieUnpermittedAttribute',
+  ),
+  invalidCredentialsCookieInvalidDomain(
+    'InvalidCredentialsCookieInvalidDomain',
+  ),
+  invalidCredentialsCookiePrefix('InvalidCredentialsCookiePrefix'),
+  invalidScopeRulePath('InvalidScopeRulePath'),
+  invalidScopeRuleHostPattern('InvalidScopeRuleHostPattern'),
+  scopeRuleOriginScopedHostPatternMismatch(
+    'ScopeRuleOriginScopedHostPatternMismatch',
+  ),
+  scopeRuleSiteScopedHostPatternMismatch(
+    'ScopeRuleSiteScopedHostPatternMismatch',
+  ),
+  signingQuotaExceeded('SigningQuotaExceeded'),
+  invalidConfigJson('InvalidConfigJson'),
+  invalidFederatedSessionProviderFailedToRestoreKey(
+    'InvalidFederatedSessionProviderFailedToRestoreKey',
+  ),
+  failedToUnwrapKey('FailedToUnwrapKey'),
+  sessionDeletedDuringRefresh('SessionDeletedDuringRefresh');
+
+  final String value;
+
+  const DeviceBoundSessionFetchResult(this.value);
+
+  factory DeviceBoundSessionFetchResult.fromJson(String value) =>
+      DeviceBoundSessionFetchResult.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Session event details specific to creation.
+class CreationEventDetails {
+  /// The result of the fetch attempt.
+  final DeviceBoundSessionFetchResult fetchResult;
+
+  /// The session if there was a newly created session. This is populated for
+  /// all successful creation events.
+  final DeviceBoundSession? newSession;
+
+  CreationEventDetails({required this.fetchResult, this.newSession});
+
+  factory CreationEventDetails.fromJson(Map<String, dynamic> json) {
+    return CreationEventDetails(
+      fetchResult: DeviceBoundSessionFetchResult.fromJson(
+        json['fetchResult'] as String,
+      ),
+      newSession: json.containsKey('newSession')
+          ? DeviceBoundSession.fromJson(
+              json['newSession'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fetchResult': fetchResult.toJson(),
+      if (newSession != null) 'newSession': newSession!.toJson(),
+    };
+  }
+}
+
+/// Session event details specific to refresh.
+class RefreshEventDetails {
+  /// The result of a refresh.
+  final RefreshEventDetailsRefreshResult refreshResult;
+
+  /// If there was a fetch attempt, the result of that.
+  final DeviceBoundSessionFetchResult? fetchResult;
+
+  /// The session display if there was a newly created session. This is populated
+  /// for any refresh event that modifies the session config.
+  final DeviceBoundSession? newSession;
+
+  /// See comments on `net::device_bound_sessions::RefreshEventResult::was_fully_proactive_refresh`.
+  final bool wasFullyProactiveRefresh;
+
+  RefreshEventDetails({
+    required this.refreshResult,
+    this.fetchResult,
+    this.newSession,
+    required this.wasFullyProactiveRefresh,
+  });
+
+  factory RefreshEventDetails.fromJson(Map<String, dynamic> json) {
+    return RefreshEventDetails(
+      refreshResult: RefreshEventDetailsRefreshResult.fromJson(
+        json['refreshResult'] as String,
+      ),
+      fetchResult: json.containsKey('fetchResult')
+          ? DeviceBoundSessionFetchResult.fromJson(
+              json['fetchResult'] as String,
+            )
+          : null,
+      newSession: json.containsKey('newSession')
+          ? DeviceBoundSession.fromJson(
+              json['newSession'] as Map<String, dynamic>,
+            )
+          : null,
+      wasFullyProactiveRefresh:
+          json['wasFullyProactiveRefresh'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'refreshResult': refreshResult,
+      'wasFullyProactiveRefresh': wasFullyProactiveRefresh,
+      if (fetchResult != null) 'fetchResult': fetchResult!.toJson(),
+      if (newSession != null) 'newSession': newSession!.toJson(),
+    };
+  }
+}
+
+enum RefreshEventDetailsRefreshResult {
+  refreshed('Refreshed'),
+  initializedService('InitializedService'),
+  unreachable('Unreachable'),
+  serverError('ServerError'),
+  refreshQuotaExceeded('RefreshQuotaExceeded'),
+  fatalError('FatalError'),
+  signingQuotaExceeded('SigningQuotaExceeded');
+
+  final String value;
+
+  const RefreshEventDetailsRefreshResult(this.value);
+
+  factory RefreshEventDetailsRefreshResult.fromJson(String value) =>
+      RefreshEventDetailsRefreshResult.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Session event details specific to termination.
+class TerminationEventDetails {
+  /// The reason for a session being deleted.
+  final TerminationEventDetailsDeletionReason deletionReason;
+
+  TerminationEventDetails({required this.deletionReason});
+
+  factory TerminationEventDetails.fromJson(Map<String, dynamic> json) {
+    return TerminationEventDetails(
+      deletionReason: TerminationEventDetailsDeletionReason.fromJson(
+        json['deletionReason'] as String,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'deletionReason': deletionReason};
+  }
+}
+
+enum TerminationEventDetailsDeletionReason {
+  expired('Expired'),
+  failedToRestoreKey('FailedToRestoreKey'),
+  failedToUnwrapKey('FailedToUnwrapKey'),
+  storagePartitionCleared('StoragePartitionCleared'),
+  clearBrowsingData('ClearBrowsingData'),
+  serverRequested('ServerRequested'),
+  invalidSessionParams('InvalidSessionParams'),
+  refreshFatalError('RefreshFatalError');
+
+  final String value;
+
+  const TerminationEventDetailsDeletionReason(this.value);
+
+  factory TerminationEventDetailsDeletionReason.fromJson(String value) =>
+      TerminationEventDetailsDeletionReason.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Session event details specific to challenges.
+class ChallengeEventDetails {
+  /// The result of a challenge.
+  final ChallengeEventDetailsChallengeResult challengeResult;
+
+  /// The challenge set.
+  final String challenge;
+
+  ChallengeEventDetails({
+    required this.challengeResult,
+    required this.challenge,
+  });
+
+  factory ChallengeEventDetails.fromJson(Map<String, dynamic> json) {
+    return ChallengeEventDetails(
+      challengeResult: ChallengeEventDetailsChallengeResult.fromJson(
+        json['challengeResult'] as String,
+      ),
+      challenge: json['challenge'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'challengeResult': challengeResult, 'challenge': challenge};
+  }
+}
+
+enum ChallengeEventDetailsChallengeResult {
+  success('Success'),
+  noSessionId('NoSessionId'),
+  noSessionMatch('NoSessionMatch'),
+  cantSetBoundCookie('CantSetBoundCookie');
+
+  final String value;
+
+  const ChallengeEventDetailsChallengeResult(this.value);
+
+  factory ChallengeEventDetailsChallengeResult.fromJson(String value) =>
+      ChallengeEventDetailsChallengeResult.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// An object providing the result of a network resource load.

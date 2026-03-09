@@ -146,12 +146,9 @@ class TargetApi {
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
-  /// Returns: An array of browser context ids.
-  Future<List<browser.BrowserContextID>> getBrowserContexts() async {
+  Future<GetBrowserContextsResult> getBrowserContexts() async {
     var result = await _client.send('Target.getBrowserContexts');
-    return (result['browserContextIds'] as List)
-        .map((e) => browser.BrowserContextID.fromJson(e as String))
-        .toList();
+    return GetBrowserContextsResult.fromJson(result);
   }
 
   /// Creates a new page.
@@ -172,6 +169,13 @@ class TargetApi {
   /// [hidden] Whether to create a hidden target. The hidden target is observable via protocol, but not
   /// present in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or
   /// `background: false`. The life-time of the tab is limited to the life-time of the session.
+  /// [focus] If specified, the option is used to determine if the new target should
+  /// be focused or not. By default, the focus behavior depends on the
+  /// value of the background field. For example, background=false and focus=false
+  /// will result in the target tab being opened but the browser window remain
+  /// unchanged (if it was in the background, it will remain in the background)
+  /// and background=false with focus=undefined will result in the window being focused.
+  /// Using background: true and focus: true is not supported and will result in an error.
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {
@@ -186,6 +190,7 @@ class TargetApi {
     bool? background,
     bool? forTab,
     bool? hidden,
+    bool? focus,
   }) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
@@ -201,6 +206,7 @@ class TargetApi {
       if (background != null) 'background': background,
       if (forTab != null) 'forTab': forTab,
       if (hidden != null) 'hidden': hidden,
+      if (focus != null) 'focus': focus,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }
@@ -439,6 +445,32 @@ class TargetCrashedEvent {
       targetId: TargetID.fromJson(json['targetId'] as String),
       status: json['status'] as String,
       errorCode: json['errorCode'] as int,
+    );
+  }
+}
+
+class GetBrowserContextsResult {
+  /// An array of browser context ids.
+  final List<browser.BrowserContextID> browserContextIds;
+
+  /// The id of the default browser context if available.
+  final browser.BrowserContextID? defaultBrowserContextId;
+
+  GetBrowserContextsResult({
+    required this.browserContextIds,
+    this.defaultBrowserContextId,
+  });
+
+  factory GetBrowserContextsResult.fromJson(Map<String, dynamic> json) {
+    return GetBrowserContextsResult(
+      browserContextIds: (json['browserContextIds'] as List)
+          .map((e) => browser.BrowserContextID.fromJson(e as String))
+          .toList(),
+      defaultBrowserContextId: json.containsKey('defaultBrowserContextId')
+          ? browser.BrowserContextID.fromJson(
+              json['defaultBrowserContextId'] as String,
+            )
+          : null,
     );
   }
 }

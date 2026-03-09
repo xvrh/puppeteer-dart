@@ -43,6 +43,7 @@ import 'pwa.dart';
 import 'runtime.dart';
 import 'security.dart';
 import 'service_worker.dart';
+import 'smart_card_emulation.dart';
 import 'storage.dart';
 import 'system_info.dart';
 import 'target.dart';
@@ -226,6 +227,10 @@ class DevTools {
   ServiceWorkerApi get serviceWorker =>
       _serviceWorker ??= ServiceWorkerApi(client);
   ServiceWorkerApi? _serviceWorker;
+
+  SmartCardEmulationApi get smartCardEmulation =>
+      _smartCardEmulation ??= SmartCardEmulationApi(client);
+  SmartCardEmulationApi? _smartCardEmulation;
 
   StorageApi get storage => _storage ??= StorageApi(client);
   StorageApi? _storage;

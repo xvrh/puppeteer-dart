@@ -39,6 +39,13 @@ class TracingApi {
     return (result['categories'] as List).map((e) => e as String).toList();
   }
 
+  /// Return a descriptor for all available tracing categories.
+  /// Returns: Base64-encoded serialized perfetto.protos.TrackEventDescriptor protobuf message.
+  Future<String> getTrackEventDescriptor() async {
+    var result = await _client.send('Tracing.getTrackEventDescriptor');
+    return result['descriptor'] as String;
+  }
+
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
   Future<void> recordClockSyncMarker(String syncId) async {

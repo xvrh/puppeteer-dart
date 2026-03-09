@@ -7,15 +7,31 @@ class ExtensionsApi {
 
   ExtensionsApi(this._client);
 
+  /// Runs an extension default action.
+  /// Available if the client is connected using the --remote-debugging-pipe
+  /// flag and the --enable-unsafe-extension-debugging flag is set.
+  /// [id] Extension id.
+  /// [targetId] A tab target ID to trigger the default extension action on.
+  Future<void> triggerAction(String id, String targetId) async {
+    await _client.send('Extensions.triggerAction', {
+      'id': id,
+      'targetId': targetId,
+    });
+  }
+
   /// Installs an unpacked extension from the filesystem similar to
   /// --load-extension CLI flags. Returns extension ID once the extension
   /// has been installed. Available if the client is connected using the
   /// --remote-debugging-pipe flag and the --enable-unsafe-extension-debugging
   /// flag is set.
   /// [path] Absolute file path.
+  /// [enableInIncognito] Enable the extension in incognito
   /// Returns: Extension id.
-  Future<String> loadUnpacked(String path) async {
-    var result = await _client.send('Extensions.loadUnpacked', {'path': path});
+  Future<String> loadUnpacked(String path, {bool? enableInIncognito}) async {
+    var result = await _client.send('Extensions.loadUnpacked', {
+      'path': path,
+      if (enableInIncognito != null) 'enableInIncognito': enableInIncognito,
+    });
     return result['id'] as String;
   }
 

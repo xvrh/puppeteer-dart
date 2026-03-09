@@ -289,7 +289,7 @@ class Puppeteer {
     var browser = await createBrowser(
       null,
       connection,
-      browserContextIds: browserContextIds,
+      browserContextIds: browserContextIds.browserContextIds,
       ignoreHttpsErrors: ignoreHttpsErrors,
       defaultViewport: connectOptions.computedDefaultViewport,
       plugins: allPlugins,
