@@ -1305,8 +1305,7 @@ enum PseudoType {
   detailsContent('details-content'),
   picker('picker'),
   permissionIcon('permission-icon'),
-  overscrollAreaParent('overscroll-area-parent'),
-  overscrollClientArea('overscroll-client-area');
+  overscrollAreaParent('overscroll-area-parent');
 
   final String value;
 

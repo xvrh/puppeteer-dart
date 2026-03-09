@@ -176,6 +176,8 @@ class CSSApi {
   /// to the provided property syntax, the value is parsed using combined
   /// syntax as if null `propertyName` was provided. If the value cannot be
   /// resolved even then, return the provided value without any changes.
+  /// Note: this function currently does not resolve CSS random() function,
+  /// it returns unmodified random() function parts.`
   /// [values] Cascade-dependent keywords (revert/revert-layer) do not work.
   /// [nodeId] Id of the node in whose context the expression is evaluated
   /// [propertyName] Only longhands and custom property names are accepted.

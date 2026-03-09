@@ -34,6 +34,25 @@ class OverlayApi {
         ),
       );
 
+  /// Fired when user asks to show the Inspect panel.
+  Stream<dom.BackendNodeId> get onInspectPanelShowRequested => _client.onEvent
+      .where((event) => event.name == 'Overlay.inspectPanelShowRequested')
+      .map(
+        (event) => dom.BackendNodeId.fromJson(
+          event.parameters['backendNodeId'] as int,
+        ),
+      );
+
+  /// Fired when user asks to restore the Inspected Element floating window.
+  Stream<dom.BackendNodeId> get onInspectedElementWindowRestored => _client
+      .onEvent
+      .where((event) => event.name == 'Overlay.inspectedElementWindowRestored')
+      .map(
+        (event) => dom.BackendNodeId.fromJson(
+          event.parameters['backendNodeId'] as int,
+        ),
+      );
+
   /// Fired when user cancels the inspect mode.
   Stream<void> get onInspectModeCanceled => _client.onEvent.where(
     (event) => event.name == 'Overlay.inspectModeCanceled',
@@ -286,6 +305,15 @@ class OverlayApi {
   ) async {
     await _client.send('Overlay.setShowContainerQueryOverlays', {
       'containerQueryHighlightConfigs': [...containerQueryHighlightConfigs],
+    });
+  }
+
+  /// [inspectedElementAnchorConfig] Node identifier for which to show an anchor for.
+  Future<void> setShowInspectedElementAnchor(
+    InspectedElementAnchorConfig inspectedElementAnchorConfig,
+  ) async {
+    await _client.send('Overlay.setShowInspectedElementAnchor', {
+      'inspectedElementAnchorConfig': inspectedElementAnchorConfig,
     });
   }
 
@@ -1347,4 +1375,32 @@ enum InspectMode {
 
   @override
   String toString() => value.toString();
+}
+
+class InspectedElementAnchorConfig {
+  /// Identifier of the node to highlight.
+  final dom.NodeId? nodeId;
+
+  /// Identifier of the backend node to highlight.
+  final dom.BackendNodeId? backendNodeId;
+
+  InspectedElementAnchorConfig({this.nodeId, this.backendNodeId});
+
+  factory InspectedElementAnchorConfig.fromJson(Map<String, dynamic> json) {
+    return InspectedElementAnchorConfig(
+      nodeId: json.containsKey('nodeId')
+          ? dom.NodeId.fromJson(json['nodeId'] as int)
+          : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (nodeId != null) 'nodeId': nodeId!.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
+    };
+  }
 }

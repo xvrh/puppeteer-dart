@@ -174,8 +174,6 @@ enum CookieExclusionReason {
   excludeSameSiteNoneInsecure('ExcludeSameSiteNoneInsecure'),
   excludeSameSiteLax('ExcludeSameSiteLax'),
   excludeSameSiteStrict('ExcludeSameSiteStrict'),
-  excludeInvalidSameParty('ExcludeInvalidSameParty'),
-  excludeSamePartyCrossPartyContext('ExcludeSamePartyCrossPartyContext'),
   excludeDomainNonAscii('ExcludeDomainNonASCII'),
   excludeThirdPartyCookieBlockedInFirstPartySet(
     'ExcludeThirdPartyCookieBlockedInFirstPartySet',
@@ -1120,6 +1118,27 @@ enum UnencodedDigestError {
   String toString() => value.toString();
 }
 
+enum ConnectionAllowlistError {
+  invalidHeader('InvalidHeader'),
+  moreThanOneList('MoreThanOneList'),
+  itemNotInnerList('ItemNotInnerList'),
+  invalidAllowlistItemType('InvalidAllowlistItemType'),
+  reportingEndpointNotToken('ReportingEndpointNotToken'),
+  invalidUrlPattern('InvalidUrlPattern');
+
+  final String value;
+
+  const ConnectionAllowlistError(this.value);
+
+  factory ConnectionAllowlistError.fromJson(String value) =>
+      ConnectionAllowlistError.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Details for issues around "Attribution Reporting API" usage.
 /// Explainer: https://github.com/WICG/attribution-reporting-api
 class AttributionReportingIssueDetails {
@@ -1321,6 +1340,27 @@ class UnencodedDigestIssueDetails {
   }
 }
 
+class ConnectionAllowlistIssueDetails {
+  final ConnectionAllowlistError error;
+
+  final AffectedRequest request;
+
+  ConnectionAllowlistIssueDetails({required this.error, required this.request});
+
+  factory ConnectionAllowlistIssueDetails.fromJson(Map<String, dynamic> json) {
+    return ConnectionAllowlistIssueDetails(
+      error: ConnectionAllowlistError.fromJson(json['error'] as String),
+      request: AffectedRequest.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'error': error.toJson(), 'request': request.toJson()};
+  }
+}
+
 enum GenericIssueErrorType {
   formLabelForNameError('FormLabelForNameError'),
   formDuplicateIdForInputError('FormDuplicateIdForInputError'),
@@ -1345,7 +1385,14 @@ enum GenericIssueErrorType {
     'FormInputHasWrongButWellIntendedAutocompleteValueError',
   ),
   responseWasBlockedByOrb('ResponseWasBlockedByORB'),
-  navigationEntryMarkedSkippable('NavigationEntryMarkedSkippable');
+  navigationEntryMarkedSkippable('NavigationEntryMarkedSkippable'),
+  autofillAndManualTextPolicyControlledFeaturesInfo(
+    'AutofillAndManualTextPolicyControlledFeaturesInfo',
+  ),
+  autofillPolicyControlledFeatureInfo('AutofillPolicyControlledFeatureInfo'),
+  manualTextPolicyControlledFeatureInfo(
+    'ManualTextPolicyControlledFeatureInfo',
+  );
 
   final String value;
 
@@ -2176,6 +2223,7 @@ enum InspectorIssueCode {
   elementAccessibilityIssue('ElementAccessibilityIssue'),
   sriMessageSignatureIssue('SRIMessageSignatureIssue'),
   unencodedDigestIssue('UnencodedDigestIssue'),
+  connectionAllowlistIssue('ConnectionAllowlistIssue'),
   userReidentificationIssue('UserReidentificationIssue'),
   permissionElementIssue('PermissionElementIssue');
 
@@ -2246,6 +2294,8 @@ class InspectorIssueDetails {
 
   final UnencodedDigestIssueDetails? unencodedDigestIssueDetails;
 
+  final ConnectionAllowlistIssueDetails? connectionAllowlistIssueDetails;
+
   final UserReidentificationIssueDetails? userReidentificationIssueDetails;
 
   final PermissionElementIssueDetails? permissionElementIssueDetails;
@@ -2275,6 +2325,7 @@ class InspectorIssueDetails {
     this.elementAccessibilityIssueDetails,
     this.sriMessageSignatureIssueDetails,
     this.unencodedDigestIssueDetails,
+    this.connectionAllowlistIssueDetails,
     this.userReidentificationIssueDetails,
     this.permissionElementIssueDetails,
   });
@@ -2417,6 +2468,12 @@ class InspectorIssueDetails {
               json['unencodedDigestIssueDetails'] as Map<String, dynamic>,
             )
           : null,
+      connectionAllowlistIssueDetails:
+          json.containsKey('connectionAllowlistIssueDetails')
+          ? ConnectionAllowlistIssueDetails.fromJson(
+              json['connectionAllowlistIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       userReidentificationIssueDetails:
           json.containsKey('userReidentificationIssueDetails')
           ? UserReidentificationIssueDetails.fromJson(
@@ -2493,6 +2550,9 @@ class InspectorIssueDetails {
             .toJson(),
       if (unencodedDigestIssueDetails != null)
         'unencodedDigestIssueDetails': unencodedDigestIssueDetails!.toJson(),
+      if (connectionAllowlistIssueDetails != null)
+        'connectionAllowlistIssueDetails': connectionAllowlistIssueDetails!
+            .toJson(),
       if (userReidentificationIssueDetails != null)
         'userReidentificationIssueDetails': userReidentificationIssueDetails!
             .toJson(),
