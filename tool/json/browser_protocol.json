@@ -1004,7 +1004,8 @@
             "description": "Audits domain allows investigation of page violations and possible improvements.",
             "experimental": true,
             "dependencies": [
-                "Network"
+                "Network",
+                "Runtime"
             ],
             "types": [
                 {
@@ -1180,6 +1181,29 @@
                             "description": "The recommended solution to the issue.",
                             "optional": true,
                             "$ref": "CookieIssueInsight"
+                        }
+                    ]
+                },
+                {
+                    "id": "PerformanceIssueType",
+                    "type": "string",
+                    "enum": [
+                        "DocumentCookie"
+                    ]
+                },
+                {
+                    "id": "PerformanceIssueDetails",
+                    "description": "Details for a performance issue.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "performanceIssueType",
+                            "$ref": "PerformanceIssueType"
+                        },
+                        {
+                            "name": "sourceCodeLocation",
+                            "optional": true,
+                            "$ref": "SourceCodeLocation"
                         }
                     ]
                 },
@@ -1448,40 +1472,6 @@
                     ]
                 },
                 {
-                    "id": "LowTextContrastIssueDetails",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "violatingNodeId",
-                            "$ref": "DOM.BackendNodeId"
-                        },
-                        {
-                            "name": "violatingNodeSelector",
-                            "type": "string"
-                        },
-                        {
-                            "name": "contrastRatio",
-                            "type": "number"
-                        },
-                        {
-                            "name": "thresholdAA",
-                            "type": "number"
-                        },
-                        {
-                            "name": "thresholdAAA",
-                            "type": "number"
-                        },
-                        {
-                            "name": "fontSize",
-                            "type": "string"
-                        },
-                        {
-                            "name": "fontWeight",
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
                     "id": "CorsIssueDetails",
                     "description": "Details for a CORS related issue, e.g. a warning or error related to\nCORS RFC1918 enforcement.",
                     "type": "object",
@@ -1616,6 +1606,18 @@
                     ]
                 },
                 {
+                    "id": "ConnectionAllowlistError",
+                    "type": "string",
+                    "enum": [
+                        "InvalidHeader",
+                        "MoreThanOneList",
+                        "ItemNotInnerList",
+                        "InvalidAllowlistItemType",
+                        "ReportingEndpointNotToken",
+                        "InvalidUrlPattern"
+                    ]
+                },
+                {
                     "id": "AttributionReportingIssueDetails",
                     "description": "Details for issues around \"Attribution Reporting API\" usage.\nExplainer: https://github.com/WICG/attribution-reporting-api",
                     "type": "object",
@@ -1739,6 +1741,20 @@
                     ]
                 },
                 {
+                    "id": "ConnectionAllowlistIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "error",
+                            "$ref": "ConnectionAllowlistError"
+                        },
+                        {
+                            "name": "request",
+                            "$ref": "AffectedRequest"
+                        }
+                    ]
+                },
+                {
                     "id": "GenericIssueErrorType",
                     "type": "string",
                     "enum": [
@@ -1756,7 +1772,8 @@
                         "NavigationEntryMarkedSkippable",
                         "AutofillAndManualTextPolicyControlledFeaturesInfo",
                         "AutofillPolicyControlledFeatureInfo",
-                        "ManualTextPolicyControlledFeatureInfo"
+                        "ManualTextPolicyControlledFeatureInfo",
+                        "FormModelContextParameterMissingTitleAndDescription"
                     ]
                 },
                 {
@@ -1888,10 +1905,6 @@
                         "ConfigNoResponse",
                         "ConfigInvalidResponse",
                         "ConfigInvalidContentType",
-                        "ClientMetadataHttpNotFound",
-                        "ClientMetadataNoResponse",
-                        "ClientMetadataInvalidResponse",
-                        "ClientMetadataInvalidContentType",
                         "IdpNotPotentiallyTrustworthy",
                         "DisabledInSettings",
                         "DisabledInFlags",
@@ -1913,11 +1926,9 @@
                         "Canceled",
                         "RpPageNotVisible",
                         "SilentMediationFailure",
-                        "ThirdPartyCookiesBlocked",
                         "NotSignedInWithIdp",
                         "MissingTransientUserActivation",
                         "ReplacedByActiveMode",
-                        "InvalidFieldsSpecified",
                         "RelyingPartyOriginIsOpaque",
                         "TypeNotMatching",
                         "UiDismissedNoEmbargo",
@@ -2219,6 +2230,72 @@
                     ]
                 },
                 {
+                    "id": "AdScriptIdentifier",
+                    "description": "Metadata about the ad script that was on the stack that caused the current\nscript in the `AdAncestry` to be considered ad related.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "scriptId",
+                            "description": "The script's v8 identifier.",
+                            "$ref": "Runtime.ScriptId"
+                        },
+                        {
+                            "name": "debuggerId",
+                            "description": "v8's debugging id for the v8::Context.",
+                            "$ref": "Runtime.UniqueDebuggerId"
+                        },
+                        {
+                            "name": "name",
+                            "description": "The script's url (or generated name based on id if inline script).",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "AdAncestry",
+                    "description": "Providence about how an ad script was determined to be such. It is an ad\nbecause its url matched a filterlist rule, or because some other ad script\nwas on the stack when this script was loaded.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "adAncestryChain",
+                            "description": "The ad-script in the stack when the offending script was loaded. This is\nrecursive down to the root script that was tagged due to the filterlist\nrule.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdScriptIdentifier"
+                            }
+                        },
+                        {
+                            "name": "rootScriptFilterlistRule",
+                            "description": "The filterlist rule that caused the root (last) script in\n`adAncestry` to be ad-tagged.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "SelectivePermissionsInterventionIssueDetails",
+                    "description": "The issue warns about blocked calls to privacy sensitive APIs via the\nSelective Permissions Intervention.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "apiName",
+                            "description": "Which API was intervened on.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "adAncestry",
+                            "description": "Why the ad script using the API is considered an ad.",
+                            "$ref": "AdAncestry"
+                        },
+                        {
+                            "name": "stackTrace",
+                            "description": "The stack trace at the time of the intervention.",
+                            "optional": true,
+                            "$ref": "Runtime.StackTrace"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -2229,7 +2306,6 @@
                         "HeavyAdIssue",
                         "ContentSecurityPolicyIssue",
                         "SharedArrayBufferIssue",
-                        "LowTextContrastIssue",
                         "CorsIssue",
                         "AttributionReportingIssue",
                         "QuirksModeIssue",
@@ -2248,8 +2324,11 @@
                         "ElementAccessibilityIssue",
                         "SRIMessageSignatureIssue",
                         "UnencodedDigestIssue",
+                        "ConnectionAllowlistIssue",
                         "UserReidentificationIssue",
-                        "PermissionElementIssue"
+                        "PermissionElementIssue",
+                        "PerformanceIssue",
+                        "SelectivePermissionsInterventionIssue"
                     ]
                 },
                 {
@@ -2286,11 +2365,6 @@
                             "name": "sharedArrayBufferIssueDetails",
                             "optional": true,
                             "$ref": "SharedArrayBufferIssueDetails"
-                        },
-                        {
-                            "name": "lowTextContrastIssueDetails",
-                            "optional": true,
-                            "$ref": "LowTextContrastIssueDetails"
                         },
                         {
                             "name": "corsIssueDetails",
@@ -2384,6 +2458,11 @@
                             "$ref": "UnencodedDigestIssueDetails"
                         },
                         {
+                            "name": "connectionAllowlistIssueDetails",
+                            "optional": true,
+                            "$ref": "ConnectionAllowlistIssueDetails"
+                        },
+                        {
                             "name": "userReidentificationIssueDetails",
                             "optional": true,
                             "$ref": "UserReidentificationIssueDetails"
@@ -2392,6 +2471,16 @@
                             "name": "permissionElementIssueDetails",
                             "optional": true,
                             "$ref": "PermissionElementIssueDetails"
+                        },
+                        {
+                            "name": "performanceIssueDetails",
+                            "optional": true,
+                            "$ref": "PerformanceIssueDetails"
+                        },
+                        {
+                            "name": "selectivePermissionsInterventionIssueDetails",
+                            "optional": true,
+                            "$ref": "SelectivePermissionsInterventionIssueDetails"
                         }
                     ]
                 },
@@ -2481,18 +2570,6 @@
                 {
                     "name": "enable",
                     "description": "Enables issues domain, sends the issues collected so far to the client by means of the\n`issueAdded` event."
-                },
-                {
-                    "name": "checkContrast",
-                    "description": "Runs the contrast check for the target page. Found issues are reported\nusing Audits.issueAdded event.",
-                    "parameters": [
-                        {
-                            "name": "reportAAA",
-                            "description": "Whether to report WCAG AAA level issues. Default is false.",
-                            "optional": true,
-                            "type": "boolean"
-                        }
-                    ]
                 },
                 {
                     "name": "checkFormsIssues",
@@ -4504,6 +4581,16 @@
                             "items": {
                                 "$ref": "CSSStartingStyle"
                             }
+                        },
+                        {
+                            "name": "navigations",
+                            "description": "@navigation CSS at-rule array.\nThe array enumerates @navigation at-rules starting with the innermost one, going outwards.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSNavigation"
+                            }
                         }
                     ]
                 },
@@ -4519,7 +4606,8 @@
                         "LayerRule",
                         "ScopeRule",
                         "StyleRule",
-                        "StartingStyleRule"
+                        "StartingStyleRule",
+                        "NavigationRule"
                     ]
                 },
                 {
@@ -4903,6 +4991,37 @@
                         {
                             "name": "active",
                             "description": "Whether the supports condition is satisfied.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "range",
+                            "description": "The associated rule header range in the enclosing stylesheet (if\navailable).",
+                            "optional": true,
+                            "$ref": "SourceRange"
+                        },
+                        {
+                            "name": "styleSheetId",
+                            "description": "Identifier of the stylesheet containing this object (if exists).",
+                            "optional": true,
+                            "$ref": "DOM.StyleSheetId"
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSNavigation",
+                    "description": "CSS Navigation at-rule descriptor.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "text",
+                            "description": "Navigation rule text.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "active",
+                            "description": "Whether the navigation condition is satisfied.",
+                            "optional": true,
                             "type": "boolean"
                         },
                         {
@@ -5357,6 +5476,12 @@
                             "$ref": "CSSSupports"
                         },
                         {
+                            "name": "navigation",
+                            "description": "@navigation condition. Only one type of condition should be set.",
+                            "optional": true,
+                            "$ref": "CSSNavigation"
+                        },
+                        {
                             "name": "children",
                             "description": "Block body.",
                             "type": "array",
@@ -5664,7 +5789,7 @@
                 },
                 {
                     "name": "resolveValues",
-                    "description": "Resolve the specified values in the context of the provided element.\nFor example, a value of '1em' is evaluated according to the computed\n'font-size' of the element and a value 'calc(1px + 2px)' will be\nresolved to '3px'.\nIf the `propertyName` was specified the `values` are resolved as if\nthey were property's declaration. If a value cannot be parsed according\nto the provided property syntax, the value is parsed using combined\nsyntax as if null `propertyName` was provided. If the value cannot be\nresolved even then, return the provided value without any changes.",
+                    "description": "Resolve the specified values in the context of the provided element.\nFor example, a value of '1em' is evaluated according to the computed\n'font-size' of the element and a value 'calc(1px + 2px)' will be\nresolved to '3px'.\nIf the `propertyName` was specified the `values` are resolved as if\nthey were property's declaration. If a value cannot be parsed according\nto the provided property syntax, the value is parsed using combined\nsyntax as if null `propertyName` was provided. If the value cannot be\nresolved even then, return the provided value without any changes.\nNote: this function currently does not resolve CSS random() function,\nit returns unmodified random() function parts.`",
                     "experimental": true,
                     "parameters": [
                         {
@@ -6207,6 +6332,32 @@
                             "name": "supports",
                             "description": "The resulting CSS Supports rule after modification.",
                             "$ref": "CSSSupports"
+                        }
+                    ]
+                },
+                {
+                    "name": "setNavigationText",
+                    "description": "Modifies the expression of a navigation at-rule.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "styleSheetId",
+                            "$ref": "DOM.StyleSheetId"
+                        },
+                        {
+                            "name": "range",
+                            "$ref": "SourceRange"
+                        },
+                        {
+                            "name": "text",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "navigation",
+                            "description": "The resulting CSS Navigation rule after modification.",
+                            "$ref": "CSSNavigation"
                         }
                     ]
                 },
@@ -7167,6 +7318,12 @@
                             "items": {
                                 "$ref": "StyleSheetId"
                             }
+                        },
+                        {
+                            "name": "isAdRelated",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -8717,6 +8874,23 @@
                         {
                             "name": "isScrollable",
                             "description": "If the node is scrollable.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "adRelatedStateUpdated",
+                    "description": "Fired when a node's ad related state changes.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "The id of the node.",
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "isAdRelated",
+                            "description": "If the node is ad related.",
                             "type": "boolean"
                         }
                     ]
@@ -10722,6 +10896,7 @@
                     "type": "string",
                     "enum": [
                         "avif",
+                        "jxl",
                         "webp"
                     ]
                 }
@@ -10905,6 +11080,24 @@
                             "deprecated": true,
                             "optional": true,
                             "$ref": "DevicePosture"
+                        },
+                        {
+                            "name": "scrollbarType",
+                            "description": "Scrollbar type. Default: `default`.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "string",
+                            "enum": [
+                                "overlay",
+                                "default"
+                            ]
+                        },
+                        {
+                            "name": "screenOrientationLockEmulation",
+                            "description": "If set to true, enables screen orientation lock emulation, which\nintercepts screen.orientation.lock() calls from the page and reports\norientation changes via screenOrientationLockChanged events. This is\nuseful for emulating mobile device orientation lock behavior in\nresponsive design mode.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -11437,7 +11630,7 @@
                 },
                 {
                     "name": "getScreenInfos",
-                    "description": "Returns device's screen configuration.",
+                    "description": "Returns device's screen configuration. In headful mode, the physical screens configuration is returned,\nwhereas in headless mode, a virtual headless screen configuration is provided instead.",
                     "experimental": true,
                     "returns": [
                         {
@@ -11519,8 +11712,97 @@
                     ]
                 },
                 {
+                    "name": "updateScreen",
+                    "description": "Updates specified screen parameters. Only supported in headless mode.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "screenId",
+                            "description": "Target screen identifier.",
+                            "$ref": "ScreenId"
+                        },
+                        {
+                            "name": "left",
+                            "description": "Offset of the left edge of the screen in pixels.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "top",
+                            "description": "Offset of the top edge of the screen in pixels.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "width",
+                            "description": "The width of the screen in pixels.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "height",
+                            "description": "The height of the screen in pixels.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "workAreaInsets",
+                            "description": "Specifies the screen's work area.",
+                            "optional": true,
+                            "$ref": "WorkAreaInsets"
+                        },
+                        {
+                            "name": "devicePixelRatio",
+                            "description": "Specifies the screen's device pixel ratio.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "rotation",
+                            "description": "Specifies the screen's rotation angle. Available values are 0, 90, 180 and 270.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "colorDepth",
+                            "description": "Specifies the screen's color depth in bits.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "label",
+                            "description": "Specifies the descriptive label for the screen.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "isInternal",
+                            "description": "Indicates whether the screen is internal to the device or external, attached to the device. Default is false.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "screenInfo",
+                            "$ref": "ScreenInfo"
+                        }
+                    ]
+                },
+                {
                     "name": "removeScreen",
                     "description": "Remove screen from the device. Only supported in headless mode.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "screenId",
+                            "$ref": "ScreenId"
+                        }
+                    ]
+                },
+                {
+                    "name": "setPrimaryScreen",
+                    "description": "Set primary screen. Only supported in headless mode.\nNote that this changes the coordinate system origin to the top-left\nof the new primary screen, updating the bounds and work areas\nof all existing screens accordingly.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -11535,6 +11817,24 @@
                     "name": "virtualTimeBudgetExpired",
                     "description": "Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.",
                     "experimental": true
+                },
+                {
+                    "name": "screenOrientationLockChanged",
+                    "description": "Fired when a page calls screen.orientation.lock() or screen.orientation.unlock()\nwhile device emulation is enabled. This allows the DevTools frontend to update the\nemulated device orientation accordingly.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "locked",
+                            "description": "Whether the screen orientation is currently locked.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "orientation",
+                            "description": "The orientation lock type requested by the page. Only set when locked is true.",
+                            "optional": true,
+                            "$ref": "ScreenOrientation"
+                        }
+                    ]
                 }
             ]
         },
@@ -11586,9 +11886,57 @@
                         "sync",
                         "managed"
                     ]
+                },
+                {
+                    "id": "ExtensionInfo",
+                    "description": "Detailed information about an extension.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "id",
+                            "description": "Extension id.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "name",
+                            "description": "Extension name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "version",
+                            "description": "Extension version.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "path",
+                            "description": "The path from which the extension was loaded.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "enabled",
+                            "description": "Extension enabled status.",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "commands": [
+                {
+                    "name": "triggerAction",
+                    "description": "Runs an extension default action.\nAvailable if the client is connected using the --remote-debugging-pipe\nflag and the --enable-unsafe-extension-debugging flag is set.",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "description": "Extension id.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "targetId",
+                            "description": "A tab target ID to trigger the default extension action on.",
+                            "type": "string"
+                        }
+                    ]
+                },
                 {
                     "name": "loadUnpacked",
                     "description": "Installs an unpacked extension from the filesystem similar to\n--load-extension CLI flags. Returns extension ID once the extension\nhas been installed. Available if the client is connected using the\n--remote-debugging-pipe flag and the --enable-unsafe-extension-debugging\nflag is set.",
@@ -11597,6 +11945,12 @@
                             "name": "path",
                             "description": "Absolute file path.",
                             "type": "string"
+                        },
+                        {
+                            "name": "enableInIncognito",
+                            "description": "Enable the extension in incognito",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -11604,6 +11958,19 @@
                             "name": "id",
                             "description": "Extension id.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getExtensions",
+                    "description": "Gets a list of all unpacked extensions.\nAvailable if the client is connected using the --remote-debugging-pipe flag\nand the --enable-unsafe-extension-debugging flag is set.",
+                    "returns": [
+                        {
+                            "name": "extensions",
+                            "type": "array",
+                            "items": {
+                                "$ref": "ExtensionInfo"
+                            }
                         }
                     ]
                 },
@@ -15273,7 +15640,7 @@
                 },
                 {
                     "id": "RenderBlockingBehavior",
-                    "description": "The render blocking behavior of a resource request.",
+                    "description": "The render-blocking behavior of a resource request.",
                     "experimental": true,
                     "type": "string",
                     "enum": [
@@ -15595,21 +15962,14 @@
                         "PreflightInvalidAllowCredentials",
                         "PreflightMissingAllowExternal",
                         "PreflightInvalidAllowExternal",
-                        "PreflightMissingAllowPrivateNetwork",
-                        "PreflightInvalidAllowPrivateNetwork",
                         "InvalidAllowMethodsPreflightResponse",
                         "InvalidAllowHeadersPreflightResponse",
                         "MethodDisallowedByPreflightResponse",
                         "HeaderDisallowedByPreflightResponse",
                         "RedirectContainsCredentials",
-                        "InsecurePrivateNetwork",
-                        "InvalidPrivateNetworkAccess",
-                        "UnexpectedPrivateNetworkAccess",
+                        "InsecureLocalNetwork",
+                        "InvalidLocalNetworkAccess",
                         "NoCorsRedirectModeNotFollow",
-                        "PreflightMissingPrivateNetworkAccessId",
-                        "PreflightMissingPrivateNetworkAccessName",
-                        "PrivateNetworkAccessPermissionUnavailable",
-                        "PrivateNetworkAccessPermissionDenied",
                         "LocalNetworkAccessPermissionDenied"
                     ]
                 },
@@ -16874,7 +17234,7 @@
                     ]
                 },
                 {
-                    "id": "PrivateNetworkRequestPolicy",
+                    "id": "LocalNetworkAccessRequestPolicy",
                     "experimental": true,
                     "type": "string",
                     "enum": [
@@ -16922,8 +17282,8 @@
                             "$ref": "IPAddressSpace"
                         },
                         {
-                            "name": "privateNetworkRequestPolicy",
-                            "$ref": "PrivateNetworkRequestPolicy"
+                            "name": "localNetworkAccessRequestPolicy",
+                            "$ref": "LocalNetworkAccessRequestPolicy"
                         }
                     ]
                 },
@@ -17157,6 +17517,32 @@
                     ]
                 },
                 {
+                    "id": "DeviceBoundSessionWithUsage",
+                    "description": "How a device bound session was used during a request.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sessionKey",
+                            "description": "The key for the session.",
+                            "$ref": "DeviceBoundSessionKey"
+                        },
+                        {
+                            "name": "usage",
+                            "description": "How the session was used (or not used).",
+                            "type": "string",
+                            "enum": [
+                                "NotInScope",
+                                "InScopeRefreshNotYetNeeded",
+                                "InScopeRefreshNotAllowed",
+                                "ProactiveRefreshNotPossible",
+                                "ProactiveRefreshAttempted",
+                                "Deferred"
+                            ]
+                        }
+                    ]
+                },
+                {
                     "id": "DeviceBoundSessionCookieCraving",
                     "description": "A device bound session's cookie craving.",
                     "experimental": true,
@@ -17381,6 +17767,37 @@
                     ]
                 },
                 {
+                    "id": "DeviceBoundSessionFailedRequest",
+                    "description": "Details about a failed device bound session network request.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "requestUrl",
+                            "description": "The failed request URL.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "netError",
+                            "description": "The net error of the response if it was not OK.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "responseError",
+                            "description": "The response code if the net error was OK and the response code was not\n200.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "responseErrorBody",
+                            "description": "The body of the response if the net error was OK, the response code was\nnot 200, and the response body was not empty.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "CreationEventDetails",
                     "description": "Session event details specific to creation.",
                     "experimental": true,
@@ -17396,6 +17813,12 @@
                             "description": "The session if there was a newly created session. This is populated for\nall successful creation events.",
                             "optional": true,
                             "$ref": "DeviceBoundSession"
+                        },
+                        {
+                            "name": "failedRequest",
+                            "description": "Details about a failed device bound session network request if there was\none.",
+                            "optional": true,
+                            "$ref": "DeviceBoundSessionFailedRequest"
                         }
                     ]
                 },
@@ -17435,6 +17858,12 @@
                             "name": "wasFullyProactiveRefresh",
                             "description": "See comments on `net::device_bound_sessions::RefreshEventResult::was_fully_proactive_refresh`.",
                             "type": "boolean"
+                        },
+                        {
+                            "name": "failedRequest",
+                            "description": "Details about a failed device bound session network request if there was\none.",
+                            "optional": true,
+                            "$ref": "DeviceBoundSessionFailedRequest"
                         }
                     ]
                 },
@@ -17824,7 +18253,7 @@
                     "parameters": [
                         {
                             "name": "maxTotalBufferSize",
-                            "description": "Buffer size in bytes to use when preserving network payloads (XHRs, etc).",
+                            "description": "Buffer size in bytes to use when preserving network payloads (XHRs, etc).\nThis is the maximum number of bytes that will be collected by this\nDevTools session.",
                             "experimental": true,
                             "optional": true,
                             "type": "integer"
@@ -18721,7 +19150,7 @@
                         },
                         {
                             "name": "renderBlockingBehavior",
-                            "description": "The render blocking behavior of the request.",
+                            "description": "The render-blocking behavior of the request.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "RenderBlockingBehavior"
@@ -19344,6 +19773,15 @@
                             "description": "Connection timing information for the request.",
                             "experimental": true,
                             "$ref": "ConnectTiming"
+                        },
+                        {
+                            "name": "deviceBoundSessionUsages",
+                            "description": "How the request site's device bound sessions were used during this request.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "DeviceBoundSessionWithUsage"
+                            }
                         },
                         {
                             "name": "clientSecurityState",
@@ -20234,6 +20672,24 @@
                         "captureAreaScreenshot",
                         "none"
                     ]
+                },
+                {
+                    "id": "InspectedElementAnchorConfig",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the node to highlight.",
+                            "optional": true,
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Identifier of the backend node to highlight.",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -20594,6 +21050,16 @@
                     ]
                 },
                 {
+                    "name": "setShowInspectedElementAnchor",
+                    "parameters": [
+                        {
+                            "name": "inspectedElementAnchorConfig",
+                            "description": "Node identifier for which to show an anchor for.",
+                            "$ref": "InspectedElementAnchorConfig"
+                        }
+                    ]
+                },
+                {
                     "name": "setShowPaintRects",
                     "description": "Requests that backend shows paint rectangles",
                     "parameters": [
@@ -20729,6 +21195,28 @@
                             "name": "viewport",
                             "description": "Viewport to capture, in device independent pixels (dip).",
                             "$ref": "Page.Viewport"
+                        }
+                    ]
+                },
+                {
+                    "name": "inspectPanelShowRequested",
+                    "description": "Fired when user asks to show the Inspect panel.",
+                    "parameters": [
+                        {
+                            "name": "backendNodeId",
+                            "description": "Id of the node to show in the panel.",
+                            "$ref": "DOM.BackendNodeId"
+                        }
+                    ]
+                },
+                {
+                    "name": "inspectedElementWindowRestored",
+                    "description": "Fired when user asks to restore the Inspected Element floating window.",
+                    "parameters": [
+                        {
+                            "name": "backendNodeId",
+                            "description": "Id of the node to restore the floating window for.",
+                            "$ref": "DOM.BackendNodeId"
                         }
                     ]
                 },
@@ -22420,6 +22908,7 @@
                         "BackForwardCacheDisabledForPrerender",
                         "UserAgentOverrideDiffers",
                         "ForegroundCacheLimit",
+                        "ForwardCacheDisabled",
                         "BrowsingInstanceNotSwapped",
                         "BackForwardCacheDisabledForDelegate",
                         "UnloadHandlerExistsInMainFrame",
@@ -22463,6 +22952,7 @@
                         "SharedWorkerMessage",
                         "SharedWorkerWithNoActiveClient",
                         "WebLocks",
+                        "WebLocksContention",
                         "WebHID",
                         "WebBluetooth",
                         "WebShare",
@@ -25894,6 +26384,641 @@
             ]
         },
         {
+            "domain": "SmartCardEmulation",
+            "experimental": true,
+            "types": [
+                {
+                    "id": "ResultCode",
+                    "description": "Indicates the PC/SC error code.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__ErrorCodes.html\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values",
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "removed-card",
+                        "reset-card",
+                        "unpowered-card",
+                        "unresponsive-card",
+                        "unsupported-card",
+                        "reader-unavailable",
+                        "sharing-violation",
+                        "not-transacted",
+                        "no-smartcard",
+                        "proto-mismatch",
+                        "system-cancelled",
+                        "not-ready",
+                        "cancelled",
+                        "insufficient-buffer",
+                        "invalid-handle",
+                        "invalid-parameter",
+                        "invalid-value",
+                        "no-memory",
+                        "timeout",
+                        "unknown-reader",
+                        "unsupported-feature",
+                        "no-readers-available",
+                        "service-stopped",
+                        "no-service",
+                        "comm-error",
+                        "internal-error",
+                        "server-too-busy",
+                        "unexpected",
+                        "shutdown",
+                        "unknown-card",
+                        "unknown"
+                    ]
+                },
+                {
+                    "id": "ShareMode",
+                    "description": "Maps to the |SCARD_SHARE_*| values.",
+                    "type": "string",
+                    "enum": [
+                        "shared",
+                        "exclusive",
+                        "direct"
+                    ]
+                },
+                {
+                    "id": "Disposition",
+                    "description": "Indicates what the reader should do with the card.",
+                    "type": "string",
+                    "enum": [
+                        "leave-card",
+                        "reset-card",
+                        "unpower-card",
+                        "eject-card"
+                    ]
+                },
+                {
+                    "id": "ConnectionState",
+                    "description": "Maps to |SCARD_*| connection state values.",
+                    "type": "string",
+                    "enum": [
+                        "absent",
+                        "present",
+                        "swallowed",
+                        "powered",
+                        "negotiable",
+                        "specific"
+                    ]
+                },
+                {
+                    "id": "ReaderStateFlags",
+                    "description": "Maps to the |SCARD_STATE_*| flags.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "unaware",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "ignore",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "changed",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "unknown",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "unavailable",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "empty",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "present",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "exclusive",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "inuse",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "mute",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "unpowered",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "id": "ProtocolSet",
+                    "description": "Maps to the |SCARD_PROTOCOL_*| flags.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "t0",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "t1",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "raw",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "id": "Protocol",
+                    "description": "Maps to the |SCARD_PROTOCOL_*| values.",
+                    "type": "string",
+                    "enum": [
+                        "t0",
+                        "t1",
+                        "raw"
+                    ]
+                },
+                {
+                    "id": "ReaderStateIn",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "reader",
+                            "type": "string"
+                        },
+                        {
+                            "name": "currentState",
+                            "$ref": "ReaderStateFlags"
+                        },
+                        {
+                            "name": "currentInsertionCount",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "id": "ReaderStateOut",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "reader",
+                            "type": "string"
+                        },
+                        {
+                            "name": "eventState",
+                            "$ref": "ReaderStateFlags"
+                        },
+                        {
+                            "name": "eventCount",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "atr",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "enable",
+                    "description": "Enables the |SmartCardEmulation| domain."
+                },
+                {
+                    "name": "disable",
+                    "description": "Disables the |SmartCardEmulation| domain."
+                },
+                {
+                    "name": "reportEstablishContextResult",
+                    "description": "Reports the successful result of a |SCardEstablishContext| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaa1b8970169fd4883a6dc4a8f43f19b67\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportReleaseContextResult",
+                    "description": "Reports the successful result of a |SCardReleaseContext| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga6aabcba7744c5c9419fdd6404f73a934\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardreleasecontext",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportListReadersResult",
+                    "description": "Reports the successful result of a |SCardListReaders| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga93b07815789b3cf2629d439ecf20f0d9\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersa",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "readers",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "reportGetStatusChangeResult",
+                    "description": "Reports the successful result of a |SCardGetStatusChange| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga33247d5d1257d59e55647c3bb717db24\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetstatuschangea",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "readerStates",
+                            "type": "array",
+                            "items": {
+                                "$ref": "ReaderStateOut"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "reportBeginTransactionResult",
+                    "description": "Reports the result of a |SCardBeginTransaction| call.\nOn success, this creates a new transaction object.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaddb835dce01a0da1d6ca02d33ee7d861\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardbegintransaction",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportPlainResult",
+                    "description": "Reports the successful result of a call that returns only a result code.\nUsed for: |SCardCancel|, |SCardDisconnect|, |SCardSetAttrib|, |SCardEndTransaction|.\n\nThis maps to:\n1. SCardCancel\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaacbbc0c6d6c0cbbeb4f4debf6fbeeee6\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardcancel\n\n2. SCardDisconnect\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga4be198045c73ec0deb79e66c0ca1738a\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scarddisconnect\n\n3. SCardSetAttrib\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga060f0038a4ddfd5dd2b8fadf3c3a2e4f\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardsetattrib\n\n4. SCardEndTransaction\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gae8742473b404363e5c587f570d7e2f3b\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardendtransaction",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportConnectResult",
+                    "description": "Reports the successful result of a |SCardConnect| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga4e515829752e0a8dbc4d630696a8d6a5\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardconnecta",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "activeProtocol",
+                            "optional": true,
+                            "$ref": "Protocol"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportDataResult",
+                    "description": "Reports the successful result of a call that sends back data on success.\nUsed for |SCardTransmit|, |SCardControl|, and |SCardGetAttrib|.\n\nThis maps to:\n1. SCardTransmit\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga9a2d77242a271310269065e64633ab99\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardtransmit\n\n2. SCardControl\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gac3454d4657110fd7f753b2d3d8f4e32f\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardcontrol\n\n3. SCardGetAttrib\n   PC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaacfec51917255b7a25b94c5104961602\n   Microsoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetattrib",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportStatusResult",
+                    "description": "Reports the successful result of a |SCardStatus| call.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gae49c3c894ad7ac12a5b896bde70d0382\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardstatusa",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "readerName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "state",
+                            "$ref": "ConnectionState"
+                        },
+                        {
+                            "name": "atr",
+                            "type": "string"
+                        },
+                        {
+                            "name": "protocol",
+                            "optional": true,
+                            "$ref": "Protocol"
+                        }
+                    ]
+                },
+                {
+                    "name": "reportError",
+                    "description": "Reports an error result for the given request.",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "resultCode",
+                            "$ref": "ResultCode"
+                        }
+                    ]
+                }
+            ],
+            "events": [
+                {
+                    "name": "establishContextRequested",
+                    "description": "Fired when |SCardEstablishContext| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaa1b8970169fd4883a6dc4a8f43f19b67\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "releaseContextRequested",
+                    "description": "Fired when |SCardReleaseContext| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga6aabcba7744c5c9419fdd6404f73a934\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardreleasecontext",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "listReadersRequested",
+                    "description": "Fired when |SCardListReaders| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga93b07815789b3cf2629d439ecf20f0d9\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersa",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "getStatusChangeRequested",
+                    "description": "Fired when |SCardGetStatusChange| is called. Timeout is specified in milliseconds.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga33247d5d1257d59e55647c3bb717db24\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetstatuschangea",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "readerStates",
+                            "type": "array",
+                            "items": {
+                                "$ref": "ReaderStateIn"
+                            }
+                        },
+                        {
+                            "name": "timeout",
+                            "description": "in milliseconds, if absent, it means \"infinite\"",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "cancelRequested",
+                    "description": "Fired when |SCardCancel| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaacbbc0c6d6c0cbbeb4f4debf6fbeeee6\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardcancel",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "connectRequested",
+                    "description": "Fired when |SCardConnect| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga4e515829752e0a8dbc4d630696a8d6a5\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardconnecta",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "reader",
+                            "type": "string"
+                        },
+                        {
+                            "name": "shareMode",
+                            "$ref": "ShareMode"
+                        },
+                        {
+                            "name": "preferredProtocols",
+                            "$ref": "ProtocolSet"
+                        }
+                    ]
+                },
+                {
+                    "name": "disconnectRequested",
+                    "description": "Fired when |SCardDisconnect| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga4be198045c73ec0deb79e66c0ca1738a\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scarddisconnect",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "disposition",
+                            "$ref": "Disposition"
+                        }
+                    ]
+                },
+                {
+                    "name": "transmitRequested",
+                    "description": "Fired when |SCardTransmit| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga9a2d77242a271310269065e64633ab99\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardtransmit",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        },
+                        {
+                            "name": "protocol",
+                            "optional": true,
+                            "$ref": "Protocol"
+                        }
+                    ]
+                },
+                {
+                    "name": "controlRequested",
+                    "description": "Fired when |SCardControl| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gac3454d4657110fd7f753b2d3d8f4e32f\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardcontrol",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "controlCode",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getAttribRequested",
+                    "description": "Fired when |SCardGetAttrib| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaacfec51917255b7a25b94c5104961602\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetattrib",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "attribId",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "setAttribRequested",
+                    "description": "Fired when |SCardSetAttrib| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#ga060f0038a4ddfd5dd2b8fadf3c3a2e4f\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardsetattrib",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "attribId",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "statusRequested",
+                    "description": "Fired when |SCardStatus| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gae49c3c894ad7ac12a5b896bde70d0382\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardstatusa",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "beginTransactionRequested",
+                    "description": "Fired when |SCardBeginTransaction| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gaddb835dce01a0da1d6ca02d33ee7d861\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardbegintransaction",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "endTransactionRequested",
+                    "description": "Fired when |SCardEndTransaction| is called.\n\nThis maps to:\nPC/SC Lite: https://pcsclite.apdu.fr/api/group__API.html#gae8742473b404363e5c587f570d7e2f3b\nMicrosoft: https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardendtransaction",
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "handle",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "disposition",
+                            "$ref": "Disposition"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "domain": "Storage",
             "experimental": true,
             "dependencies": [
@@ -28594,6 +29719,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "focus",
+                            "description": "If specified, the option is used to determine if the new target should\nbe focused or not. By default, the focus behavior depends on the\nvalue of the background field. For example, background=false and focus=false\nwill result in the target tab being opened but the browser window remain\nunchanged (if it was in the background, it will remain in the background)\nand background=false with focus=undefined will result in the window being focused.\nUsing background: true and focus: true is not supported and will result in an error.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -30248,6 +31380,118 @@
                         {
                             "name": "credential",
                             "$ref": "Credential"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain": "WebMCP",
+            "experimental": true,
+            "dependencies": [
+                "Runtime",
+                "Page",
+                "DOM"
+            ],
+            "types": [
+                {
+                    "id": "Annotation",
+                    "description": "Tool annotations",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "readOnly",
+                            "description": "A hint indicating that the tool does not modify any state.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "autosubmit",
+                            "description": "If the declarative tool was declared with the autosubmit attribute.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "id": "Tool",
+                    "description": "Definition of a tool that can be invoked.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Tool name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "description",
+                            "description": "Tool description.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "inputSchema",
+                            "description": "Schema for the tool's input parameters.",
+                            "optional": true,
+                            "type": "object"
+                        },
+                        {
+                            "name": "annotations",
+                            "description": "Optional annotations for the tool.",
+                            "optional": true,
+                            "$ref": "Annotation"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame identifier associated with the tool registration.",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Optional node ID for declarative tools.",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "stackTrace",
+                            "description": "The stack trace at the time of the registration.",
+                            "optional": true,
+                            "$ref": "Runtime.StackTrace"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "enable",
+                    "description": "Enables the WebMCP domain, allowing events to be sent. Enabling the domain will trigger a toolsAdded event for\nall currently registered tools."
+                }
+            ],
+            "events": [
+                {
+                    "name": "toolsAdded",
+                    "description": "Event fired when new tools are added.",
+                    "parameters": [
+                        {
+                            "name": "tools",
+                            "description": "Array of tools that were added.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Tool"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "toolsRemoved",
+                    "description": "Event fired when tools are removed.",
+                    "parameters": [
+                        {
+                            "name": "tools",
+                            "description": "Array of tools that were removed.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Tool"
+                            }
                         }
                     ]
                 }
