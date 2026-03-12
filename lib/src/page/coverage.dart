@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:logging/logging.dart';
 import '../../protocol/css.dart';
-import '../../protocol/dom.dart';
 import '../../protocol/debugger.dart';
 import '../../protocol/dev_tools.dart';
+import '../../protocol/dom.dart';
 import '../../protocol/profiler.dart';
 import '../../protocol/runtime.dart';
 import 'execution_context.dart';
