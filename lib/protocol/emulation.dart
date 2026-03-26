@@ -15,6 +15,16 @@ class EmulationApi {
     (event) => event.name == 'Emulation.virtualTimeBudgetExpired',
   );
 
+  /// Fired when a page calls screen.orientation.lock() or screen.orientation.unlock()
+  /// while device emulation is enabled. This allows the DevTools frontend to update the
+  /// emulated device orientation accordingly.
+  Stream<ScreenOrientationLockChangedEvent>
+  get onScreenOrientationLockChanged => _client.onEvent
+      .where((event) => event.name == 'Emulation.screenOrientationLockChanged')
+      .map(
+        (event) => ScreenOrientationLockChangedEvent.fromJson(event.parameters),
+      );
+
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.
   @Deprecated('This command is deprecated')
@@ -96,6 +106,12 @@ class EmulationApi {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
+  /// [scrollbarType] Scrollbar type. Default: `default`.
+  /// [screenOrientationLockEmulation] If set to true, enables screen orientation lock emulation, which
+  /// intercepts screen.orientation.lock() calls from the page and reports
+  /// orientation changes via screenOrientationLockChanged events. This is
+  /// useful for emulating mobile device orientation lock behavior in
+  /// responsive design mode.
   Future<void> setDeviceMetricsOverride(
     int width,
     int height,
@@ -113,7 +129,13 @@ class EmulationApi {
     DisplayFeature? displayFeature,
     @Deprecated('use Emulation.setDevicePostureOverride.')
     DevicePosture? devicePosture,
+    @Enum(['overlay', 'default']) String? scrollbarType,
+    bool? screenOrientationLockEmulation,
   }) async {
+    assert(
+      scrollbarType == null ||
+          const ['overlay', 'default'].contains(scrollbarType),
+    );
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -129,6 +151,9 @@ class EmulationApi {
       if (viewport != null) 'viewport': viewport,
       if (displayFeature != null) 'displayFeature': displayFeature,
       if (devicePosture != null) 'devicePosture': devicePosture,
+      if (scrollbarType != null) 'scrollbarType': scrollbarType,
+      if (screenOrientationLockEmulation != null)
+        'screenOrientationLockEmulation': screenOrientationLockEmulation,
     });
   }
 
@@ -520,7 +545,8 @@ class EmulationApi {
     });
   }
 
-  /// Returns device's screen configuration.
+  /// Returns device's screen configuration. In headful mode, the physical screens configuration is returned,
+  /// whereas in headless mode, a virtual headless screen configuration is provided instead.
   Future<List<ScreenInfo>> getScreenInfos() async {
     var result = await _client.send('Emulation.getScreenInfos');
     return (result['screenInfos'] as List)
@@ -566,9 +592,81 @@ class EmulationApi {
     return ScreenInfo.fromJson(result['screenInfo'] as Map<String, dynamic>);
   }
 
+  /// Updates specified screen parameters. Only supported in headless mode.
+  /// [screenId] Target screen identifier.
+  /// [left] Offset of the left edge of the screen in pixels.
+  /// [top] Offset of the top edge of the screen in pixels.
+  /// [width] The width of the screen in pixels.
+  /// [height] The height of the screen in pixels.
+  /// [workAreaInsets] Specifies the screen's work area.
+  /// [devicePixelRatio] Specifies the screen's device pixel ratio.
+  /// [rotation] Specifies the screen's rotation angle. Available values are 0, 90, 180 and 270.
+  /// [colorDepth] Specifies the screen's color depth in bits.
+  /// [label] Specifies the descriptive label for the screen.
+  /// [isInternal] Indicates whether the screen is internal to the device or external, attached to the device. Default is false.
+  Future<ScreenInfo> updateScreen(
+    ScreenId screenId, {
+    int? left,
+    int? top,
+    int? width,
+    int? height,
+    WorkAreaInsets? workAreaInsets,
+    num? devicePixelRatio,
+    int? rotation,
+    int? colorDepth,
+    String? label,
+    bool? isInternal,
+  }) async {
+    var result = await _client.send('Emulation.updateScreen', {
+      'screenId': screenId,
+      if (left != null) 'left': left,
+      if (top != null) 'top': top,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (workAreaInsets != null) 'workAreaInsets': workAreaInsets,
+      if (devicePixelRatio != null) 'devicePixelRatio': devicePixelRatio,
+      if (rotation != null) 'rotation': rotation,
+      if (colorDepth != null) 'colorDepth': colorDepth,
+      if (label != null) 'label': label,
+      if (isInternal != null) 'isInternal': isInternal,
+    });
+    return ScreenInfo.fromJson(result['screenInfo'] as Map<String, dynamic>);
+  }
+
   /// Remove screen from the device. Only supported in headless mode.
   Future<void> removeScreen(ScreenId screenId) async {
     await _client.send('Emulation.removeScreen', {'screenId': screenId});
+  }
+
+  /// Set primary screen. Only supported in headless mode.
+  /// Note that this changes the coordinate system origin to the top-left
+  /// of the new primary screen, updating the bounds and work areas
+  /// of all existing screens accordingly.
+  Future<void> setPrimaryScreen(ScreenId screenId) async {
+    await _client.send('Emulation.setPrimaryScreen', {'screenId': screenId});
+  }
+}
+
+class ScreenOrientationLockChangedEvent {
+  /// Whether the screen orientation is currently locked.
+  final bool locked;
+
+  /// The orientation lock type requested by the page. Only set when locked is true.
+  final ScreenOrientation? orientation;
+
+  ScreenOrientationLockChangedEvent({required this.locked, this.orientation});
+
+  factory ScreenOrientationLockChangedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return ScreenOrientationLockChangedEvent(
+      locked: json['locked'] as bool? ?? false,
+      orientation: json.containsKey('orientation')
+          ? ScreenOrientation.fromJson(
+              json['orientation'] as Map<String, dynamic>,
+            )
+          : null,
+    );
   }
 }
 
@@ -1288,6 +1386,7 @@ class ScreenInfo {
 /// Enum of image types that can be disabled.
 enum DisabledImageType {
   avif('avif'),
+  jxl('jxl'),
   webp('webp');
 
   final String value;

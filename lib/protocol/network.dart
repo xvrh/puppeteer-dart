@@ -537,6 +537,8 @@ class NetworkApi {
 
   /// Enables network tracking, network events will now be delivered to the client.
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
+  /// This is the maximum number of bytes that will be collected by this
+  /// DevTools session.
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
   /// [reportDirectSocketTraffic] Whether DirectSocket chunk send/receive events should be reported.
@@ -1183,7 +1185,7 @@ class RequestWillBeSentEvent {
   /// Whether the request is initiated by a user gesture. Defaults to false.
   final bool? hasUserGesture;
 
-  /// The render blocking behavior of the request.
+  /// The render-blocking behavior of the request.
   final RenderBlockingBehavior? renderBlockingBehavior;
 
   RequestWillBeSentEvent({
@@ -2697,7 +2699,7 @@ enum ResourcePriority {
   String toString() => value.toString();
 }
 
-/// The render blocking behavior of a resource request.
+/// The render-blocking behavior of a resource request.
 enum RenderBlockingBehavior {
   blocking('Blocking'),
   inBodyParserBlocking('InBodyParserBlocking'),
@@ -5884,6 +5886,54 @@ enum DeviceBoundSessionFetchResult {
   String toString() => value.toString();
 }
 
+/// Details about a failed device bound session network request.
+class DeviceBoundSessionFailedRequest {
+  /// The failed request URL.
+  final String requestUrl;
+
+  /// The net error of the response if it was not OK.
+  final String? netError;
+
+  /// The response code if the net error was OK and the response code was not
+  /// 200.
+  final int? responseError;
+
+  /// The body of the response if the net error was OK, the response code was
+  /// not 200, and the response body was not empty.
+  final String? responseErrorBody;
+
+  DeviceBoundSessionFailedRequest({
+    required this.requestUrl,
+    this.netError,
+    this.responseError,
+    this.responseErrorBody,
+  });
+
+  factory DeviceBoundSessionFailedRequest.fromJson(Map<String, dynamic> json) {
+    return DeviceBoundSessionFailedRequest(
+      requestUrl: json['requestUrl'] as String,
+      netError: json.containsKey('netError')
+          ? json['netError'] as String
+          : null,
+      responseError: json.containsKey('responseError')
+          ? json['responseError'] as int
+          : null,
+      responseErrorBody: json.containsKey('responseErrorBody')
+          ? json['responseErrorBody'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'requestUrl': requestUrl,
+      if (netError != null) 'netError': netError,
+      if (responseError != null) 'responseError': responseError,
+      if (responseErrorBody != null) 'responseErrorBody': responseErrorBody,
+    };
+  }
+}
+
 /// Session event details specific to creation.
 class CreationEventDetails {
   /// The result of the fetch attempt.
@@ -5893,7 +5943,15 @@ class CreationEventDetails {
   /// all successful creation events.
   final DeviceBoundSession? newSession;
 
-  CreationEventDetails({required this.fetchResult, this.newSession});
+  /// Details about a failed device bound session network request if there was
+  /// one.
+  final DeviceBoundSessionFailedRequest? failedRequest;
+
+  CreationEventDetails({
+    required this.fetchResult,
+    this.newSession,
+    this.failedRequest,
+  });
 
   factory CreationEventDetails.fromJson(Map<String, dynamic> json) {
     return CreationEventDetails(
@@ -5905,6 +5963,11 @@ class CreationEventDetails {
               json['newSession'] as Map<String, dynamic>,
             )
           : null,
+      failedRequest: json.containsKey('failedRequest')
+          ? DeviceBoundSessionFailedRequest.fromJson(
+              json['failedRequest'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -5912,6 +5975,7 @@ class CreationEventDetails {
     return {
       'fetchResult': fetchResult.toJson(),
       if (newSession != null) 'newSession': newSession!.toJson(),
+      if (failedRequest != null) 'failedRequest': failedRequest!.toJson(),
     };
   }
 }
@@ -5931,11 +5995,16 @@ class RefreshEventDetails {
   /// See comments on `net::device_bound_sessions::RefreshEventResult::was_fully_proactive_refresh`.
   final bool wasFullyProactiveRefresh;
 
+  /// Details about a failed device bound session network request if there was
+  /// one.
+  final DeviceBoundSessionFailedRequest? failedRequest;
+
   RefreshEventDetails({
     required this.refreshResult,
     this.fetchResult,
     this.newSession,
     required this.wasFullyProactiveRefresh,
+    this.failedRequest,
   });
 
   factory RefreshEventDetails.fromJson(Map<String, dynamic> json) {
@@ -5955,6 +6024,11 @@ class RefreshEventDetails {
           : null,
       wasFullyProactiveRefresh:
           json['wasFullyProactiveRefresh'] as bool? ?? false,
+      failedRequest: json.containsKey('failedRequest')
+          ? DeviceBoundSessionFailedRequest.fromJson(
+              json['failedRequest'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -5964,6 +6038,7 @@ class RefreshEventDetails {
       'wasFullyProactiveRefresh': wasFullyProactiveRefresh,
       if (fetchResult != null) 'fetchResult': fetchResult!.toJson(),
       if (newSession != null) 'newSession': newSession!.toJson(),
+      if (failedRequest != null) 'failedRequest': failedRequest!.toJson(),
     };
   }
 }

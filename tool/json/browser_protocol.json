@@ -6925,10 +6925,56 @@
             ]
         },
         {
+            "domain": "CrashReportContext",
+            "description": "This domain exposes the current state of the CrashReportContext API.",
+            "experimental": true,
+            "dependencies": [
+                "Page"
+            ],
+            "types": [
+                {
+                    "id": "CrashReportContextEntry",
+                    "description": "Key-value pair in CrashReportContext.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The ID of the frame where the key-value pair was set.",
+                            "$ref": "Page.FrameId"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "getEntries",
+                    "description": "Returns all entries in the CrashReportContext across all frames in the page.",
+                    "returns": [
+                        {
+                            "name": "entries",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CrashReportContextEntry"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "domain": "DOM",
             "description": "This domain exposes DOM read/write operations. Each DOM Node is represented with its mirror object\nthat has an `id`. This `id` can be used to get additional information on the Node, resolve it into\nthe JavaScript object wrapper, etc. It is important that client receives DOM events only for the\nnodes that are known to the client. Backend keeps track of the nodes that were sent to the client\nand never sends the same node twice. It is client's responsibility to collect information about\nthe nodes that were sent to the client. Note that `iframe` owner elements will return\ncorresponding document elements as their child nodes.",
             "dependencies": [
-                "Runtime"
+                "Runtime",
+                "Network"
             ],
             "types": [
                 {
@@ -7285,10 +7331,10 @@
                             }
                         },
                         {
-                            "name": "isAdRelated",
+                            "name": "adProvenance",
                             "experimental": true,
                             "optional": true,
-                            "type": "boolean"
+                            "$ref": "Network.AdProvenance"
                         }
                     ]
                 },
@@ -8854,9 +8900,10 @@
                             "$ref": "DOM.NodeId"
                         },
                         {
-                            "name": "isAdRelated",
-                            "description": "If the node is ad related.",
-                            "type": "boolean"
+                            "name": "adProvenance",
+                            "description": "The provenance of the ad related node, if it is ad related.",
+                            "optional": true,
+                            "$ref": "Network.AdProvenance"
                         }
                     ]
                 },
@@ -17294,6 +17341,26 @@
                             "description": "The filter list rule that caused the root (last) script in\n`ancestryChain` to be tagged as an ad.",
                             "optional": true,
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "AdProvenance",
+                    "description": "Represents the provenance of an ad resource or element. Only one of\n`filterlistRule` or `adScriptAncestry` can be set. If `filterlistRule`\nis provided, the resource URL directly matches a filter list rule. If\n`adScriptAncestry` is provided, an ad script initiated the resource fetch or\nappended the element to the DOM. If neither is provided, the entity is\nknown to be an ad, but provenance tracking information is unavailable.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "filterlistRule",
+                            "description": "The filterlist rule that matched, if any.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "adScriptAncestry",
+                            "description": "The script ancestry that created the ad, if any.",
+                            "optional": true,
+                            "$ref": "AdAncestry"
                         }
                     ]
                 },
@@ -31397,6 +31464,16 @@
                     ]
                 },
                 {
+                    "id": "InvocationStatus",
+                    "description": "Represents the status of a tool invocation.",
+                    "type": "string",
+                    "enum": [
+                        "Success",
+                        "Canceled",
+                        "Error"
+                    ]
+                },
+                {
                     "id": "Tool",
                     "description": "Definition of a tool that can be invoked.",
                     "type": "object",
@@ -31475,6 +31552,66 @@
                             "items": {
                                 "$ref": "Tool"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "toolInvoked",
+                    "description": "Event fired when a tool invocation starts.",
+                    "parameters": [
+                        {
+                            "name": "toolName",
+                            "description": "Name of the tool to invoke.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame id",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "invocationId",
+                            "description": "Invocation identifier.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "input",
+                            "description": "The input parameters used for the invocation.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "toolResponded",
+                    "description": "Event fired when a tool invocation completes or fails.",
+                    "parameters": [
+                        {
+                            "name": "invocationId",
+                            "description": "Invocation identifier.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "status",
+                            "description": "Status of the invocation.",
+                            "$ref": "InvocationStatus"
+                        },
+                        {
+                            "name": "output",
+                            "description": "Output or error delivered as delivered to the agent. Missing if `status` is anything other than Success.",
+                            "optional": true,
+                            "type": "object"
+                        },
+                        {
+                            "name": "errorText",
+                            "description": "Error text for protocol users.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "exception",
+                            "description": "The exception object, if the javascript tool threw an error>",
+                            "optional": true,
+                            "$ref": "Runtime.RemoteObject"
                         }
                     ]
                 }

@@ -52,15 +52,6 @@ class AuditsApi {
     await _client.send('Audits.enable');
   }
 
-  /// Runs the contrast check for the target page. Found issues are reported
-  /// using Audits.issueAdded event.
-  /// [reportAAA] Whether to report WCAG AAA level issues. Default is false.
-  Future<void> checkContrast({bool? reportAAA}) async {
-    await _client.send('Audits.checkContrast', {
-      if (reportAAA != null) 'reportAAA': reportAAA,
-    });
-  }
-
   /// Runs the form issues check for the target page. Found issues are reported
   /// using Audits.issueAdded event.
   Future<List<GenericIssueDetails>> checkFormsIssues() async {
@@ -380,6 +371,55 @@ class CookieIssueDetails {
       if (cookieUrl != null) 'cookieUrl': cookieUrl,
       if (request != null) 'request': request!.toJson(),
       if (insight != null) 'insight': insight!.toJson(),
+    };
+  }
+}
+
+enum PerformanceIssueType {
+  documentCookie('DocumentCookie');
+
+  final String value;
+
+  const PerformanceIssueType(this.value);
+
+  factory PerformanceIssueType.fromJson(String value) =>
+      PerformanceIssueType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Details for a performance issue.
+class PerformanceIssueDetails {
+  final PerformanceIssueType performanceIssueType;
+
+  final SourceCodeLocation? sourceCodeLocation;
+
+  PerformanceIssueDetails({
+    required this.performanceIssueType,
+    this.sourceCodeLocation,
+  });
+
+  factory PerformanceIssueDetails.fromJson(Map<String, dynamic> json) {
+    return PerformanceIssueDetails(
+      performanceIssueType: PerformanceIssueType.fromJson(
+        json['performanceIssueType'] as String,
+      ),
+      sourceCodeLocation: json.containsKey('sourceCodeLocation')
+          ? SourceCodeLocation.fromJson(
+              json['sourceCodeLocation'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'performanceIssueType': performanceIssueType.toJson(),
+      if (sourceCodeLocation != null)
+        'sourceCodeLocation': sourceCodeLocation!.toJson(),
     };
   }
 }
@@ -835,58 +875,6 @@ class SharedArrayBufferIssueDetails {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
       'isWarning': isWarning,
       'type': type.toJson(),
-    };
-  }
-}
-
-class LowTextContrastIssueDetails {
-  final dom.BackendNodeId violatingNodeId;
-
-  final String violatingNodeSelector;
-
-  final num contrastRatio;
-
-  final num thresholdAA;
-
-  final num thresholdAAA;
-
-  final String fontSize;
-
-  final String fontWeight;
-
-  LowTextContrastIssueDetails({
-    required this.violatingNodeId,
-    required this.violatingNodeSelector,
-    required this.contrastRatio,
-    required this.thresholdAA,
-    required this.thresholdAAA,
-    required this.fontSize,
-    required this.fontWeight,
-  });
-
-  factory LowTextContrastIssueDetails.fromJson(Map<String, dynamic> json) {
-    return LowTextContrastIssueDetails(
-      violatingNodeId: dom.BackendNodeId.fromJson(
-        json['violatingNodeId'] as int,
-      ),
-      violatingNodeSelector: json['violatingNodeSelector'] as String,
-      contrastRatio: json['contrastRatio'] as num,
-      thresholdAA: json['thresholdAA'] as num,
-      thresholdAAA: json['thresholdAAA'] as num,
-      fontSize: json['fontSize'] as String,
-      fontWeight: json['fontWeight'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'violatingNodeId': violatingNodeId.toJson(),
-      'violatingNodeSelector': violatingNodeSelector,
-      'contrastRatio': contrastRatio,
-      'thresholdAA': thresholdAA,
-      'thresholdAAA': thresholdAAA,
-      'fontSize': fontSize,
-      'fontWeight': fontWeight,
     };
   }
 }
@@ -1392,6 +1380,9 @@ enum GenericIssueErrorType {
   autofillPolicyControlledFeatureInfo('AutofillPolicyControlledFeatureInfo'),
   manualTextPolicyControlledFeatureInfo(
     'ManualTextPolicyControlledFeatureInfo',
+  ),
+  formModelContextParameterMissingTitleAndDescription(
+    'FormModelContextParameterMissingTitleAndDescription',
   );
 
   final String value;
@@ -1624,10 +1615,6 @@ enum FederatedAuthRequestIssueReason {
   configNoResponse('ConfigNoResponse'),
   configInvalidResponse('ConfigInvalidResponse'),
   configInvalidContentType('ConfigInvalidContentType'),
-  clientMetadataHttpNotFound('ClientMetadataHttpNotFound'),
-  clientMetadataNoResponse('ClientMetadataNoResponse'),
-  clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),
-  clientMetadataInvalidContentType('ClientMetadataInvalidContentType'),
   idpNotPotentiallyTrustworthy('IdpNotPotentiallyTrustworthy'),
   disabledInSettings('DisabledInSettings'),
   disabledInFlags('DisabledInFlags'),
@@ -1649,11 +1636,9 @@ enum FederatedAuthRequestIssueReason {
   canceled('Canceled'),
   rpPageNotVisible('RpPageNotVisible'),
   silentMediationFailure('SilentMediationFailure'),
-  thirdPartyCookiesBlocked('ThirdPartyCookiesBlocked'),
   notSignedInWithIdp('NotSignedInWithIdp'),
   missingTransientUserActivation('MissingTransientUserActivation'),
   replacedByActiveMode('ReplacedByActiveMode'),
-  invalidFieldsSpecified('InvalidFieldsSpecified'),
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
   typeNotMatching('TypeNotMatching'),
   uiDismissedNoEmbargo('UiDismissedNoEmbargo'),
@@ -2194,6 +2179,121 @@ class PermissionElementIssueDetails {
   }
 }
 
+/// Metadata about the ad script that was on the stack that caused the current
+/// script in the `AdAncestry` to be considered ad related.
+class AdScriptIdentifier {
+  /// The script's v8 identifier.
+  final runtime.ScriptId scriptId;
+
+  /// v8's debugging id for the v8::Context.
+  final runtime.UniqueDebuggerId debuggerId;
+
+  /// The script's url (or generated name based on id if inline script).
+  final String name;
+
+  AdScriptIdentifier({
+    required this.scriptId,
+    required this.debuggerId,
+    required this.name,
+  });
+
+  factory AdScriptIdentifier.fromJson(Map<String, dynamic> json) {
+    return AdScriptIdentifier(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      debuggerId: runtime.UniqueDebuggerId.fromJson(
+        json['debuggerId'] as String,
+      ),
+      name: json['name'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scriptId': scriptId.toJson(),
+      'debuggerId': debuggerId.toJson(),
+      'name': name,
+    };
+  }
+}
+
+/// Providence about how an ad script was determined to be such. It is an ad
+/// because its url matched a filterlist rule, or because some other ad script
+/// was on the stack when this script was loaded.
+class AdAncestry {
+  /// The ad-script in the stack when the offending script was loaded. This is
+  /// recursive down to the root script that was tagged due to the filterlist
+  /// rule.
+  final List<AdScriptIdentifier> adAncestryChain;
+
+  /// The filterlist rule that caused the root (last) script in
+  /// `adAncestry` to be ad-tagged.
+  final String? rootScriptFilterlistRule;
+
+  AdAncestry({required this.adAncestryChain, this.rootScriptFilterlistRule});
+
+  factory AdAncestry.fromJson(Map<String, dynamic> json) {
+    return AdAncestry(
+      adAncestryChain: (json['adAncestryChain'] as List)
+          .map((e) => AdScriptIdentifier.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      rootScriptFilterlistRule: json.containsKey('rootScriptFilterlistRule')
+          ? json['rootScriptFilterlistRule'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'adAncestryChain': adAncestryChain.map((e) => e.toJson()).toList(),
+      if (rootScriptFilterlistRule != null)
+        'rootScriptFilterlistRule': rootScriptFilterlistRule,
+    };
+  }
+}
+
+/// The issue warns about blocked calls to privacy sensitive APIs via the
+/// Selective Permissions Intervention.
+class SelectivePermissionsInterventionIssueDetails {
+  /// Which API was intervened on.
+  final String apiName;
+
+  /// Why the ad script using the API is considered an ad.
+  final AdAncestry adAncestry;
+
+  /// The stack trace at the time of the intervention.
+  final runtime.StackTraceData? stackTrace;
+
+  SelectivePermissionsInterventionIssueDetails({
+    required this.apiName,
+    required this.adAncestry,
+    this.stackTrace,
+  });
+
+  factory SelectivePermissionsInterventionIssueDetails.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return SelectivePermissionsInterventionIssueDetails(
+      apiName: json['apiName'] as String,
+      adAncestry: AdAncestry.fromJson(
+        json['adAncestry'] as Map<String, dynamic>,
+      ),
+      stackTrace: json.containsKey('stackTrace')
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'apiName': apiName,
+      'adAncestry': adAncestry.toJson(),
+      if (stackTrace != null) 'stackTrace': stackTrace!.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -2204,7 +2304,6 @@ enum InspectorIssueCode {
   heavyAdIssue('HeavyAdIssue'),
   contentSecurityPolicyIssue('ContentSecurityPolicyIssue'),
   sharedArrayBufferIssue('SharedArrayBufferIssue'),
-  lowTextContrastIssue('LowTextContrastIssue'),
   corsIssue('CorsIssue'),
   attributionReportingIssue('AttributionReportingIssue'),
   quirksModeIssue('QuirksModeIssue'),
@@ -2225,7 +2324,11 @@ enum InspectorIssueCode {
   unencodedDigestIssue('UnencodedDigestIssue'),
   connectionAllowlistIssue('ConnectionAllowlistIssue'),
   userReidentificationIssue('UserReidentificationIssue'),
-  permissionElementIssue('PermissionElementIssue');
+  permissionElementIssue('PermissionElementIssue'),
+  performanceIssue('PerformanceIssue'),
+  selectivePermissionsInterventionIssue(
+    'SelectivePermissionsInterventionIssue',
+  );
 
   final String value;
 
@@ -2255,8 +2358,6 @@ class InspectorIssueDetails {
   final ContentSecurityPolicyIssueDetails? contentSecurityPolicyIssueDetails;
 
   final SharedArrayBufferIssueDetails? sharedArrayBufferIssueDetails;
-
-  final LowTextContrastIssueDetails? lowTextContrastIssueDetails;
 
   final CorsIssueDetails? corsIssueDetails;
 
@@ -2300,6 +2401,11 @@ class InspectorIssueDetails {
 
   final PermissionElementIssueDetails? permissionElementIssueDetails;
 
+  final PerformanceIssueDetails? performanceIssueDetails;
+
+  final SelectivePermissionsInterventionIssueDetails?
+  selectivePermissionsInterventionIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2307,7 +2413,6 @@ class InspectorIssueDetails {
     this.heavyAdIssueDetails,
     this.contentSecurityPolicyIssueDetails,
     this.sharedArrayBufferIssueDetails,
-    this.lowTextContrastIssueDetails,
     this.corsIssueDetails,
     this.attributionReportingIssueDetails,
     this.quirksModeIssueDetails,
@@ -2328,6 +2433,8 @@ class InspectorIssueDetails {
     this.connectionAllowlistIssueDetails,
     this.userReidentificationIssueDetails,
     this.permissionElementIssueDetails,
+    this.performanceIssueDetails,
+    this.selectivePermissionsInterventionIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2363,12 +2470,6 @@ class InspectorIssueDetails {
           json.containsKey('sharedArrayBufferIssueDetails')
           ? SharedArrayBufferIssueDetails.fromJson(
               json['sharedArrayBufferIssueDetails'] as Map<String, dynamic>,
-            )
-          : null,
-      lowTextContrastIssueDetails:
-          json.containsKey('lowTextContrastIssueDetails')
-          ? LowTextContrastIssueDetails.fromJson(
-              json['lowTextContrastIssueDetails'] as Map<String, dynamic>,
             )
           : null,
       corsIssueDetails: json.containsKey('corsIssueDetails')
@@ -2486,6 +2587,18 @@ class InspectorIssueDetails {
               json['permissionElementIssueDetails'] as Map<String, dynamic>,
             )
           : null,
+      performanceIssueDetails: json.containsKey('performanceIssueDetails')
+          ? PerformanceIssueDetails.fromJson(
+              json['performanceIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      selectivePermissionsInterventionIssueDetails:
+          json.containsKey('selectivePermissionsInterventionIssueDetails')
+          ? SelectivePermissionsInterventionIssueDetails.fromJson(
+              json['selectivePermissionsInterventionIssueDetails']
+                  as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2506,8 +2619,6 @@ class InspectorIssueDetails {
       if (sharedArrayBufferIssueDetails != null)
         'sharedArrayBufferIssueDetails': sharedArrayBufferIssueDetails!
             .toJson(),
-      if (lowTextContrastIssueDetails != null)
-        'lowTextContrastIssueDetails': lowTextContrastIssueDetails!.toJson(),
       if (corsIssueDetails != null)
         'corsIssueDetails': corsIssueDetails!.toJson(),
       if (attributionReportingIssueDetails != null)
@@ -2559,6 +2670,11 @@ class InspectorIssueDetails {
       if (permissionElementIssueDetails != null)
         'permissionElementIssueDetails': permissionElementIssueDetails!
             .toJson(),
+      if (performanceIssueDetails != null)
+        'performanceIssueDetails': performanceIssueDetails!.toJson(),
+      if (selectivePermissionsInterventionIssueDetails != null)
+        'selectivePermissionsInterventionIssueDetails':
+            selectivePermissionsInterventionIssueDetails!.toJson(),
     };
   }
 }
