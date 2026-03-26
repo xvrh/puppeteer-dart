@@ -434,6 +434,21 @@ class CSSApi {
     return CSSSupports.fromJson(result['supports'] as Map<String, dynamic>);
   }
 
+  /// Modifies the expression of a navigation at-rule.
+  /// Returns: The resulting CSS Navigation rule after modification.
+  Future<CSSNavigation> setNavigationText(
+    dom.StyleSheetId styleSheetId,
+    SourceRange range,
+    String text,
+  ) async {
+    var result = await _client.send('CSS.setNavigationText', {
+      'styleSheetId': styleSheetId,
+      'range': range,
+      'text': text,
+    });
+    return CSSNavigation.fromJson(result['navigation'] as Map<String, dynamic>);
+  }
+
   /// Modifies the expression of a scope at-rule.
   /// Returns: The resulting CSS Scope rule after modification.
   Future<CSSScope> setScopeText(
@@ -1287,6 +1302,10 @@ class CSSRule {
   /// The array enumerates @starting-style at-rules starting with the innermost one, going outwards.
   final List<CSSStartingStyle>? startingStyles;
 
+  /// @navigation CSS at-rule array.
+  /// The array enumerates @navigation at-rules starting with the innermost one, going outwards.
+  final List<CSSNavigation>? navigations;
+
   CSSRule({
     this.styleSheetId,
     required this.selectorList,
@@ -1301,6 +1320,7 @@ class CSSRule {
     this.scopes,
     this.ruleTypes,
     this.startingStyles,
+    this.navigations,
   });
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
@@ -1358,6 +1378,11 @@ class CSSRule {
                 )
                 .toList()
           : null,
+      navigations: json.containsKey('navigations')
+          ? (json['navigations'] as List)
+                .map((e) => CSSNavigation.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
     );
   }
 
@@ -1381,6 +1406,8 @@ class CSSRule {
         'ruleTypes': ruleTypes!.map((e) => e.toJson()).toList(),
       if (startingStyles != null)
         'startingStyles': startingStyles!.map((e) => e.toJson()).toList(),
+      if (navigations != null)
+        'navigations': navigations!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1394,7 +1421,8 @@ enum CSSRuleType {
   layerRule('LayerRule'),
   scopeRule('ScopeRule'),
   styleRule('StyleRule'),
-  startingStyleRule('StartingStyleRule');
+  startingStyleRule('StartingStyleRule'),
+  navigationRule('NavigationRule');
 
   final String value;
 
@@ -1977,6 +2005,51 @@ class CSSSupports {
     return {
       'text': text,
       'active': active,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS Navigation at-rule descriptor.
+class CSSNavigation {
+  /// Navigation rule text.
+  final String text;
+
+  /// Whether the navigation condition is satisfied.
+  final bool? active;
+
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final dom.StyleSheetId? styleSheetId;
+
+  CSSNavigation({
+    required this.text,
+    this.active,
+    this.range,
+    this.styleSheetId,
+  });
+
+  factory CSSNavigation.fromJson(Map<String, dynamic> json) {
+    return CSSNavigation(
+      text: json['text'] as String,
+      active: json.containsKey('active') ? json['active'] as bool : null,
+      range: json.containsKey('range')
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? dom.StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      if (active != null) 'active': active,
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
@@ -2614,6 +2687,9 @@ class CSSFunctionConditionNode {
   /// @supports CSS at-rule condition. Only one type of condition should be set.
   final CSSSupports? supports;
 
+  /// @navigation condition. Only one type of condition should be set.
+  final CSSNavigation? navigation;
+
   /// Block body.
   final List<CSSFunctionNode> children;
 
@@ -2624,6 +2700,7 @@ class CSSFunctionConditionNode {
     this.media,
     this.containerQueries,
     this.supports,
+    this.navigation,
     required this.children,
     required this.conditionText,
   });
@@ -2641,6 +2718,9 @@ class CSSFunctionConditionNode {
       supports: json.containsKey('supports')
           ? CSSSupports.fromJson(json['supports'] as Map<String, dynamic>)
           : null,
+      navigation: json.containsKey('navigation')
+          ? CSSNavigation.fromJson(json['navigation'] as Map<String, dynamic>)
+          : null,
       children: (json['children'] as List)
           .map((e) => CSSFunctionNode.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2656,6 +2736,7 @@ class CSSFunctionConditionNode {
       if (containerQueries != null)
         'containerQueries': containerQueries!.toJson(),
       if (supports != null) 'supports': supports!.toJson(),
+      if (navigation != null) 'navigation': navigation!.toJson(),
     };
   }
 }

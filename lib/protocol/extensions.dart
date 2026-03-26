@@ -35,6 +35,16 @@ class ExtensionsApi {
     return result['id'] as String;
   }
 
+  /// Gets a list of all unpacked extensions.
+  /// Available if the client is connected using the --remote-debugging-pipe flag
+  /// and the --enable-unsafe-extension-debugging flag is set.
+  Future<List<ExtensionInfo>> getExtensions() async {
+    var result = await _client.send('Extensions.getExtensions');
+    return (result['extensions'] as List)
+        .map((e) => ExtensionInfo.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Uninstalls an unpacked extension (others not supported) from the profile.
   /// Available if the client is connected using the --remote-debugging-pipe flag
   /// and the --enable-unsafe-extension-debugging.
@@ -123,4 +133,50 @@ enum StorageArea {
 
   @override
   String toString() => value.toString();
+}
+
+/// Detailed information about an extension.
+class ExtensionInfo {
+  /// Extension id.
+  final String id;
+
+  /// Extension name.
+  final String name;
+
+  /// Extension version.
+  final String version;
+
+  /// The path from which the extension was loaded.
+  final String path;
+
+  /// Extension enabled status.
+  final bool enabled;
+
+  ExtensionInfo({
+    required this.id,
+    required this.name,
+    required this.version,
+    required this.path,
+    required this.enabled,
+  });
+
+  factory ExtensionInfo.fromJson(Map<String, dynamic> json) {
+    return ExtensionInfo(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      version: json['version'] as String,
+      path: json['path'] as String,
+      enabled: json['enabled'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'version': version,
+      'path': path,
+      'enabled': enabled,
+    };
+  }
 }

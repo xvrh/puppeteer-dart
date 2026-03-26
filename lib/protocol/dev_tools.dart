@@ -51,6 +51,7 @@ import 'tethering.dart';
 import 'tracing.dart';
 import 'web_audio.dart';
 import 'web_authn.dart';
+import 'web_mcp.dart';
 
 class DevTools {
   final Client client;
@@ -259,6 +260,9 @@ class DevTools {
   /// API.
   WebAuthnApi get webAuthn => _webAuthn ??= WebAuthnApi(client);
   WebAuthnApi? _webAuthn;
+
+  WebMCPApi get webMcp => _webMcp ??= WebMCPApi(client);
+  WebMCPApi? _webMcp;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

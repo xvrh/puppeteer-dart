@@ -3675,6 +3675,7 @@ enum BackForwardCacheNotRestoredReason {
   backForwardCacheDisabledForPrerender('BackForwardCacheDisabledForPrerender'),
   userAgentOverrideDiffers('UserAgentOverrideDiffers'),
   foregroundCacheLimit('ForegroundCacheLimit'),
+  forwardCacheDisabled('ForwardCacheDisabled'),
   browsingInstanceNotSwapped('BrowsingInstanceNotSwapped'),
   backForwardCacheDisabledForDelegate('BackForwardCacheDisabledForDelegate'),
   unloadHandlerExistsInMainFrame('UnloadHandlerExistsInMainFrame'),

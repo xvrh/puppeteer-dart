@@ -92,6 +92,12 @@ class DOMApi {
       .where((event) => event.name == 'DOM.scrollableFlagUpdated')
       .map((event) => ScrollableFlagUpdatedEvent.fromJson(event.parameters));
 
+  /// Fired when a node's ad related state changes.
+  Stream<AdRelatedStateUpdatedEvent> get onAdRelatedStateUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'DOM.adRelatedStateUpdated')
+      .map((event) => AdRelatedStateUpdatedEvent.fromJson(event.parameters));
+
   /// Fired when a node's starting styles changes.
   Stream<AffectedByStartingStylesFlagUpdatedEvent>
   get onAffectedByStartingStylesFlagUpdated => _client.onEvent
@@ -1050,6 +1056,23 @@ class ScrollableFlagUpdatedEvent {
   }
 }
 
+class AdRelatedStateUpdatedEvent {
+  /// The id of the node.
+  final dom.NodeId nodeId;
+
+  /// If the node is ad related.
+  final bool isAdRelated;
+
+  AdRelatedStateUpdatedEvent({required this.nodeId, required this.isAdRelated});
+
+  factory AdRelatedStateUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return AdRelatedStateUpdatedEvent(
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+      isAdRelated: json['isAdRelated'] as bool? ?? false,
+    );
+  }
+}
+
 class AffectedByStartingStylesFlagUpdatedEvent {
   /// The id of the node.
   final dom.NodeId nodeId;
@@ -1514,6 +1537,8 @@ class Node {
 
   final List<StyleSheetId>? adoptedStyleSheets;
 
+  final bool? isAdRelated;
+
   Node({
     required this.nodeId,
     this.parentId,
@@ -1548,6 +1573,7 @@ class Node {
     this.isScrollable,
     this.affectedByStartingStyles,
     this.adoptedStyleSheets,
+    this.isAdRelated,
   });
 
   factory Node.fromJson(Map<String, dynamic> json) {
@@ -1641,6 +1667,9 @@ class Node {
                 .map((e) => StyleSheetId.fromJson(e as String))
                 .toList()
           : null,
+      isAdRelated: json.containsKey('isAdRelated')
+          ? json['isAdRelated'] as bool
+          : null,
     );
   }
 
@@ -1688,6 +1717,7 @@ class Node {
         'adoptedStyleSheets': adoptedStyleSheets!
             .map((e) => e.toJson())
             .toList(),
+      if (isAdRelated != null) 'isAdRelated': isAdRelated,
     };
   }
 }
