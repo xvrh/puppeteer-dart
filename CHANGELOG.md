@@ -1,3 +1,6 @@
+## 3.22.0
+- Update to Chrome 147.0.7727.56.
+
 ## 3.21.0
 - Update to Chrome 146.0.7680.66.
 
