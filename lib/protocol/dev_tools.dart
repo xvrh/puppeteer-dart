@@ -8,6 +8,7 @@ import 'bluetooth_emulation.dart';
 import 'browser.dart';
 import 'cache_storage.dart';
 import 'cast.dart';
+import 'crash_report_context.dart';
 import 'css.dart';
 import 'debugger.dart';
 import 'device_access.dart';
@@ -104,6 +105,11 @@ class DevTools {
   /// functionalities.
   CastApi get cast => _cast ??= CastApi(client);
   CastApi? _cast;
+
+  /// This domain exposes the current state of the CrashReportContext API.
+  CrashReportContextApi get crashReportContext =>
+      _crashReportContext ??= CrashReportContextApi(client);
+  CrashReportContextApi? _crashReportContext;
 
   /// This domain exposes DOM read/write operations. Each DOM Node is represented with its mirror object
   /// that has an `id`. This `id` can be used to get additional information on the Node, resolve it into

@@ -2179,78 +2179,6 @@ class PermissionElementIssueDetails {
   }
 }
 
-/// Metadata about the ad script that was on the stack that caused the current
-/// script in the `AdAncestry` to be considered ad related.
-class AdScriptIdentifier {
-  /// The script's v8 identifier.
-  final runtime.ScriptId scriptId;
-
-  /// v8's debugging id for the v8::Context.
-  final runtime.UniqueDebuggerId debuggerId;
-
-  /// The script's url (or generated name based on id if inline script).
-  final String name;
-
-  AdScriptIdentifier({
-    required this.scriptId,
-    required this.debuggerId,
-    required this.name,
-  });
-
-  factory AdScriptIdentifier.fromJson(Map<String, dynamic> json) {
-    return AdScriptIdentifier(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
-      debuggerId: runtime.UniqueDebuggerId.fromJson(
-        json['debuggerId'] as String,
-      ),
-      name: json['name'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'scriptId': scriptId.toJson(),
-      'debuggerId': debuggerId.toJson(),
-      'name': name,
-    };
-  }
-}
-
-/// Providence about how an ad script was determined to be such. It is an ad
-/// because its url matched a filterlist rule, or because some other ad script
-/// was on the stack when this script was loaded.
-class AdAncestry {
-  /// The ad-script in the stack when the offending script was loaded. This is
-  /// recursive down to the root script that was tagged due to the filterlist
-  /// rule.
-  final List<AdScriptIdentifier> adAncestryChain;
-
-  /// The filterlist rule that caused the root (last) script in
-  /// `adAncestry` to be ad-tagged.
-  final String? rootScriptFilterlistRule;
-
-  AdAncestry({required this.adAncestryChain, this.rootScriptFilterlistRule});
-
-  factory AdAncestry.fromJson(Map<String, dynamic> json) {
-    return AdAncestry(
-      adAncestryChain: (json['adAncestryChain'] as List)
-          .map((e) => AdScriptIdentifier.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      rootScriptFilterlistRule: json.containsKey('rootScriptFilterlistRule')
-          ? json['rootScriptFilterlistRule'] as String
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'adAncestryChain': adAncestryChain.map((e) => e.toJson()).toList(),
-      if (rootScriptFilterlistRule != null)
-        'rootScriptFilterlistRule': rootScriptFilterlistRule,
-    };
-  }
-}
-
 /// The issue warns about blocked calls to privacy sensitive APIs via the
 /// Selective Permissions Intervention.
 class SelectivePermissionsInterventionIssueDetails {
@@ -2258,7 +2186,7 @@ class SelectivePermissionsInterventionIssueDetails {
   final String apiName;
 
   /// Why the ad script using the API is considered an ad.
-  final AdAncestry adAncestry;
+  final network.AdAncestry adAncestry;
 
   /// The stack trace at the time of the intervention.
   final runtime.StackTraceData? stackTrace;
@@ -2274,7 +2202,7 @@ class SelectivePermissionsInterventionIssueDetails {
   ) {
     return SelectivePermissionsInterventionIssueDetails(
       apiName: json['apiName'] as String,
-      adAncestry: AdAncestry.fromJson(
+      adAncestry: network.AdAncestry.fromJson(
         json['adAncestry'] as Map<String, dynamic>,
       ),
       stackTrace: json.containsKey('stackTrace')

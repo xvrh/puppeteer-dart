@@ -5154,6 +5154,117 @@ class ClientSecurityState {
   }
 }
 
+/// Identifies the script on the stack that caused a resource or element to be
+/// labeled as an ad. For resources, this indicates the context that triggered
+/// the fetch. For elements, this indicates the context that caused the element
+/// to be appended to the DOM.
+class AdScriptIdentifier {
+  /// The script's V8 identifier.
+  final runtime.ScriptId scriptId;
+
+  /// V8's debugging ID for the v8::Context.
+  final runtime.UniqueDebuggerId debuggerId;
+
+  /// The script's url (or generated name based on id if inline script).
+  final String name;
+
+  AdScriptIdentifier({
+    required this.scriptId,
+    required this.debuggerId,
+    required this.name,
+  });
+
+  factory AdScriptIdentifier.fromJson(Map<String, dynamic> json) {
+    return AdScriptIdentifier(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      debuggerId: runtime.UniqueDebuggerId.fromJson(
+        json['debuggerId'] as String,
+      ),
+      name: json['name'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scriptId': scriptId.toJson(),
+      'debuggerId': debuggerId.toJson(),
+      'name': name,
+    };
+  }
+}
+
+/// Encapsulates the script ancestry and the root script filter list rule that
+/// caused the resource or element to be labeled as an ad.
+class AdAncestry {
+  /// A chain of `AdScriptIdentifier`s representing the ancestry of an ad
+  /// script that led to the creation of a resource or element. The chain is
+  /// ordered from the script itself (lowest level) up to its root ancestor
+  /// that was flagged by a filter list.
+  final List<AdScriptIdentifier> ancestryChain;
+
+  /// The filter list rule that caused the root (last) script in
+  /// `ancestryChain` to be tagged as an ad.
+  final String? rootScriptFilterlistRule;
+
+  AdAncestry({required this.ancestryChain, this.rootScriptFilterlistRule});
+
+  factory AdAncestry.fromJson(Map<String, dynamic> json) {
+    return AdAncestry(
+      ancestryChain: (json['ancestryChain'] as List)
+          .map((e) => AdScriptIdentifier.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      rootScriptFilterlistRule: json.containsKey('rootScriptFilterlistRule')
+          ? json['rootScriptFilterlistRule'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ancestryChain': ancestryChain.map((e) => e.toJson()).toList(),
+      if (rootScriptFilterlistRule != null)
+        'rootScriptFilterlistRule': rootScriptFilterlistRule,
+    };
+  }
+}
+
+/// Represents the provenance of an ad resource or element. Only one of
+/// `filterlistRule` or `adScriptAncestry` can be set. If `filterlistRule`
+/// is provided, the resource URL directly matches a filter list rule. If
+/// `adScriptAncestry` is provided, an ad script initiated the resource fetch or
+/// appended the element to the DOM. If neither is provided, the entity is
+/// known to be an ad, but provenance tracking information is unavailable.
+class AdProvenance {
+  /// The filterlist rule that matched, if any.
+  final String? filterlistRule;
+
+  /// The script ancestry that created the ad, if any.
+  final AdAncestry? adScriptAncestry;
+
+  AdProvenance({this.filterlistRule, this.adScriptAncestry});
+
+  factory AdProvenance.fromJson(Map<String, dynamic> json) {
+    return AdProvenance(
+      filterlistRule: json.containsKey('filterlistRule')
+          ? json['filterlistRule'] as String
+          : null,
+      adScriptAncestry: json.containsKey('adScriptAncestry')
+          ? AdAncestry.fromJson(
+              json['adScriptAncestry'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (filterlistRule != null) 'filterlistRule': filterlistRule,
+      if (adScriptAncestry != null)
+        'adScriptAncestry': adScriptAncestry!.toJson(),
+    };
+  }
+}
+
 enum CrossOriginOpenerPolicyValue {
   sameOrigin('SameOrigin'),
   sameOriginAllowPopups('SameOriginAllowPopups'),

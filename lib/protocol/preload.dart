@@ -368,12 +368,15 @@ class PreloadingAttemptKey {
 
   final String url;
 
+  final bool? formSubmission;
+
   final SpeculationTargetHint? targetHint;
 
   PreloadingAttemptKey({
     required this.loaderId,
     required this.action,
     required this.url,
+    this.formSubmission,
     this.targetHint,
   });
 
@@ -382,6 +385,9 @@ class PreloadingAttemptKey {
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       action: SpeculationAction.fromJson(json['action'] as String),
       url: json['url'] as String,
+      formSubmission: json.containsKey('formSubmission')
+          ? json['formSubmission'] as bool
+          : null,
       targetHint: json.containsKey('targetHint')
           ? SpeculationTargetHint.fromJson(json['targetHint'] as String)
           : null,
@@ -393,6 +399,7 @@ class PreloadingAttemptKey {
       'loaderId': loaderId.toJson(),
       'action': action.toJson(),
       'url': url,
+      if (formSubmission != null) 'formSubmission': formSubmission,
       if (targetHint != null) 'targetHint': targetHint!.toJson(),
     };
   }
@@ -557,7 +564,8 @@ enum PrerenderFinalStatus {
   v8OptimizerDisabled('V8OptimizerDisabled'),
   prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
   browsingDataRemoved('BrowsingDataRemoved'),
-  prerenderHostReused('PrerenderHostReused');
+  prerenderHostReused('PrerenderHostReused'),
+  formSubmitWhenPrerendering('FormSubmitWhenPrerendering');
 
   final String value;
 

@@ -2790,12 +2790,16 @@ class CSSFunctionRule {
   /// Function body.
   final List<CSSFunctionNode> children;
 
+  /// The BackendNodeId of the DOM node that constitutes the origin tree scope of this rule.
+  final dom.BackendNodeId? originTreeScopeNodeId;
+
   CSSFunctionRule({
     required this.name,
     this.styleSheetId,
     required this.origin,
     required this.parameters,
     required this.children,
+    this.originTreeScopeNodeId,
   });
 
   factory CSSFunctionRule.fromJson(Map<String, dynamic> json) {
@@ -2811,6 +2815,9 @@ class CSSFunctionRule {
       children: (json['children'] as List)
           .map((e) => CSSFunctionNode.fromJson(e as Map<String, dynamic>))
           .toList(),
+      originTreeScopeNodeId: json.containsKey('originTreeScopeNodeId')
+          ? dom.BackendNodeId.fromJson(json['originTreeScopeNodeId'] as int)
+          : null,
     );
   }
 
@@ -2821,6 +2828,8 @@ class CSSFunctionRule {
       'parameters': parameters.map((e) => e.toJson()).toList(),
       'children': children.map((e) => e.toJson()).toList(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+      if (originTreeScopeNodeId != null)
+        'originTreeScopeNodeId': originTreeScopeNodeId!.toJson(),
     };
   }
 }
