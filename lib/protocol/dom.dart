@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../src/connection.dart';
 import 'dom.dart' as dom;
+import 'network.dart' as network;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 
@@ -1060,15 +1061,19 @@ class AdRelatedStateUpdatedEvent {
   /// The id of the node.
   final dom.NodeId nodeId;
 
-  /// If the node is ad related.
-  final bool isAdRelated;
+  /// The provenance of the ad related node, if it is ad related.
+  final network.AdProvenance? adProvenance;
 
-  AdRelatedStateUpdatedEvent({required this.nodeId, required this.isAdRelated});
+  AdRelatedStateUpdatedEvent({required this.nodeId, this.adProvenance});
 
   factory AdRelatedStateUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return AdRelatedStateUpdatedEvent(
       nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
-      isAdRelated: json['isAdRelated'] as bool? ?? false,
+      adProvenance: json.containsKey('adProvenance')
+          ? network.AdProvenance.fromJson(
+              json['adProvenance'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 }
@@ -1294,6 +1299,7 @@ enum PseudoType {
   checkmark('checkmark'),
   before('before'),
   after('after'),
+  expandIcon('expand-icon'),
   pickerIcon('picker-icon'),
   interestHint('interest-hint'),
   marker('marker'),
@@ -1537,7 +1543,7 @@ class Node {
 
   final List<StyleSheetId>? adoptedStyleSheets;
 
-  final bool? isAdRelated;
+  final network.AdProvenance? adProvenance;
 
   Node({
     required this.nodeId,
@@ -1573,7 +1579,7 @@ class Node {
     this.isScrollable,
     this.affectedByStartingStyles,
     this.adoptedStyleSheets,
-    this.isAdRelated,
+    this.adProvenance,
   });
 
   factory Node.fromJson(Map<String, dynamic> json) {
@@ -1667,8 +1673,10 @@ class Node {
                 .map((e) => StyleSheetId.fromJson(e as String))
                 .toList()
           : null,
-      isAdRelated: json.containsKey('isAdRelated')
-          ? json['isAdRelated'] as bool
+      adProvenance: json.containsKey('adProvenance')
+          ? network.AdProvenance.fromJson(
+              json['adProvenance'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
@@ -1717,7 +1725,7 @@ class Node {
         'adoptedStyleSheets': adoptedStyleSheets!
             .map((e) => e.toJson())
             .toList(),
-      if (isAdRelated != null) 'isAdRelated': isAdRelated,
+      if (adProvenance != null) 'adProvenance': adProvenance!.toJson(),
     };
   }
 }

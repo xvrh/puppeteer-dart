@@ -377,11 +377,11 @@ class PageApi {
   /// chain is ordered from the most immediate script (in the frame creation
   /// stack) to more distant ancestors (that created the immediately preceding
   /// script). Only sent if frame is labelled as an ad and ids are available.
-  Future<AdScriptAncestry> getAdScriptAncestry(FrameId frameId) async {
+  Future<network.AdAncestry> getAdScriptAncestry(FrameId frameId) async {
     var result = await _client.send('Page.getAdScriptAncestry', {
       'frameId': frameId,
     });
-    return AdScriptAncestry.fromJson(
+    return network.AdAncestry.fromJson(
       result['adScriptAncestry'] as Map<String, dynamic>,
     );
   }
@@ -1720,72 +1720,6 @@ class AdFrameStatus {
   }
 }
 
-/// Identifies the script which caused a script or frame to be labelled as an
-/// ad.
-class AdScriptId {
-  /// Script Id of the script which caused a script or frame to be labelled as
-  /// an ad.
-  final runtime.ScriptId scriptId;
-
-  /// Id of scriptId's debugger.
-  final runtime.UniqueDebuggerId debuggerId;
-
-  AdScriptId({required this.scriptId, required this.debuggerId});
-
-  factory AdScriptId.fromJson(Map<String, dynamic> json) {
-    return AdScriptId(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
-      debuggerId: runtime.UniqueDebuggerId.fromJson(
-        json['debuggerId'] as String,
-      ),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'scriptId': scriptId.toJson(), 'debuggerId': debuggerId.toJson()};
-  }
-}
-
-/// Encapsulates the script ancestry and the root script filterlist rule that
-/// caused the frame to be labelled as an ad. Only created when `ancestryChain`
-/// is not empty.
-class AdScriptAncestry {
-  /// A chain of `AdScriptId`s representing the ancestry of an ad script that
-  /// led to the creation of a frame. The chain is ordered from the script
-  /// itself (lower level) up to its root ancestor that was flagged by
-  /// filterlist.
-  final List<AdScriptId> ancestryChain;
-
-  /// The filterlist rule that caused the root (last) script in
-  /// `ancestryChain` to be ad-tagged. Only populated if the rule is
-  /// available.
-  final String? rootScriptFilterlistRule;
-
-  AdScriptAncestry({
-    required this.ancestryChain,
-    this.rootScriptFilterlistRule,
-  });
-
-  factory AdScriptAncestry.fromJson(Map<String, dynamic> json) {
-    return AdScriptAncestry(
-      ancestryChain: (json['ancestryChain'] as List)
-          .map((e) => AdScriptId.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      rootScriptFilterlistRule: json.containsKey('rootScriptFilterlistRule')
-          ? json['rootScriptFilterlistRule'] as String
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'ancestryChain': ancestryChain.map((e) => e.toJson()).toList(),
-      if (rootScriptFilterlistRule != null)
-        'rootScriptFilterlistRule': rootScriptFilterlistRule,
-    };
-  }
-}
-
 /// Indicates whether the frame is a secure context and why it is the case.
 enum SecureContextType {
   secure('Secure'),
@@ -1901,7 +1835,6 @@ enum PermissionsPolicyFeature {
   encryptedMedia('encrypted-media'),
   executionWhileOutOfViewport('execution-while-out-of-viewport'),
   executionWhileNotRendered('execution-while-not-rendered'),
-  fencedUnpartitionedStorageRead('fenced-unpartitioned-storage-read'),
   focusWithoutUserActivation('focus-without-user-activation'),
   fullscreen('fullscreen'),
   frobulate('frobulate'),
