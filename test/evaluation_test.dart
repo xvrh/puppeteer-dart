@@ -128,8 +128,8 @@ void main() {
       expect(result, equals(42));
     });
     test('should throw when evaluation triggers reload', () async {
-      expect(
-        () => page.evaluate('''() => {
+      await expectLater(
+        page.evaluate('''() => {
         location.reload();
         return new Promise(() => {});
       }'''),
