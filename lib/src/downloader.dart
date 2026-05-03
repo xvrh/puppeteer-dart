@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
@@ -18,8 +19,57 @@ class DownloadedBrowserInfo {
   });
 }
 
+/// Returns the default cache directory used by [downloadChrome] when no
+/// `cachePath` is provided.
 ///
-/// Downloads the chrome revision specified by [revision] to the [cachePath] directory.
+/// When a Dart package config is available at runtime (the normal case for
+/// `dart test`, `flutter test`, `dart run`, `flutter run`, …), this resolves
+/// to `<workspace-root>/.dart_tool/puppeteer/local-chrome` per Dart's
+/// project-specific tool caching convention. In a workspace this is the
+/// workspace root, so all member packages share a single Chrome download.
+///
+/// When no package config is available — which is the case for AOT-compiled
+/// executables — this falls back to an OS-appropriate user cache directory.
+String defaultBrowserCachePath() {
+  final config = Isolate.packageConfigSync;
+  if (config != null) {
+    return config.resolve('puppeteer/local-chrome/').toFilePath();
+  }
+  return _osUserCacheDir();
+}
+
+String _osUserCacheDir() {
+  final env = Platform.environment;
+  if (Platform.isMacOS) {
+    final home = env['HOME'];
+    if (home != null && home.isNotEmpty) {
+      return p.join(home, 'Library', 'Caches', 'puppeteer', 'local-chrome');
+    }
+  } else if (Platform.isWindows) {
+    final localAppData = env['LOCALAPPDATA'];
+    if (localAppData != null && localAppData.isNotEmpty) {
+      return p.join(localAppData, 'puppeteer', 'local-chrome');
+    }
+  } else {
+    // Linux / other POSIX.
+    final xdgCache = env['XDG_CACHE_HOME'];
+    if (xdgCache != null && xdgCache.isNotEmpty) {
+      return p.join(xdgCache, 'puppeteer', 'local-chrome');
+    }
+    final home = env['HOME'];
+    if (home != null && home.isNotEmpty) {
+      return p.join(home, '.cache', 'puppeteer', 'local-chrome');
+    }
+  }
+  // Last resort: temp dir. Not ideal (potentially wiped on reboot) but better
+  // than failing.
+  return p.join(Directory.systemTemp.path, 'puppeteer', 'local-chrome');
+}
+
+///
+/// Downloads the chrome revision specified by [version] to the [cachePath]
+/// directory.
+///
 /// ```dart
 /// await downloadChrome(
 ///   version: '112.0.5615.121',
@@ -28,6 +78,13 @@ class DownloadedBrowserInfo {
 ///     print('downloaded $received of $total bytes');
 ///   });
 /// ```
+///
+/// When [cachePath] is omitted, the default location is
+/// `.dart_tool/puppeteer/local-chrome/` under the current Dart project (or
+/// workspace root). For executables compiled to AOT — where the package
+/// config isn't available at runtime — the default falls back to an OS
+/// user cache directory (e.g. `~/Library/Caches/puppeteer` on macOS,
+/// `~/.cache/puppeteer` on Linux, `%LOCALAPPDATA%\puppeteer` on Windows).
 ///
 /// Concurrent calls (within the same isolate, across isolates in the same VM,
 /// and across separate processes) are coordinated so that only one actually
@@ -40,7 +97,7 @@ Future<DownloadedBrowserInfo> downloadChrome({
   BrowserPlatform? platform,
 }) async {
   version ??= _lastVersion;
-  cachePath ??= '.local-chrome';
+  cachePath ??= defaultBrowserCachePath();
   platform ??= BrowserPlatform.current;
 
   final platformLocal = platform;
