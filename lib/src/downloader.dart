@@ -28,6 +28,11 @@ class DownloadedBrowserInfo {
 ///     print('downloaded $received of $total bytes');
 ///   });
 /// ```
+///
+/// Concurrent calls (within the same isolate, across isolates in the same VM,
+/// and across separate processes) are coordinated so that only one actually
+/// downloads and unzips Chrome. Other callers wait for the in-flight download
+/// to finish, then return a path to the same shared installation.
 Future<DownloadedBrowserInfo> downloadChrome({
   String? version,
   String? cachePath,
@@ -38,42 +43,214 @@ Future<DownloadedBrowserInfo> downloadChrome({
   cachePath ??= '.local-chrome';
   platform ??= BrowserPlatform.current;
 
-  var revisionDirectory = Directory(p.join(cachePath, version));
-  if (!revisionDirectory.existsSync()) {
-    revisionDirectory.createSync(recursive: true);
-  }
-
-  var exePath = p.join(revisionDirectory.path, getExecutablePath(platform));
-
-  var executableFile = File(exePath);
-
-  if (!executableFile.existsSync()) {
-    var url = _downloadUrl(platform, version);
-    var zipPath = p.join(revisionDirectory.path, p.url.basename(url));
-    await _downloadFile(url, zipPath, onDownloadProgress);
-    _unzip(zipPath, revisionDirectory.path);
-    File(zipPath).deleteSync();
-
-    if (!executableFile.existsSync()) {
-      throw Exception("$exePath doesn't exist");
-    }
-
-    if (!Platform.isWindows) {
-      await Process.run('chmod', ['+x', executableFile.absolute.path]);
-    }
-
-    if (Platform.isMacOS) {
-      final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
-
-      await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
-    }
-  }
-
-  return DownloadedBrowserInfo(
-    folderPath: revisionDirectory.path,
-    executablePath: executableFile.path,
+  final platformLocal = platform;
+  return ensureBrowserDownloaded(
+    cachePath: cachePath,
     version: version,
+    executableRelPath: getExecutablePath(platformLocal),
+    download: (partialDir) async {
+      final url = _downloadUrl(platformLocal, version!);
+      final zipPath = p.join(partialDir, p.url.basename(url));
+      await _downloadFile(url, zipPath, onDownloadProgress);
+      _unzip(zipPath, partialDir);
+      File(zipPath).deleteSync();
+
+      final exePath = p.join(partialDir, getExecutablePath(platformLocal));
+      final executableFile = File(exePath);
+      if (!executableFile.existsSync()) {
+        throw Exception("$exePath doesn't exist");
+      }
+
+      if (!Platform.isWindows) {
+        await Process.run('chmod', ['+x', executableFile.absolute.path]);
+      }
+      if (Platform.isMacOS) {
+        final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
+        await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
+      }
+    },
   );
+}
+
+/// Coordinates a browser download into [cachePath]/[version], ensuring at most
+/// one caller (across isolates and processes) actually runs [download].
+///
+/// Coordination uses the filesystem so it works across processes: the owning
+/// caller creates a `<version>.downloading` directory (atomic mkdir), runs
+/// [download] inside it, then atomically renames it to `<version>`. Other
+/// concurrent callers detect the existing directory and poll until the
+/// executable appears (or until the dir is cleaned up after a failure).
+///
+/// [staleThreshold] guards against orphaned `<version>.downloading` directories
+/// left behind by a crashed prior caller; if the directory's mtime is older
+/// than this, it is removed and ownership is retried.
+///
+/// [waitTimeout] caps the total time a waiter will block.
+Future<DownloadedBrowserInfo> ensureBrowserDownloaded({
+  required String cachePath,
+  required String version,
+  required String executableRelPath,
+  required Future<void> Function(String partialDir) download,
+  Duration waitTimeout = const Duration(minutes: 15),
+  Duration staleThreshold = const Duration(minutes: 15),
+  Duration pollInterval = const Duration(milliseconds: 100),
+}) {
+  final key = '$cachePath|$version|$executableRelPath';
+  final existing = _inFlightDownloads[key];
+  if (existing != null) return existing;
+  final future = _runEnsureDownloaded(
+    cachePath: cachePath,
+    version: version,
+    executableRelPath: executableRelPath,
+    download: download,
+    waitTimeout: waitTimeout,
+    staleThreshold: staleThreshold,
+    pollInterval: pollInterval,
+  );
+  _inFlightDownloads[key] = future;
+  // Use whenComplete to clear the cache entry whether the download succeeded
+  // or failed. The Future returned by whenComplete is intentionally ignored
+  // to avoid an "unhandled error" warning if the download throws — error
+  // handling is the caller's responsibility on `future` itself.
+  future.whenComplete(() {
+    if (identical(_inFlightDownloads[key], future)) {
+      _inFlightDownloads.remove(key);
+    }
+  }).ignore();
+  return future;
+}
+
+final Map<String, Future<DownloadedBrowserInfo>> _inFlightDownloads = {};
+
+Future<DownloadedBrowserInfo> _runEnsureDownloaded({
+  required String cachePath,
+  required String version,
+  required String executableRelPath,
+  required Future<void> Function(String partialDir) download,
+  required Duration waitTimeout,
+  required Duration staleThreshold,
+  required Duration pollInterval,
+}) async {
+  final versionDir = Directory(p.join(cachePath, version));
+  final exeFile = File(p.join(versionDir.path, executableRelPath));
+  final downloadingDir = Directory(p.join(cachePath, '$version.downloading'));
+  // Lock file is the atomic mutex. File.createSync(exclusive: true) maps to
+  // O_CREAT|O_EXCL on POSIX and CREATE_NEW on Windows, both atomic across
+  // processes and isolates.
+  final lockFile = File(p.join(cachePath, '$version.downloading.lock'));
+
+  DownloadedBrowserInfo result() => DownloadedBrowserInfo(
+        executablePath: exeFile.path,
+        folderPath: versionDir.path,
+        version: version,
+      );
+
+  if (exeFile.existsSync()) return result();
+
+  Directory(cachePath).createSync(recursive: true);
+
+  final deadline = DateTime.now().add(waitTimeout);
+
+  while (true) {
+    if (exeFile.existsSync()) return result();
+    if (DateTime.now().isAfter(deadline)) {
+      throw TimeoutException(
+        'Timed out waiting for browser download to ${versionDir.path}. '
+        'If a previous download crashed, delete ${lockFile.path} to retry.',
+      );
+    }
+
+    var weOwn = false;
+    try {
+      lockFile.createSync(exclusive: true);
+      weOwn = true;
+    } on PathExistsException {
+      // Another caller holds the lock — fall through to the waiter path.
+    }
+
+    if (weOwn) {
+      try {
+        // Clean any leftover state from a prior failed attempt.
+        _safeDelete(downloadingDir);
+        if (versionDir.existsSync() && !exeFile.existsSync()) {
+          // <version>/ exists without exe — anomalous (rename is atomic).
+          // Clean it up so our atomic rename below can succeed.
+          _safeDelete(versionDir);
+        }
+        downloadingDir.createSync(recursive: true);
+
+        await download(downloadingDir.path);
+        final partialExe = File(p.join(downloadingDir.path, executableRelPath));
+        if (!partialExe.existsSync()) {
+          throw Exception(
+            'Download callback completed but executable was not produced at '
+            "'$executableRelPath' inside '${downloadingDir.path}'.",
+          );
+        }
+
+        try {
+          await downloadingDir.rename(versionDir.path);
+        } on FileSystemException {
+          if (versionDir.existsSync() && exeFile.existsSync()) {
+            _safeDelete(downloadingDir);
+          } else {
+            rethrow;
+          }
+        }
+        return result();
+      } finally {
+        _safeDelete(downloadingDir); // no-op if rename succeeded
+        try {
+          if (lockFile.existsSync()) lockFile.deleteSync();
+        } on FileSystemException {
+          // ignore
+        }
+      }
+    }
+
+    // Waiter path: poll until exe appears, lock disappears, or it goes stale.
+    while (true) {
+      if (DateTime.now().isAfter(deadline)) {
+        throw TimeoutException(
+          'Timed out waiting for another process to finish downloading '
+          'browser to ${versionDir.path}. If a previous download crashed, '
+          'delete ${lockFile.path} to retry.',
+        );
+      }
+      await Future<void>.delayed(pollInterval);
+      if (exeFile.existsSync()) return result();
+      if (!lockFile.existsSync()) break;
+      if (_isStaleFile(lockFile, staleThreshold)) {
+        try {
+          lockFile.deleteSync();
+        } on FileSystemException {
+          // Another caller already cleaned it up.
+        }
+        break;
+      }
+    }
+  }
+}
+
+bool _isStaleFile(File f, Duration threshold) {
+  try {
+    final mtime = f.statSync().modified;
+    return DateTime.now().difference(mtime) > threshold;
+  } on FileSystemException {
+    return false;
+  }
+}
+
+void _safeDelete(FileSystemEntity entity) {
+  try {
+    if (entity is Directory) {
+      if (entity.existsSync()) entity.deleteSync(recursive: true);
+    } else if (entity is File) {
+      if (entity.existsSync()) entity.deleteSync();
+    }
+  } on FileSystemException {
+    // Ignore: another caller likely cleaned it up.
+  }
 }
 
 Future<void> _downloadFile(
