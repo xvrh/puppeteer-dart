@@ -35,10 +35,17 @@ String defaultBrowserCachePath() {
   if (config != null) {
     return config.resolve('puppeteer/local-chrome/').toFilePath();
   }
-  return _osUserCacheDir();
+  return userBrowserCachePath();
 }
 
-String _osUserCacheDir() {
+/// Returns a machine-wide cache directory under the OS user cache, suitable
+/// for sharing a single Chrome installation across multiple Dart projects or
+/// git worktrees.
+///
+/// macOS: `~/Library/Caches/puppeteer/local-chrome`
+/// Linux: `$XDG_CACHE_HOME/puppeteer/local-chrome` (or `~/.cache/...`)
+/// Windows: `%LOCALAPPDATA%\puppeteer\local-chrome`
+String userBrowserCachePath() {
   final env = Platform.environment;
   if (Platform.isMacOS) {
     final home = env['HOME'];

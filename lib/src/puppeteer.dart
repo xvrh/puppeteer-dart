@@ -71,6 +71,27 @@ class Puppeteer {
 
   Puppeteer._();
 
+  /// Cache directory [downloadChrome] uses when no `cachePath` is provided.
+  ///
+  /// In a Dart project this resolves to
+  /// `<workspace-root>/.dart_tool/puppeteer/local-chrome` (per Dart's
+  /// project-specific tool caching convention). In an AOT-compiled binary
+  /// with no package config, this falls back to [userCachePath].
+  String get defaultCachePath => defaultBrowserCachePath();
+
+  /// Machine-wide cache directory under the OS user cache. Pass to
+  /// [downloadChrome] when you want a single Chrome shared across projects
+  /// and git worktrees:
+  ///
+  /// ```dart
+  /// await downloadChrome(cachePath: puppeteer.userCachePath);
+  /// ```
+  ///
+  /// macOS: `~/Library/Caches/puppeteer/local-chrome`
+  /// Linux: `$XDG_CACHE_HOME/puppeteer/local-chrome` (or `~/.cache/...`)
+  /// Windows: `%LOCALAPPDATA%\puppeteer\local-chrome`
+  String get userCachePath => userBrowserCachePath();
+
   /// This method starts a Chrome instance and connects to the DevTools endpoint.
   ///
   /// If [executablePath] is not provided and no environment variable
