@@ -1,3 +1,17 @@
+## 3.23.0
+- Update to Chrome 148.0.7778.97.
+- `downloadChrome` is now safe to call concurrently across isolates and
+  processes: only one caller actually downloads Chrome; others wait and
+  share the result. Useful when multiple `dart test` isolates each call
+  `puppeteer.launch()` against an empty cache.
+- Default `cachePath` moved from `.local-chrome/` to
+  `.dart_tool/puppeteer/local-chrome/` (under the current Dart project or
+  workspace root), per Dart's project-specific tool caching convention. For
+  AOT-compiled binaries with no package config, falls back to an OS user
+  cache dir (`~/Library/Caches/puppeteer`, `~/.cache/puppeteer`, or
+  `%LOCALAPPDATA%\puppeteer`). Existing `.local-chrome/` directories on disk
+  can be deleted manually.
+
 ## 3.22.0
 - Update to Chrome 147.0.7727.56.
 
