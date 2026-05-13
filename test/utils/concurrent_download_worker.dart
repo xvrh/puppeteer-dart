@@ -28,13 +28,18 @@ Future<void> main(List<String> args) async {
     executableRelPath: p.join('chrome', 'exe'),
     download: (partialDir) async {
       File(
-        p.join(logDir, 'download-$workerId-${DateTime.now().microsecondsSinceEpoch}'),
+        p.join(
+          logDir,
+          'download-$workerId-${DateTime.now().microsecondsSinceEpoch}',
+        ),
       ).writeAsStringSync('downloaded by $workerId');
       // Long enough that any concurrent worker reaching createSync after us
       // will hit EEXIST and become a waiter.
       await Future<void>.delayed(const Duration(seconds: 2));
       Directory(p.join(partialDir, 'chrome')).createSync(recursive: true);
-      File(p.join(partialDir, 'chrome', 'exe')).writeAsStringSync('fake binary');
+      File(
+        p.join(partialDir, 'chrome', 'exe'),
+      ).writeAsStringSync('fake binary');
     },
   );
 

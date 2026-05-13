@@ -4,7 +4,9 @@
 
 - [class: Puppeteer](#class-puppeteer)
   * [puppeteer.connect](#puppeteerconnect)
+  * [puppeteer.defaultCachePath](#puppeteerdefaultcachepath)
   * [puppeteer.launch](#puppeteerlaunch)
+  * [puppeteer.userCachePath](#puppeteerusercachepath)
 - [class: Browser](#class-browser)
   * [browser.browserContexts](#browserbrowsercontexts)
   * [browser.close](#browserclose)
@@ -276,6 +278,18 @@ Parameters:
 puppeteer.connect({String? browserWsEndpoint, String? browserUrl, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<Plugin>? plugins}) → Future<Browser> 
 ```
 
+#### puppeteer.defaultCachePath
+Cache directory [downloadChrome] uses when no `cachePath` is provided.
+
+In a Dart project this resolves to
+`<workspace-root>/.dart_tool/puppeteer/local-chrome` (per Dart's
+project-specific tool caching convention). In an AOT-compiled binary
+with no package config, this falls back to [userCachePath].
+
+```dart
+puppeteer.defaultCachePath → String
+```
+
 #### puppeteer.launch(...)
 This method starts a Chrome instance and connects to the DevTools endpoint.
 
@@ -319,6 +333,23 @@ Parameters:
 
 ```dart
 puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout, bool? waitForInitialPage}) → Future<Browser> 
+```
+
+#### puppeteer.userCachePath
+Machine-wide cache directory under the OS user cache. Pass to
+[downloadChrome] when you want a single Chrome shared across projects
+and git worktrees:
+
+```dart
+await downloadChrome(cachePath: puppeteer.userCachePath);
+```
+
+macOS: `~/Library/Caches/puppeteer/local-chrome`
+Linux: `$XDG_CACHE_HOME/puppeteer/local-chrome` (or `~/.cache/...`)
+Windows: `%LOCALAPPDATA%\puppeteer\local-chrome`
+
+```dart
+puppeteer.userCachePath → String
 ```
 
 ### class: Browser

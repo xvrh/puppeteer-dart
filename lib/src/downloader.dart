@@ -130,7 +130,11 @@ Future<DownloadedBrowserInfo> downloadChrome({
       }
       if (Platform.isMacOS) {
         final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
-        await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
+        await Process.run('xattr', [
+          '-d',
+          'com.apple.quarantine',
+          chromeAppPath,
+        ]);
       }
     },
   );
@@ -204,10 +208,10 @@ Future<DownloadedBrowserInfo> _runEnsureDownloaded({
   final lockFile = File(p.join(cachePath, '$version.downloading.lock'));
 
   DownloadedBrowserInfo result() => DownloadedBrowserInfo(
-        executablePath: exeFile.path,
-        folderPath: versionDir.path,
-        version: version,
-      );
+    executablePath: exeFile.path,
+    folderPath: versionDir.path,
+    version: version,
+  );
 
   if (exeFile.existsSync()) return result();
 

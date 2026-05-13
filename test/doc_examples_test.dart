@@ -37,6 +37,19 @@ void main() {
     server.clearRoutes();
   });
 
+  group('Puppeteer', () {
+    test('userCachePath', () async {
+      // Wrap in a never-called function so the snippet is type-checked
+      // without actually downloading a Chrome binary during tests.
+      Future<void> example() async {
+        //---
+        await downloadChrome(cachePath: puppeteer.userCachePath);
+        //---
+      }
+
+      expect(example, isA<Function>());
+    });
+  });
   group('Browser', () {
     test('class', () async {
       //---
