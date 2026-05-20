@@ -25480,7 +25480,8 @@
                         "PrerenderFailedDuringPrefetch",
                         "BrowsingDataRemoved",
                         "PrerenderHostReused",
-                        "FormSubmitWhenPrerendering"
+                        "FormSubmitWhenPrerendering",
+                        "CrossDocumentRestart"
                     ]
                 },
                 {
