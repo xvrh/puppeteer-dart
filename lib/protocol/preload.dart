@@ -565,7 +565,8 @@ enum PrerenderFinalStatus {
   prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
   browsingDataRemoved('BrowsingDataRemoved'),
   prerenderHostReused('PrerenderHostReused'),
-  formSubmitWhenPrerendering('FormSubmitWhenPrerendering');
+  formSubmitWhenPrerendering('FormSubmitWhenPrerendering'),
+  crossDocumentRestart('CrossDocumentRestart');
 
   final String value;
 
