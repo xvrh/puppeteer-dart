@@ -1880,6 +1880,7 @@ enum PermissionsPolicyFeature {
   subApps('sub-apps'),
   summarizer('summarizer'),
   syncXhr('sync-xhr'),
+  tools('tools'),
   translator('translator'),
   unload('unload'),
   usb('usb'),
@@ -3732,6 +3733,7 @@ enum BackForwardCacheNotRestoredReason {
   embedderExtensionSentMessageToCachedFrame(
     'EmbedderExtensionSentMessageToCachedFrame',
   ),
+  embedderExtensionFrame('EmbedderExtensionFrame'),
   requestedByWebViewClient('RequestedByWebViewClient'),
   postMessageByWebViewClient('PostMessageByWebViewClient'),
   cacheControlNoStoreDeviceBoundSessionTerminated(

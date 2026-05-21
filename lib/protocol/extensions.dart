@@ -8,8 +8,6 @@ class ExtensionsApi {
   ExtensionsApi(this._client);
 
   /// Runs an extension default action.
-  /// Available if the client is connected using the --remote-debugging-pipe
-  /// flag and the --enable-unsafe-extension-debugging flag is set.
   /// [id] Extension id.
   /// [targetId] A tab target ID to trigger the default extension action on.
   Future<void> triggerAction(String id, String targetId) async {
@@ -21,9 +19,7 @@ class ExtensionsApi {
 
   /// Installs an unpacked extension from the filesystem similar to
   /// --load-extension CLI flags. Returns extension ID once the extension
-  /// has been installed. Available if the client is connected using the
-  /// --remote-debugging-pipe flag and the --enable-unsafe-extension-debugging
-  /// flag is set.
+  /// has been installed.
   /// [path] Absolute file path.
   /// [enableInIncognito] Enable the extension in incognito
   /// Returns: Extension id.
@@ -36,8 +32,6 @@ class ExtensionsApi {
   }
 
   /// Gets a list of all unpacked extensions.
-  /// Available if the client is connected using the --remote-debugging-pipe flag
-  /// and the --enable-unsafe-extension-debugging flag is set.
   Future<List<ExtensionInfo>> getExtensions() async {
     var result = await _client.send('Extensions.getExtensions');
     return (result['extensions'] as List)
@@ -46,8 +40,6 @@ class ExtensionsApi {
   }
 
   /// Uninstalls an unpacked extension (others not supported) from the profile.
-  /// Available if the client is connected using the --remote-debugging-pipe flag
-  /// and the --enable-unsafe-extension-debugging.
   /// [id] Extension id.
   Future<void> uninstall(String id) async {
     await _client.send('Extensions.uninstall', {'id': id});

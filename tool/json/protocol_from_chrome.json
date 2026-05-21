@@ -1773,7 +1773,11 @@
                         "AutofillAndManualTextPolicyControlledFeaturesInfo",
                         "AutofillPolicyControlledFeatureInfo",
                         "ManualTextPolicyControlledFeatureInfo",
-                        "FormModelContextParameterMissingTitleAndDescription"
+                        "FormModelContextParameterMissingTitleAndDescription",
+                        "FormModelContextMissingToolName",
+                        "FormModelContextMissingToolDescription",
+                        "FormModelContextRequiredParameterMissingName",
+                        "FormModelContextParameterMissingName"
                     ]
                 },
                 {
@@ -7025,7 +7029,7 @@
                         "after",
                         "expand-icon",
                         "picker-icon",
-                        "interest-hint",
+                        "interest-button",
                         "marker",
                         "backdrop",
                         "column",
@@ -11935,7 +11939,7 @@
             "commands": [
                 {
                     "name": "triggerAction",
-                    "description": "Runs an extension default action.\nAvailable if the client is connected using the --remote-debugging-pipe\nflag and the --enable-unsafe-extension-debugging flag is set.",
+                    "description": "Runs an extension default action.",
                     "parameters": [
                         {
                             "name": "id",
@@ -11951,7 +11955,7 @@
                 },
                 {
                     "name": "loadUnpacked",
-                    "description": "Installs an unpacked extension from the filesystem similar to\n--load-extension CLI flags. Returns extension ID once the extension\nhas been installed. Available if the client is connected using the\n--remote-debugging-pipe flag and the --enable-unsafe-extension-debugging\nflag is set.",
+                    "description": "Installs an unpacked extension from the filesystem similar to\n--load-extension CLI flags. Returns extension ID once the extension\nhas been installed.",
                     "parameters": [
                         {
                             "name": "path",
@@ -11975,7 +11979,7 @@
                 },
                 {
                     "name": "getExtensions",
-                    "description": "Gets a list of all unpacked extensions.\nAvailable if the client is connected using the --remote-debugging-pipe flag\nand the --enable-unsafe-extension-debugging flag is set.",
+                    "description": "Gets a list of all unpacked extensions.",
                     "returns": [
                         {
                             "name": "extensions",
@@ -11988,7 +11992,7 @@
                 },
                 {
                     "name": "uninstall",
-                    "description": "Uninstalls an unpacked extension (others not supported) from the profile.\nAvailable if the client is connected using the --remote-debugging-pipe flag\nand the --enable-unsafe-extension-debugging.",
+                    "description": "Uninstalls an unpacked extension (others not supported) from the profile.",
                     "parameters": [
                         {
                             "name": "id",
@@ -17096,6 +17100,12 @@
                             "description": "WebRTC packetReordering feature.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "offline",
+                            "description": "True to emulate internet disconnection.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -17776,6 +17786,7 @@
                         "Success",
                         "KeyError",
                         "SigningError",
+                        "TransientSigningError",
                         "ServerRequestedTermination",
                         "InvalidSessionId",
                         "InvalidChallenge",
@@ -17916,7 +17927,9 @@
                                 "ServerError",
                                 "RefreshQuotaExceeded",
                                 "FatalError",
-                                "SigningQuotaExceeded"
+                                "SigningQuotaExceeded",
+                                "RefreshedAsWaiter",
+                                "TransientSigningError"
                             ]
                         },
                         {
@@ -17962,7 +17975,8 @@
                                 "ClearBrowsingData",
                                 "ServerRequested",
                                 "InvalidSessionParams",
-                                "RefreshFatalError"
+                                "RefreshFatalError",
+                                "DevTools"
                             ]
                         }
                     ]
@@ -18268,7 +18282,15 @@
                     "parameters": [
                         {
                             "name": "offline",
-                            "description": "True to emulate internet disconnection.",
+                            "description": "True to emulate internet disconnection. Deprecated, use the offline property in matchedNetworkConditions\nor emulateOfflineServiceWorker instead.",
+                            "deprecated": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "emulateOfflineServiceWorker",
+                            "description": "True to emulate offline service worker.",
+                            "optional": true,
                             "type": "boolean"
                         },
                         {
@@ -18871,6 +18893,17 @@
                     ]
                 },
                 {
+                    "name": "deleteDeviceBoundSession",
+                    "description": "Deletes a device bound session.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "$ref": "DeviceBoundSessionKey"
+                        }
+                    ]
+                },
+                {
                     "name": "fetchSchemefulSite",
                     "description": "Fetches the schemeful site for a specific origin.",
                     "experimental": true,
@@ -18926,16 +18959,6 @@
                         {
                             "name": "enableThirdPartyCookieRestriction",
                             "description": "Whether 3pc restriction is enabled.",
-                            "type": "boolean"
-                        },
-                        {
-                            "name": "disableThirdPartyCookieMetadata",
-                            "description": "Whether 3pc grace period exception should be enabled; false by default.",
-                            "type": "boolean"
-                        },
-                        {
-                            "name": "disableThirdPartyCookieHeuristics",
-                            "description": "Whether 3pc heuristics exceptions should be enabled; false by default.",
                             "type": "boolean"
                         }
                     ]
@@ -21686,6 +21709,7 @@
                         "sub-apps",
                         "summarizer",
                         "sync-xhr",
+                        "tools",
                         "translator",
                         "unload",
                         "usb",
@@ -23046,6 +23070,7 @@
                         "EmbedderExtensionMessaging",
                         "EmbedderExtensionMessagingForOpenPort",
                         "EmbedderExtensionSentMessageToCachedFrame",
+                        "EmbedderExtensionFrame",
                         "RequestedByWebViewClient",
                         "PostMessageByWebViewClient",
                         "CacheControlNoStoreDeviceBoundSessionTerminated",
@@ -28646,6 +28671,12 @@
                             "type": "boolean"
                         },
                         {
+                            "name": "parentId",
+                            "description": "Id of the parent target, if any. For example, \"iframe\" target may have a \"page\" parent.",
+                            "optional": true,
+                            "$ref": "TargetID"
+                        },
+                        {
                             "name": "openerId",
                             "description": "Opener target Id",
                             "optional": true,
@@ -28666,7 +28697,7 @@
                         },
                         {
                             "name": "parentFrameId",
-                            "description": "Id of the parent frame, only present for the \"iframe\" targets.",
+                            "description": "Id of the parent frame, present for \"iframe\" and \"worker\" targets. For nested workers,\nthis is the \"ancestor\" frame that created the first worker in the nested chain.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "Page.FrameId"
@@ -30675,6 +30706,12 @@
                             "type": "boolean"
                         },
                         {
+                            "name": "untrustedContent",
+                            "description": "A hint indicating that the tool output may contain untrusted content, ex: UGC, 3rd party data.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
                             "name": "autosubmit",
                             "description": "If the declarative tool was declared with the autosubmit attribute.",
                             "optional": true,
@@ -30687,7 +30724,7 @@
                     "description": "Represents the status of a tool invocation.",
                     "type": "string",
                     "enum": [
-                        "Success",
+                        "Completed",
                         "Canceled",
                         "Error"
                     ]
@@ -30737,6 +30774,23 @@
                             "$ref": "Runtime.StackTrace"
                         }
                     ]
+                },
+                {
+                    "id": "RemovedTool",
+                    "description": "Definition of a tool that was removed.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Tool name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame identifier associated with the tool registration.",
+                            "$ref": "Page.FrameId"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -30747,6 +30801,45 @@
                 {
                     "name": "disable",
                     "description": "Disables the WebMCP domain."
+                },
+                {
+                    "name": "invokeTool",
+                    "description": "Invokes a registered tool.",
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "Frame in which to invoke the tool.",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "toolName",
+                            "description": "Name of the tool to invoke.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "input",
+                            "description": "Input parameters for the tool, matching the tool's inputSchema.",
+                            "type": "object"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "invocationId",
+                            "description": "Unique identifier for this invocation. Response is sent before tool events.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "cancelInvocation",
+                    "description": "Cancels a pending tool invocation.",
+                    "parameters": [
+                        {
+                            "name": "invocationId",
+                            "description": "Invocation identifier to cancel.",
+                            "type": "string"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -30773,7 +30866,7 @@
                             "description": "Array of tools that were removed.",
                             "type": "array",
                             "items": {
-                                "$ref": "Tool"
+                                "$ref": "RemovedTool"
                             }
                         }
                     ]
@@ -30820,7 +30913,7 @@
                         },
                         {
                             "name": "output",
-                            "description": "Output or error delivered as delivered to the agent. Missing if `status` is anything other than Success.",
+                            "description": "Output or error delivered as delivered to the agent. Missing if `status` is anything other than Completed.\nNote: The output is untrusted and poses a prompt injection risk. Clients should treat this as potentially malicious user input.",
                             "optional": true,
                             "type": "any"
                         },

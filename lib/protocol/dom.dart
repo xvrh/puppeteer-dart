@@ -1301,7 +1301,7 @@ enum PseudoType {
   after('after'),
   expandIcon('expand-icon'),
   pickerIcon('picker-icon'),
-  interestHint('interest-hint'),
+  interestButton('interest-button'),
   marker('marker'),
   backdrop('backdrop'),
   column('column'),

@@ -496,19 +496,25 @@ class NetworkApi {
   /// Activates emulation of network conditions for individual requests using URL match patterns. Unlike the deprecated
   /// Network.emulateNetworkConditions this method does not affect `navigator` state. Use Network.overrideNetworkState to
   /// explicitly modify `navigator` behavior.
-  /// [offline] True to emulate internet disconnection.
+  /// [emulateOfflineServiceWorker] True to emulate offline service worker.
   /// [matchedNetworkConditions] Configure conditions for matching requests. If multiple entries match a request, the first entry wins.  Global
   /// conditions can be configured by leaving the urlPattern for the conditions empty. These global conditions are
   /// also applied for throttling of p2p connections.
   /// Returns: An id for each entry in matchedNetworkConditions. The id will be included in the requestWillBeSentExtraInfo for
   /// requests affected by a rule.
   Future<List<String>> emulateNetworkConditionsByRule(
-    bool offline,
-    List<NetworkConditions> matchedNetworkConditions,
-  ) async {
+    List<NetworkConditions> matchedNetworkConditions, {
+    @Deprecated(
+      'use the offline property in matchedNetworkConditions\nor emulateOfflineServiceWorker instead.',
+    )
+    bool? offline,
+    bool? emulateOfflineServiceWorker,
+  }) async {
     var result = await _client.send('Network.emulateNetworkConditionsByRule', {
-      'offline': offline,
       'matchedNetworkConditions': [...matchedNetworkConditions],
+      if (offline != null) 'offline': offline,
+      if (emulateOfflineServiceWorker != null)
+        'emulateOfflineServiceWorker': emulateOfflineServiceWorker,
     });
     return (result['ruleIds'] as List).map((e) => e as String).toList();
   }
@@ -859,6 +865,11 @@ class NetworkApi {
     await _client.send('Network.enableDeviceBoundSessions', {'enable': enable});
   }
 
+  /// Deletes a device bound session.
+  Future<void> deleteDeviceBoundSession(DeviceBoundSessionKey key) async {
+    await _client.send('Network.deleteDeviceBoundSession', {'key': key});
+  }
+
   /// Fetches the schemeful site for a specific origin.
   /// [origin] The URL origin.
   /// Returns: The corresponding schemeful site.
@@ -892,17 +903,9 @@ class NetworkApi {
   /// Sets Controls for third-party cookie access
   /// Page reload is required before the new cookie behavior will be observed
   /// [enableThirdPartyCookieRestriction] Whether 3pc restriction is enabled.
-  /// [disableThirdPartyCookieMetadata] Whether 3pc grace period exception should be enabled; false by default.
-  /// [disableThirdPartyCookieHeuristics] Whether 3pc heuristics exceptions should be enabled; false by default.
-  Future<void> setCookieControls(
-    bool enableThirdPartyCookieRestriction,
-    bool disableThirdPartyCookieMetadata,
-    bool disableThirdPartyCookieHeuristics,
-  ) async {
+  Future<void> setCookieControls(bool enableThirdPartyCookieRestriction) async {
     await _client.send('Network.setCookieControls', {
       'enableThirdPartyCookieRestriction': enableThirdPartyCookieRestriction,
-      'disableThirdPartyCookieMetadata': disableThirdPartyCookieMetadata,
-      'disableThirdPartyCookieHeuristics': disableThirdPartyCookieHeuristics,
     });
   }
 }
@@ -4796,6 +4799,9 @@ class NetworkConditions {
   /// WebRTC packetReordering feature.
   final bool? packetReordering;
 
+  /// True to emulate internet disconnection.
+  final bool? offline;
+
   NetworkConditions({
     required this.urlPattern,
     required this.latency,
@@ -4805,6 +4811,7 @@ class NetworkConditions {
     this.packetLoss,
     this.packetQueueLength,
     this.packetReordering,
+    this.offline,
   });
 
   factory NetworkConditions.fromJson(Map<String, dynamic> json) {
@@ -4825,6 +4832,7 @@ class NetworkConditions {
       packetReordering: json.containsKey('packetReordering')
           ? json['packetReordering'] as bool
           : null,
+      offline: json.containsKey('offline') ? json['offline'] as bool : null,
     );
   }
 
@@ -4838,6 +4846,7 @@ class NetworkConditions {
       if (packetLoss != null) 'packetLoss': packetLoss,
       if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
       if (packetReordering != null) 'packetReordering': packetReordering,
+      if (offline != null) 'offline': offline,
     };
   }
 }
@@ -5896,6 +5905,7 @@ enum DeviceBoundSessionFetchResult {
   success('Success'),
   keyError('KeyError'),
   signingError('SigningError'),
+  transientSigningError('TransientSigningError'),
   serverRequestedTermination('ServerRequestedTermination'),
   invalidSessionId('InvalidSessionId'),
   invalidChallenge('InvalidChallenge'),
@@ -6161,7 +6171,9 @@ enum RefreshEventDetailsRefreshResult {
   serverError('ServerError'),
   refreshQuotaExceeded('RefreshQuotaExceeded'),
   fatalError('FatalError'),
-  signingQuotaExceeded('SigningQuotaExceeded');
+  signingQuotaExceeded('SigningQuotaExceeded'),
+  refreshedAsWaiter('RefreshedAsWaiter'),
+  transientSigningError('TransientSigningError');
 
   final String value;
 
@@ -6206,7 +6218,8 @@ enum TerminationEventDetailsDeletionReason {
   clearBrowsingData('ClearBrowsingData'),
   serverRequested('ServerRequested'),
   invalidSessionParams('InvalidSessionParams'),
-  refreshFatalError('RefreshFatalError');
+  refreshFatalError('RefreshFatalError'),
+  devTools('DevTools');
 
   final String value;
 
