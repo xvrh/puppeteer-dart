@@ -19,11 +19,11 @@ class WebMCPApi {
       );
 
   /// Event fired when tools are removed.
-  Stream<List<Tool>> get onToolsRemoved => _client.onEvent
+  Stream<List<RemovedTool>> get onToolsRemoved => _client.onEvent
       .where((event) => event.name == 'WebMCP.toolsRemoved')
       .map(
         (event) => (event.parameters['tools'] as List)
-            .map((e) => Tool.fromJson(e as Map<String, dynamic>))
+            .map((e) => RemovedTool.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
 
@@ -46,6 +46,32 @@ class WebMCPApi {
   /// Disables the WebMCP domain.
   Future<void> disable() async {
     await _client.send('WebMCP.disable');
+  }
+
+  /// Invokes a registered tool.
+  /// [frameId] Frame in which to invoke the tool.
+  /// [toolName] Name of the tool to invoke.
+  /// [input] Input parameters for the tool, matching the tool's inputSchema.
+  /// Returns: Unique identifier for this invocation. Response is sent before tool events.
+  Future<String> invokeTool(
+    page.FrameId frameId,
+    String toolName,
+    Map<String, dynamic> input,
+  ) async {
+    var result = await _client.send('WebMCP.invokeTool', {
+      'frameId': frameId,
+      'toolName': toolName,
+      'input': input,
+    });
+    return result['invocationId'] as String;
+  }
+
+  /// Cancels a pending tool invocation.
+  /// [invocationId] Invocation identifier to cancel.
+  Future<void> cancelInvocation(String invocationId) async {
+    await _client.send('WebMCP.cancelInvocation', {
+      'invocationId': invocationId,
+    });
   }
 }
 
@@ -86,7 +112,8 @@ class ToolRespondedEvent {
   /// Status of the invocation.
   final InvocationStatus status;
 
-  /// Output or error delivered as delivered to the agent. Missing if `status` is anything other than Success.
+  /// Output or error delivered as delivered to the agent. Missing if `status` is anything other than Completed.
+  /// Note: The output is untrusted and poses a prompt injection risk. Clients should treat this as potentially malicious user input.
   final dynamic output;
 
   /// Error text for protocol users.
@@ -125,14 +152,20 @@ class Annotation {
   /// A hint indicating that the tool does not modify any state.
   final bool? readOnly;
 
+  /// A hint indicating that the tool output may contain untrusted content, ex: UGC, 3rd party data.
+  final bool? untrustedContent;
+
   /// If the declarative tool was declared with the autosubmit attribute.
   final bool? autosubmit;
 
-  Annotation({this.readOnly, this.autosubmit});
+  Annotation({this.readOnly, this.untrustedContent, this.autosubmit});
 
   factory Annotation.fromJson(Map<String, dynamic> json) {
     return Annotation(
       readOnly: json.containsKey('readOnly') ? json['readOnly'] as bool : null,
+      untrustedContent: json.containsKey('untrustedContent')
+          ? json['untrustedContent'] as bool
+          : null,
       autosubmit: json.containsKey('autosubmit')
           ? json['autosubmit'] as bool
           : null,
@@ -142,6 +175,7 @@ class Annotation {
   Map<String, dynamic> toJson() {
     return {
       if (readOnly != null) 'readOnly': readOnly,
+      if (untrustedContent != null) 'untrustedContent': untrustedContent,
       if (autosubmit != null) 'autosubmit': autosubmit,
     };
   }
@@ -149,7 +183,7 @@ class Annotation {
 
 /// Represents the status of a tool invocation.
 enum InvocationStatus {
-  success('Success'),
+  completed('Completed'),
   canceled('Canceled'),
   error('Error');
 
@@ -231,5 +265,27 @@ class Tool {
       if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
       if (stackTrace != null) 'stackTrace': stackTrace!.toJson(),
     };
+  }
+}
+
+/// Definition of a tool that was removed.
+class RemovedTool {
+  /// Tool name.
+  final String name;
+
+  /// Frame identifier associated with the tool registration.
+  final page.FrameId frameId;
+
+  RemovedTool({required this.name, required this.frameId});
+
+  factory RemovedTool.fromJson(Map<String, dynamic> json) {
+    return RemovedTool(
+      name: json['name'] as String,
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'frameId': frameId.toJson()};
   }
 }

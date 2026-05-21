@@ -1383,7 +1383,15 @@ enum GenericIssueErrorType {
   ),
   formModelContextParameterMissingTitleAndDescription(
     'FormModelContextParameterMissingTitleAndDescription',
-  );
+  ),
+  formModelContextMissingToolName('FormModelContextMissingToolName'),
+  formModelContextMissingToolDescription(
+    'FormModelContextMissingToolDescription',
+  ),
+  formModelContextRequiredParameterMissingName(
+    'FormModelContextRequiredParameterMissingName',
+  ),
+  formModelContextParameterMissingName('FormModelContextParameterMissingName');
 
   final String value;
 

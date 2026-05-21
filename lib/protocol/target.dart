@@ -501,6 +501,9 @@ class TargetInfo {
   /// Whether the target has an attached client.
   final bool attached;
 
+  /// Id of the parent target, if any. For example, "iframe" target may have a "page" parent.
+  final TargetID? parentId;
+
   /// Opener target Id
   final TargetID? openerId;
 
@@ -510,7 +513,8 @@ class TargetInfo {
   /// Frame id of originating window (is only set if target has an opener).
   final page.FrameId? openerFrameId;
 
-  /// Id of the parent frame, only present for the "iframe" targets.
+  /// Id of the parent frame, present for "iframe" and "worker" targets. For nested workers,
+  /// this is the "ancestor" frame that created the first worker in the nested chain.
   final page.FrameId? parentFrameId;
 
   final browser.BrowserContextID? browserContextId;
@@ -525,6 +529,7 @@ class TargetInfo {
     required this.title,
     required this.url,
     required this.attached,
+    this.parentId,
     this.openerId,
     required this.canAccessOpener,
     this.openerFrameId,
@@ -540,6 +545,9 @@ class TargetInfo {
       title: json['title'] as String,
       url: json['url'] as String,
       attached: json['attached'] as bool? ?? false,
+      parentId: json.containsKey('parentId')
+          ? TargetID.fromJson(json['parentId'] as String)
+          : null,
       openerId: json.containsKey('openerId')
           ? TargetID.fromJson(json['openerId'] as String)
           : null,
@@ -567,6 +575,7 @@ class TargetInfo {
       'url': url,
       'attached': attached,
       'canAccessOpener': canAccessOpener,
+      if (parentId != null) 'parentId': parentId!.toJson(),
       if (openerId != null) 'openerId': openerId!.toJson(),
       if (openerFrameId != null) 'openerFrameId': openerFrameId!.toJson(),
       if (parentFrameId != null) 'parentFrameId': parentFrameId!.toJson(),
