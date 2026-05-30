@@ -128,7 +128,7 @@ void main() {
       final startingContext = browser.browserContexts.length;
       var context = await browser.createIncognitoBrowserContext();
       var page = await context.newPage();
-      await page.devTools.network.emulateNetworkConditionsByRule(false, [
+      await page.devTools.network.emulateNetworkConditionsByRule( [
         NetworkConditions(
           urlPattern: '',
           latency: 1000,

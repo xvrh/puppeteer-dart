@@ -90,12 +90,13 @@ class NetworkManager {
     if (_offline == value) return;
     _offline = value;
     await Future.wait([
-      _network.emulateNetworkConditionsByRule(_offline, [
+      _network.emulateNetworkConditionsByRule( [
         NetworkConditions(
           urlPattern: '',
           latency: 0,
           downloadThroughput: -1,
           uploadThroughput: -1,
+          offline: _offline
         ),
       ]),
       // emulateNetworkConditionsByRule does not affect navigator.onLine;
