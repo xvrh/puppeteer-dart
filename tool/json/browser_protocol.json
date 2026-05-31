@@ -599,6 +599,67 @@
             ]
         },
         {
+            "domain": "Ads",
+            "description": "A domain for ad-related metrics and data.",
+            "experimental": true,
+            "dependencies": [
+                "Network",
+                "Page",
+                "Runtime"
+            ],
+            "types": [
+                {
+                    "id": "AdMetrics",
+                    "description": "Ad metrics for a page.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "viewportAdDensityByArea",
+                            "description": "The viewport ad density by area, represented as a percentage (an integer\nbetween 0 and 100).",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "averageViewportAdDensityByArea",
+                            "description": "The time-weighted average of the viewport ad density by area, measured\nacross the duration of the page.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "viewportAdCount",
+                            "description": "The number of ads currently visible within the viewport.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "averageViewportAdCount",
+                            "description": "The time-weighted average of the viewport ad count, measured across the\nduration of the page.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "totalAdCpuTime",
+                            "description": "The total ad CPU usage, in milliseconds.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "totalAdNetworkBytes",
+                            "description": "The total ad network bytes.",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "getAdMetrics",
+                    "description": "Retrieves ad metrics for the current page.",
+                    "returns": [
+                        {
+                            "name": "metrics",
+                            "$ref": "AdMetrics"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "domain": "Animation",
             "experimental": true,
             "dependencies": [
@@ -1560,6 +1621,7 @@
                         "WriteErrorNonSecureContext",
                         "WriteErrorNonStringIdField",
                         "WriteErrorNonStringInMatchDestList",
+                        "WriteErrorInvalidMatchDestList",
                         "WriteErrorNonStringMatchField",
                         "WriteErrorNonTokenTypeField",
                         "WriteErrorRequestAborted",
@@ -1972,6 +2034,56 @@
                     ]
                 },
                 {
+                    "id": "EmailVerificationRequestIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "emailVerificationRequestIssueReason",
+                            "$ref": "EmailVerificationRequestIssueReason"
+                        }
+                    ]
+                },
+                {
+                    "id": "EmailVerificationRequestIssueReason",
+                    "description": "Represents the failure reason when an email verification request fails.\nShould be updated alongside EmailVerificationRequestResult in\nthird_party/blink/public/mojom/devtools/inspector_issue.mojom.",
+                    "type": "string",
+                    "enum": [
+                        "InvalidEmail",
+                        "DnsFetchFailed",
+                        "DnsInvalidRecord",
+                        "WellKnownHttpNotFound",
+                        "WellKnownNoResponse",
+                        "WellKnownInvalidResponse",
+                        "WellKnownListEmpty",
+                        "WellKnownInvalidContentType",
+                        "WellKnownMissingIssuanceEndpoint",
+                        "WellKnownIssuanceEndpointCrossOrigin",
+                        "WellKnownUnsupportedSigningAlgorithm",
+                        "TokenHttpNotFound",
+                        "TokenNoResponse",
+                        "TokenInvalidResponse",
+                        "TokenInvalidContentType",
+                        "TokenMalformedSdJwt",
+                        "TokenInvalidSdJwt",
+                        "KeyBindingSigningFailed",
+                        "RpOriginIsOpaque",
+                        "WellKnownMissingAccountsEndpoint",
+                        "UserLoggedOut",
+                        "WellKnownAccountsEndpointCrossOrigin",
+                        "AccountsHttpNotFound",
+                        "AccountsNoResponse",
+                        "AccountsInvalidResponse",
+                        "AccountsInvalidContentType",
+                        "AccountsEmptyList",
+                        "EmailVerificationWellKnownHttpNotFound",
+                        "EmailVerificationWellKnownNoResponse",
+                        "EmailVerificationWellKnownInvalidResponse",
+                        "EmailVerificationWellKnownInvalidContentType",
+                        "JwksHttpNotFound",
+                        "JwksInvalidResponse"
+                    ]
+                },
+                {
                     "id": "ClientHintIssueDetails",
                     "description": "This issue tracks client hints related issues. It's used to deprecate old\nfeatures, encourage the use of new ones, and provide general guidance.",
                     "type": "object",
@@ -2294,7 +2406,8 @@
                         "UserReidentificationIssue",
                         "PermissionElementIssue",
                         "PerformanceIssue",
-                        "SelectivePermissionsInterventionIssue"
+                        "SelectivePermissionsInterventionIssue",
+                        "EmailVerificationRequestIssue"
                     ]
                 },
                 {
@@ -2447,6 +2560,11 @@
                             "name": "selectivePermissionsInterventionIssueDetails",
                             "optional": true,
                             "$ref": "SelectivePermissionsInterventionIssueDetails"
+                        },
+                        {
+                            "name": "emailVerificationRequestIssueDetails",
+                            "optional": true,
+                            "$ref": "EmailVerificationRequestIssueDetails"
                         }
                     ]
                 },
@@ -11406,7 +11524,7 @@
                 },
                 {
                     "name": "setPressureStateOverride",
-                    "description": "TODO: OBSOLETE: To remove when setPressureDataOverride is merged.\nProvides a given pressure state that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
+                    "description": "Provides a given pressure state that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -11416,26 +11534,6 @@
                         {
                             "name": "state",
                             "$ref": "PressureState"
-                        }
-                    ]
-                },
-                {
-                    "name": "setPressureDataOverride",
-                    "description": "Provides a given pressure data set that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "source",
-                            "$ref": "PressureSource"
-                        },
-                        {
-                            "name": "state",
-                            "$ref": "PressureState"
-                        },
-                        {
-                            "name": "ownContributionEstimate",
-                            "optional": true,
-                            "type": "number"
                         }
                     ]
                 },
@@ -17889,7 +17987,8 @@
                         "InvalidConfigJson",
                         "InvalidFederatedSessionProviderFailedToRestoreKey",
                         "FailedToUnwrapKey",
-                        "SessionDeletedDuringRefresh"
+                        "SessionDeletedDuringRefresh",
+                        "CrossOriginRegistrationSiteNotIncluded"
                     ]
                 },
                 {
@@ -25598,7 +25697,8 @@
                         "PrefetchProxyNotAvailable",
                         "PrefetchResponseUsed",
                         "PrefetchSuccessfulButNotUsed",
-                        "PrefetchNotUsedProbeFailed"
+                        "PrefetchNotUsedProbeFailed",
+                        "PrefetchCancelledOnUserNavigation"
                     ]
                 },
                 {
@@ -29280,7 +29380,7 @@
                         },
                         {
                             "name": "panelId",
-                            "description": "The id of the panel we want DevTools to open initially. Currently\nsupported panels are elements, console, network, sources, resources\nand performance.",
+                            "description": "The id of the panel we want DevTools to open initially. Currently\nsupported panels are elements, console, network, sources, resources,\ntimeline, chrome-recorder, heap-profiler, lighthouse, and security.",
                             "optional": true,
                             "type": "string"
                         }
