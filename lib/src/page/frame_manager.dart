@@ -8,6 +8,7 @@ import 'dom_world.dart';
 import 'execution_context.dart';
 import 'js_handle.dart';
 import 'lifecycle_watcher.dart';
+import 'locator.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'page.dart';
@@ -504,6 +505,12 @@ class Frame {
   Future<ExecutionContext> get executionContext {
     return _mainWorld.executionContext;
   }
+
+  /// Creates a [Locator] for the provided [selector], scoped to this frame.
+  ///
+  /// See [Locator] and [Page.locator] for details.
+  Locator locator(String selector) =>
+      NodeLocator.create(frameManager.page, this, selector);
 
   /// The only difference between [Frame.evaluate] and [Frame.evaluateHandle] is
   /// that [Frame.evaluateHandle] returns in-page object (JSHandle).

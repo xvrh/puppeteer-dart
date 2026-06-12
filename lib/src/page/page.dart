@@ -29,6 +29,7 @@ import 'helper.dart';
 import 'js_handle.dart';
 import 'keyboard.dart';
 import 'lifecycle_watcher.dart';
+import 'locator.dart';
 import 'metrics.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
@@ -419,6 +420,17 @@ class Page {
   Touchscreen get touchscreen => _touchscreen;
 
   Mouse get mouse => _mouse;
+
+  /// Creates a [Locator] for the provided [selector].
+  ///
+  /// A locator auto-waits for the element to be present, visible and actionable
+  /// and retries the whole action if it fails. See [Locator] for details.
+  ///
+  /// ```dart
+  /// await page.locator('button').click();
+  /// ```
+  Locator locator(String selector) =>
+      NodeLocator.create(this, mainFrame, selector);
 
   bool get isDragInterceptionEnabled => _userDragInterceptionEnabled;
 

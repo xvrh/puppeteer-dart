@@ -8,6 +8,7 @@ import 'execution_context.dart';
 import 'frame_manager.dart';
 import 'helper.dart';
 import 'keyboard.dart';
+import 'locator.dart';
 import 'page.dart';
 
 export '../../protocol/dom.dart' show BoxModel;
@@ -362,6 +363,16 @@ async function _(element, pageJavascriptEnabled) {
     }
     return area.abs();
   }
+
+  /// Scrolls the element into view if it is not already, using the same
+  /// actionability logic as [click].
+  Future<void> scrollIntoViewIfNeeded() => _scrollIntoViewIfNeeded();
+
+  /// Returns a [Locator] for this element handle. The locator applies the usual
+  /// actionability preconditions (visibility, stability, etc.) when an action
+  /// is performed.
+  Locator asLocator() =>
+      NodeLocator.fromHandle(page, frame ?? page.mainFrame, this);
 
   Future<void> hover() async {
     await _scrollIntoViewIfNeeded();
