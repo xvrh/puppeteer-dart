@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
@@ -256,6 +257,9 @@ class Puppeteer {
 
       return browser;
     } else {
+      // Never connected within the timeout: don't leave an orphaned Chrome
+      // (and let `_waitForWebSocketUrl` tear down its stream subscriptions).
+      await _killChrome(chromeProcess);
       throw Exception('Not able to connect to Chrome DevTools');
     }
   }
@@ -375,20 +379,57 @@ Future<int> _killChrome(Process process) {
 
 final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
-Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
+Future<String> _waitForWebSocketUrl(Process chromeProcess) {
+  var completer = Completer<String>();
   var accumulatedLines = <String>[];
-  await for (String line
-      in chromeProcess.stderr
-          .transform(Utf8Decoder())
-          .transform(LineSplitter())) {
-    accumulatedLines.add(line);
-    _logger.warning('[Chrome stderr]: $line');
-    var match = _devToolRegExp.firstMatch(line);
-    if (match != null) {
-      return match.group(1)!;
-    }
-  }
-  throw Exception('Websocket url not found.\n${accumulatedLines.join('\n')}');
+
+  // Drain both stdout and stderr for the lifetime of the process. An undrained
+  // pipe blocks Chrome once it fills the ~64KB OS buffer (stdout is otherwise
+  // never read), and keeping stderr drained preserves Chrome's post-handshake
+  // output (warnings, crash reasons) instead of discarding it.
+  Stream<String> lines(Stream<List<int>> stream) => stream
+      .transform(const Utf8Decoder(allowMalformed: true))
+      .transform(const LineSplitter());
+
+  var subscriptions = [
+    lines(chromeProcess.stderr).listen(
+      (line) {
+        if (completer.isCompleted) {
+          _logger.finer('[Chrome stderr]: $line');
+          return;
+        }
+        accumulatedLines.add(line);
+        _logger.warning('[Chrome stderr]: $line');
+        var match = _devToolRegExp.firstMatch(line);
+        if (match != null) completer.complete(match.group(1)!);
+      },
+      onError: (Object error) {
+        if (!completer.isCompleted) completer.completeError(error);
+      },
+      cancelOnError: false,
+    ),
+    lines(chromeProcess.stdout).listen(
+      (line) => _logger.finer('[Chrome stdout]: $line'),
+      onError: (Object _) {},
+      cancelOnError: false,
+    ),
+  ];
+
+  // When Chrome exits, stop draining and fail the wait if it never connected.
+  unawaited(
+    chromeProcess.exitCode.then((_) async {
+      for (var subscription in subscriptions) {
+        await subscription.cancel();
+      }
+      if (!completer.isCompleted) {
+        completer.completeError(
+          Exception('Websocket url not found.\n${accumulatedLines.join('\n')}'),
+        );
+      }
+    }),
+  );
+
+  return completer.future;
 }
 
 Future<String> _inferExecutablePath() async {
