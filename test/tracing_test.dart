@@ -38,23 +38,19 @@ void main() {
       await page.tracing.stop(result);
       expect(result.toString().length, greaterThan(0));
     });
-    test(
-      'should run with custom categories if provided',
-      () async {
-        await page.tracing.start(
-          categories: ['disabled-by-default-v8.cpu_profiler.hires'],
-        );
-        var buffer = StringBuffer();
-        await page.tracing.stop(buffer);
-        var traceJson = jsonDecode(buffer.toString()) as Map<String, dynamic>;
+    test('should run with custom categories if provided', () async {
+      await page.tracing.start(
+        categories: ['-*', 'disabled-by-default-devtools.timeline.frame'],
+      );
+      var buffer = StringBuffer();
+      await page.tracing.stop(buffer);
+      var traceJson = jsonDecode(buffer.toString()) as Map<String, dynamic>;
+      var events = traceJson['traceEvents'] as List;
 
-        expect(
-          (traceJson['metadata'] as Map<String, dynamic>)['trace-config'],
-          contains('disabled-by-default-v8.cpu_profiler.hires'),
-        );
-      },
-      skip: 'Not working anymore: should investigate',
-    );
+      // Excluding all categories with '-*' must actually take effect: the
+      // 'toplevel' category is present by default but should be absent here.
+      expect(events.any((e) => (e as Map)['cat'] == 'toplevel'), isFalse);
+    });
     test('should throw if tracing on two pages', () async {
       await page.tracing.start();
       var newPage = await browser.newPage();

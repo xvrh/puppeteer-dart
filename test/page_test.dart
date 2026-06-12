@@ -118,16 +118,29 @@ void main() {
     });
   });
   group('Page.Events.error', () {
-    test('should throw when page crashes', () async {
-      var onErrorFuture = page.onError.first;
-
-      await page
-          .goto('chrome://crash')
-          .then<Response?>((e) => e)
-          .catchError((_) => null);
-      var error = await onErrorFuture;
-      expect(error.message, 'Page crashed!');
-    });
+    test(
+      'should throw when page crashes',
+      () async {
+        // Under CI load the `Inspector.targetCrashed` event can be delivered
+        // late (queued behind a starved event loop), and Chrome destroys the
+        // target a few seconds after a renderer crash — which closes
+        // `page.onError`. Use a persistent listener (so a late close does not
+        // surface as "Bad state: No element" the way `.first` does) and a
+        // generous timeout (so a delayed-but-not-lost event still passes).
+        var crashError = Completer<ClientError>();
+        var subscription = page.onError.listen((e) {
+          if (!crashError.isCompleted) crashError.complete(e);
+        });
+        await page
+            .goto('chrome://crash')
+            .then<Response?>((e) => e)
+            .catchError((_) => null);
+        var error = await crashError.future;
+        await subscription.cancel();
+        expect(error.message, 'Page crashed!');
+      },
+      timeout: const Timeout(Duration(seconds: 60)),
+    );
   });
   group('Page.Events.Popup', () {
     test('should work', () async {

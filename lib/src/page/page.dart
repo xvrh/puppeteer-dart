@@ -999,12 +999,19 @@ function addPageBinding(bindingName) {
   }
 
   void _handleException(ExceptionThrownEvent event) {
+    if (_onErrorController.isClosed) return;
     _onErrorController.add(ClientError(event.exceptionDetails));
   }
 
   void _handleTargetCrashed(void _) {
+    // A renderer crash does not destroy the page target (Chrome shows a "sad
+    // tab" and the page can recover on the next navigation). Match upstream
+    // Puppeteer and only surface the error here — do NOT dispose the page.
+    // Disposing on crash used to race the error delivery against closing
+    // `_onErrorController`, which intermittently turned `page.onError.first`
+    // into a "No element" / timeout failure.
+    if (_onErrorController.isClosed) return;
     _onErrorController.add(ClientError.pageCrashed());
-    Future(() => _dispose('Target crashed'));
   }
 
   Future<void> _onBindingCalled(BindingCalledEvent event) async {
