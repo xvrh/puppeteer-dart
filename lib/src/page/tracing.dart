@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../../protocol/dev_tools.dart';
 import '../../protocol/io.dart';
+import '../../protocol/tracing.dart' show TraceConfig;
 
 /// You can use [tracing.start] and [tracing.stop] to create a trace file which
 /// can be opened in Chrome DevTools or [timeline viewer](https://chromedevtools.github.io/timeline-viewer/).
@@ -51,12 +52,22 @@ class Tracing {
       categories.add('disabled-by-default-devtools.screenshot');
     }
 
+    var excludedCategories = [
+      for (var category in categories)
+        if (category.startsWith('-')) category.substring(1),
+    ];
+    var includedCategories = [
+      for (var category in categories)
+        if (!category.startsWith('-')) category,
+    ];
+
     _recording = true;
     await _devTools.tracing.start(
       transferMode: 'ReturnAsStream',
-      //TODO(xha): use the new api
-      // ignore: deprecated_member_use_from_same_package
-      categories: categories.join(','),
+      traceConfig: TraceConfig(
+        includedCategories: includedCategories,
+        excludedCategories: excludedCategories,
+      ),
     );
   }
 
