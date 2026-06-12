@@ -525,11 +525,11 @@ void main() {
       // 3. After that, remove the iframe.
       frame.remove();
       }''');
-        var popupTarget = page.browserContext.targets.firstWhere(
-          (target) => target != page.target,
-        );
-        // 4. Connect to the popup and make sure it doesn't throw.
-        await popupTarget.page;
+        // 4. The target will always be the last one.
+        var popupTarget = page.browserContext.targets.last;
+        // 5. Connect to the popup and make sure it doesn't throw and is not the
+        // same page.
+        expect(await popupTarget.page, isNot(page));
       },
     );
   });
