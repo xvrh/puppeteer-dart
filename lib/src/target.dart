@@ -98,7 +98,16 @@ class Target {
         : null;
   }
 
-  Future<Page> get page async => (await pageOrNull)!;
+  Future<Page> get page async {
+    var page = await pageOrNull;
+    if (page == null) {
+      throw StateError(
+        'Target of type "$type" (url: $url) is not a page. '
+        'Use `pageOrNull` to handle non-page targets.',
+      );
+    }
+    return page;
+  }
 
   bool get isPage => _isPageTarget(_info);
 
