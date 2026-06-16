@@ -604,6 +604,37 @@ class NodeLocator extends Locator {
   }
 }
 
+/// A locator that locates a value by repeatedly evaluating a JavaScript
+/// function until it returns a truthy value.
+class FunctionLocator extends Locator {
+  final Frame frame;
+  @Language('js')
+  final String pageFunction;
+
+  FunctionLocator._(super.timeout, this.frame, this.pageFunction);
+
+  factory FunctionLocator.create(
+    Page page,
+    Frame frame,
+    @Language('js') String pageFunction,
+  ) {
+    return FunctionLocator._(
+      page.defaultTimeout ?? globalDefaultTimeout,
+      frame,
+      pageFunction,
+    );
+  }
+
+  @override
+  FunctionLocator _clone() =>
+      FunctionLocator._(_timeout, frame, pageFunction)..copyOptions(this);
+
+  @override
+  Future<JsHandle> _wait(Future<void>? signal) {
+    return frame.waitForFunction(pageFunction, timeout: _conditionTimeout);
+  }
+}
+
 /// Base class for locators that delegate the resolution of a handle to another
 /// locator (e.g. [MappedLocator], [FilteredLocator]).
 abstract class DelegatedLocator extends Locator {

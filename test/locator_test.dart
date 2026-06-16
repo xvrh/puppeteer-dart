@@ -13,8 +13,8 @@ import 'utils/utils.dart';
 // - `AbortController`/`AbortSignal` becomes an optional `Future<void> signal`
 //   that aborts the action when it completes.
 // - The upstream fake-timer timeout tests use small real timeouts here.
-// - `FunctionLocator` (`page.locator(func)`) is intentionally out of scope for
-//   this batch.
+// - The `page.locator(func)` overload is `page.locatorFunction(jsString)` here
+//   (Dart can't overload, and the function is passed as a JS source string).
 
 void main() {
   late Server server;
@@ -632,6 +632,27 @@ void main() {
 '''),
         );
         expect(await page.locator('div').waitHandle(), isNotNull);
+      });
+    });
+
+    group('FunctionLocator', () {
+      test('should work', () async {
+        var result = page
+            .locatorFunction(
+              '() => new Promise(resolve => setTimeout(() => resolve(true), 100))',
+            )
+            .wait();
+        expect(await result, isTrue);
+      });
+
+      test('should work with actions', () async {
+        await page.setContent(
+          '<div onclick="window.clicked = true">test</div>',
+        );
+        await page
+            .locatorFunction('() => document.getElementsByTagName("div")[0]')
+            .click();
+        expect(await page.evaluate('() => window.clicked'), isTrue);
       });
     });
 

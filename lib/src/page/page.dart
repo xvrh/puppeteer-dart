@@ -432,6 +432,20 @@ class Page {
   Locator locator(String selector) =>
       NodeLocator.create(this, mainFrame, selector);
 
+  /// Creates a [Locator] for the provided JavaScript [pageFunction].
+  ///
+  /// The function is evaluated in the page repeatedly until it returns a truthy
+  /// value; the locator then resolves to a handle for that value. The function
+  /// may be asynchronous (return a `Promise`).
+  ///
+  /// ```dart
+  /// var ready = await page
+  ///     .locatorFunction('() => document.querySelector(".ready")')
+  ///     .waitHandle();
+  /// ```
+  Locator locatorFunction(@Language('js') String pageFunction) =>
+      FunctionLocator.create(this, mainFrame, pageFunction);
+
   bool get isDragInterceptionEnabled => _userDragInterceptionEnabled;
 
   /// An array of all frames attached to the page.
