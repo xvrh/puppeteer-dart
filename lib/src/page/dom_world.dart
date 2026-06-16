@@ -6,6 +6,7 @@ import 'frame_manager.dart';
 import 'js_handle.dart';
 import 'lifecycle_watcher.dart';
 import 'mouse.dart';
+import 'query_handler.dart' as query_handler;
 
 class DomWorld {
   final FrameManager frameManager;
@@ -366,6 +367,14 @@ async function _(content) {
     bool? hidden,
     Duration? timeout,
   }) {
+    if (query_handler.isSpecialSelector(selector)) {
+      return _waitForPSelector(
+        selector,
+        visible: visible,
+        hidden: hidden,
+        timeout: timeout,
+      );
+    }
     return _waitForSelectorOrXPath(
       selector,
       isXPath: false,
@@ -373,6 +382,38 @@ async function _(content) {
       hidden: hidden,
       timeout: timeout,
     );
+  }
+
+  Future<ElementHandle?> _waitForPSelector(
+    String selector, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) async {
+    query_handler.checkSelectorSupported(selector);
+    var kind = query_handler.legacyKind(selector);
+    var value = kind != null ? selector.substring(kind.length + 1) : selector;
+    var waitForVisible = visible ?? false;
+    var waitForHidden = hidden ?? false;
+
+    var polling = waitForVisible || waitForHidden
+        ? Polling.everyFrame
+        : Polling.mutation;
+    var title = 'selector "$selector"${waitForHidden ? ' to be hidden' : ''}';
+    var waitTask = WaitTask(
+      this,
+      query_handler.pSelectorWaitPredicate,
+      title: title,
+      polling: polling,
+      timeout: timeout ?? frameManager.page.defaultTimeout,
+      predicateArgs: [value, kind ?? '', waitForVisible, waitForHidden],
+    );
+    var handle = await waitTask.future;
+    if (handle.asElement == null) {
+      await handle.dispose();
+      return null;
+    }
+    return handle.asElement;
   }
 
   Future<ElementHandle?> waitForXPath(

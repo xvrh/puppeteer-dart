@@ -33,6 +33,7 @@ import 'mouse_test.dart' as mouse_test;
 import 'navigation_test.dart' as navigation_test;
 import 'network_test.dart' as network_test;
 import 'oopif_test.dart' as oopif_test;
+import 'p_selectors_test.dart' as p_selectors_test;
 import 'page_test.dart' as page_test;
 import 'query_selector_test.dart' as query_selector_test;
 import 'readme_test.dart' as readme_test;
@@ -81,6 +82,7 @@ void main() {
   group('navigation_test', navigation_test.main);
   group('network_test', network_test.main);
   group('oopif_test', oopif_test.main);
+  group('p_selectors_test', p_selectors_test.main);
   group('page_test', page_test.main);
   group('query_selector_test', query_selector_test.main);
   group('readme_test', readme_test.main);
