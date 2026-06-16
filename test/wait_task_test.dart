@@ -124,6 +124,40 @@ void main() {
     test('should return the success value as a JSHandle', () async {
       expect(await (await page.waitForFunction('() => 5')).jsonValue, 5);
     });
+    test('should await an async predicate (raf)', () async {
+      var handle = await page.waitForFunction(
+        '() => Promise.resolve(5)',
+        polling: Polling.everyFrame,
+      );
+      expect(await handle.jsonValue, 5);
+    });
+    test('should await an async predicate (interval)', () async {
+      var handle = await page.waitForFunction(
+        '() => Promise.resolve(5)',
+        polling: Polling.interval(Duration(milliseconds: 10)),
+      );
+      expect(await handle.jsonValue, 5);
+    });
+    test('should await an async predicate (mutation)', () async {
+      var handle = await page.waitForFunction(
+        '() => Promise.resolve(5)',
+        polling: Polling.mutation,
+      );
+      expect(await handle.jsonValue, 5);
+    });
+    test('should wait for an async predicate to become truthy', () async {
+      var watchdog = page.waitForFunction(
+        "() => Promise.resolve(window.__FOO === 'hit')",
+      );
+      await page.evaluate("() => window.__FOO = 'hit'");
+      await watchdog;
+    });
+    test('should propagate errors from an async predicate', () async {
+      expect(
+        page.waitForFunction('() => Promise.reject(new Error("boom"))'),
+        throwsA(anything),
+      );
+    });
     test('should return the window as a success value', () async {
       expect(await page.waitForFunction('() => window'), isNotNull);
     });

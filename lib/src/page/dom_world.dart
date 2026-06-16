@@ -591,22 +591,28 @@ async function _(predicateBody, polling, timeout, ...args) {
   /**
    * @return {!Promise<*>}
    */
-  function pollMutation() {
-    const success = predicate.apply(null, args);
+  async function pollMutation() {
+    const success = await predicate.apply(null, args);
     if (success)
-      return Promise.resolve(success);
+      return success;
 
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
-    const observer = new MutationObserver(mutations => {
-      if (timedOut) {
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
+    const observer = new MutationObserver(async () => {
+      try {
+        if (timedOut) {
+          observer.disconnect();
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success) {
+          observer.disconnect();
+          fulfill(success);
+        }
+      } catch (error) {
         observer.disconnect();
-        fulfill();
-      }
-      const success = predicate.apply(null, args);
-      if (success) {
-        observer.disconnect();
-        fulfill(success);
+        reject(error);
       }
     });
     observer.observe(document, {
@@ -621,21 +627,25 @@ async function _(predicateBody, polling, timeout, ...args) {
    * @return {!Promise<*>}
    */
   function pollRaf() {
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
     onRaf();
     return result;
 
-    function onRaf() {
-      if (timedOut) {
-        fulfill();
-        return;
+    async function onRaf() {
+      try {
+        if (timedOut) {
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success)
+          fulfill(success);
+        else
+          requestAnimationFrame(onRaf);
+      } catch (error) {
+        reject(error);
       }
-      const success = predicate.apply(null, args);
-      if (success)
-        fulfill(success);
-      else
-        requestAnimationFrame(onRaf);
     }
   }
 
@@ -644,21 +654,25 @@ async function _(predicateBody, polling, timeout, ...args) {
    * @return {!Promise<*>}
    */
   function pollInterval(pollInterval) {
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
     onTimeout();
     return result;
 
-    function onTimeout() {
-      if (timedOut) {
-        fulfill();
-        return;
+    async function onTimeout() {
+      try {
+        if (timedOut) {
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success)
+          fulfill(success);
+        else
+          setTimeout(onTimeout, pollInterval);
+      } catch (error) {
+        reject(error);
       }
-      const success = predicate.apply(null, args);
-      if (success)
-        fulfill(success);
-      else
-        setTimeout(onTimeout, pollInterval);
     }
   }
 }
