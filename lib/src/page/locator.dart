@@ -303,8 +303,6 @@ function _(el, scrollTop, scrollLeft) {
     return completer.future.whenComplete(() => timer?.cancel());
   }
 
-  // Conditions.
-
   Duration? get _conditionTimeout => _timeout > Duration.zero ? _timeout : null;
 
   DateTime? get _conditionDeadline {

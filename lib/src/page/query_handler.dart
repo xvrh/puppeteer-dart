@@ -185,8 +185,6 @@ const _engine =
     }
   }
 
-  // --- Text matching ---------------------------------------------------------
-
   function isSuitableNodeForTextMatching(node) {
     return !['SCRIPT', 'STYLE'].includes(node.nodeName) &&
         !(document.head && document.head.contains(node));
@@ -240,8 +238,6 @@ const _engine =
     }
   }
 
-  // --- XPath -----------------------------------------------------------------
-
   function* xpathQuerySelectorAll(root, selector, maxResults) {
     maxResults = maxResults || -1;
     const doc = root.ownerDocument || document;
@@ -255,8 +251,6 @@ const _engine =
     }
     for (const found of items) yield found;
   }
-
-  // --- Pierce (shadow DOM) ---------------------------------------------------
 
   function pierceQuerySelectorAll(element, selector) {
     const result = [];
@@ -300,8 +294,6 @@ const _engine =
     }
   }
 
-  // --- DOM ordering ----------------------------------------------------------
-
   function calculateDepth(node) {
     const depth = [];
     while (node) {
@@ -338,8 +330,6 @@ const _engine =
       .sort((a, b) => compareDepths(a[1], b[1]))
       .map(entry => entry[0]);
   }
-
-  // --- Selector parsing ------------------------------------------------------
 
   function unquote(text) {
     if (text.length <= 1) return text;
@@ -498,8 +488,6 @@ const _engine =
     return selectors;
   }
 
-  // --- Query engine ----------------------------------------------------------
-
   function isQueryableNode(node) {
     return 'querySelectorAll' in node;
   }
@@ -566,7 +554,6 @@ const _engine =
       } else if (part === '>>>') {
         elements = flatMap(elements, pierceAll);
       } else {
-        // part is a compound selector; apply it within the current elements.
         const compound = part;
         elements = flatMap(elements, function* (element) {
           yield* compoundEngine(element, compound);
