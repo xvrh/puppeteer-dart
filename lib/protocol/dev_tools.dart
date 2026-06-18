@@ -1,5 +1,6 @@
 import '../src/connection.dart';
 import 'accessibility.dart';
+import 'ads.dart';
 import 'animation.dart';
 import 'audits.dart';
 import 'autofill.dart';
@@ -62,6 +63,10 @@ class DevTools {
   AccessibilityApi get accessibility =>
       _accessibility ??= AccessibilityApi(client);
   AccessibilityApi? _accessibility;
+
+  /// A domain for ad-related metrics and data.
+  AdsApi get ads => _ads ??= AdsApi(client);
+  AdsApi? _ads;
 
   AnimationApi get animation => _animation ??= AnimationApi(client);
   AnimationApi? _animation;
