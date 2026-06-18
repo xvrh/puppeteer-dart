@@ -356,8 +356,8 @@ class TargetApi {
   /// Opens a DevTools window for the target.
   /// [targetId] This can be the page or tab target ID.
   /// [panelId] The id of the panel we want DevTools to open initially. Currently
-  /// supported panels are elements, console, network, sources, resources
-  /// and performance.
+  /// supported panels are elements, console, network, sources, resources,
+  /// timeline, chrome-recorder, heap-profiler, lighthouse, and security.
   /// Returns: The targetId of DevTools page target.
   Future<TargetID> openDevTools(TargetID targetId, {String? panelId}) async {
     var result = await _client.send('Target.openDevTools', {
@@ -523,6 +523,10 @@ class TargetInfo {
   /// the type of "page", this may be set to "prerender".
   final String? subtype;
 
+  /// Embedder-specific target metadata. This is only set for targets of
+  /// type "tab".
+  final Map<String, dynamic>? embedderData;
+
   TargetInfo({
     required this.targetId,
     required this.type,
@@ -536,6 +540,7 @@ class TargetInfo {
     this.parentFrameId,
     this.browserContextId,
     this.subtype,
+    this.embedderData,
   });
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
@@ -564,6 +569,9 @@ class TargetInfo {
             )
           : null,
       subtype: json.containsKey('subtype') ? json['subtype'] as String : null,
+      embedderData: json.containsKey('embedderData')
+          ? json['embedderData'] as Map<String, dynamic>
+          : null,
     );
   }
 
@@ -582,6 +590,7 @@ class TargetInfo {
       if (browserContextId != null)
         'browserContextId': browserContextId!.toJson(),
       if (subtype != null) 'subtype': subtype,
+      if (embedderData != null) 'embedderData': embedderData,
     };
   }
 }

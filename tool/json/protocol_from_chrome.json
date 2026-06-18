@@ -599,6 +599,67 @@
             ]
         },
         {
+            "domain": "Ads",
+            "description": "A domain for ad-related metrics and data.",
+            "experimental": true,
+            "dependencies": [
+                "Network",
+                "Page",
+                "Runtime"
+            ],
+            "types": [
+                {
+                    "id": "AdMetrics",
+                    "description": "Ad metrics for a page.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "viewportAdDensityByArea",
+                            "description": "The viewport ad density by area, represented as a percentage (an integer\nbetween 0 and 100).",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "averageViewportAdDensityByArea",
+                            "description": "The time-weighted average of the viewport ad density by area, measured\nacross the duration of the page.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "viewportAdCount",
+                            "description": "The number of ads currently visible within the viewport.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "averageViewportAdCount",
+                            "description": "The time-weighted average of the viewport ad count, measured across the\nduration of the page.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "totalAdCpuTime",
+                            "description": "The total ad CPU usage, in milliseconds.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "totalAdNetworkBytes",
+                            "description": "The total ad network bytes.",
+                            "type": "number"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "getAdMetrics",
+                    "description": "Retrieves ad metrics for the current page.",
+                    "returns": [
+                        {
+                            "name": "metrics",
+                            "$ref": "AdMetrics"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "domain": "Animation",
             "experimental": true,
             "dependencies": [
@@ -1560,6 +1621,7 @@
                         "WriteErrorNonSecureContext",
                         "WriteErrorNonStringIdField",
                         "WriteErrorNonStringInMatchDestList",
+                        "WriteErrorInvalidMatchDestList",
                         "WriteErrorNonStringMatchField",
                         "WriteErrorNonTokenTypeField",
                         "WriteErrorRequestAborted",
@@ -1592,7 +1654,11 @@
                         "ValidationFailedSignatureExpired",
                         "ValidationFailedInvalidLength",
                         "ValidationFailedSignatureMismatch",
-                        "ValidationFailedIntegrityMismatch"
+                        "ValidationFailedIntegrityMismatch",
+                        "SignatureBaseUnknownDerivedComponent",
+                        "SignatureBaseMissingHeader",
+                        "SignatureBaseInvalidUnencodedDigest",
+                        "SignatureBaseUnsupportedComponent"
                     ]
                 },
                 {
@@ -1770,6 +1836,7 @@
                         "FormInputHasWrongButWellIntendedAutocompleteValueError",
                         "ResponseWasBlockedByORB",
                         "NavigationEntryMarkedSkippable",
+                        "BackUINavigationWouldSkipAd",
                         "AutofillAndManualTextPolicyControlledFeaturesInfo",
                         "AutofillPolicyControlledFeatureInfo",
                         "ManualTextPolicyControlledFeatureInfo",
@@ -1964,6 +2031,79 @@
                         "InvalidConfigOrWellKnown",
                         "InvalidAccountsResponse",
                         "NoReturningUserFromFetchedAccounts"
+                    ]
+                },
+                {
+                    "id": "EmailVerificationRequestIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "emailVerificationRequestIssueReason",
+                            "$ref": "EmailVerificationRequestIssueReason"
+                        }
+                    ]
+                },
+                {
+                    "id": "EmailVerificationRequestIssueReason",
+                    "description": "Represents the failure reason when an email verification request fails.\nShould be updated alongside EmailVerificationRequestResult in\nthird_party/blink/public/mojom/devtools/inspector_issue.mojom.",
+                    "type": "string",
+                    "enum": [
+                        "InvalidEmail",
+                        "DnsFetchFailed",
+                        "DnsInvalidRecord",
+                        "WellKnownHttpNotFound",
+                        "WellKnownNoResponse",
+                        "WellKnownInvalidResponse",
+                        "WellKnownListEmpty",
+                        "WellKnownInvalidContentType",
+                        "WellKnownMissingIssuanceEndpoint",
+                        "WellKnownIssuanceEndpointCrossOrigin",
+                        "WellKnownUnsupportedSigningAlgorithm",
+                        "TokenHttpNotFound",
+                        "TokenNoResponse",
+                        "TokenInvalidResponse",
+                        "TokenInvalidContentType",
+                        "TokenMalformedSdJwt",
+                        "TokenInvalidSdJwt",
+                        "KeyBindingSigningFailed",
+                        "RpOriginIsOpaque",
+                        "WellKnownMissingAccountsEndpoint",
+                        "UserLoggedOut",
+                        "WellKnownAccountsEndpointCrossOrigin",
+                        "AccountsHttpNotFound",
+                        "AccountsNoResponse",
+                        "AccountsInvalidResponse",
+                        "AccountsInvalidContentType",
+                        "AccountsEmptyList",
+                        "EmailVerificationWellKnownHttpNotFound",
+                        "EmailVerificationWellKnownNoResponse",
+                        "EmailVerificationWellKnownInvalidResponse",
+                        "EmailVerificationWellKnownInvalidContentType",
+                        "JwksHttpNotFound",
+                        "JwksInvalidResponse",
+                        "TokenVerificationSdJwtUnsupportedHeaderAlg",
+                        "TokenVerificationSdJwtMissingIss",
+                        "TokenVerificationSdJwtMissingIat",
+                        "TokenVerificationSdJwtMissingCnf",
+                        "TokenVerificationSdJwtMissingEmail",
+                        "TokenVerificationSdJwtInvalidIssuedAt",
+                        "TokenVerificationSdJwtInvalidIssuer",
+                        "TokenVerificationSdJwtJwksMissingKeys",
+                        "TokenVerificationSdJwtSignatureFailed",
+                        "TokenVerificationSdJwtInvalidEmailVerified",
+                        "TokenVerificationSdJwtInvalidEmail",
+                        "TokenVerificationSdJwtInvalidHolderKey",
+                        "TokenVerificationKbInvalidTyp",
+                        "TokenVerificationKbMissingAud",
+                        "TokenVerificationKbMissingNonce",
+                        "TokenVerificationKbMissingIat",
+                        "TokenVerificationKbMissingSdHash",
+                        "TokenVerificationKbInvalidIssuedAt",
+                        "TokenVerificationKbInvalidAudience",
+                        "TokenVerificationKbInvalidNonce",
+                        "TokenVerificationKbInvalidSdHash",
+                        "TokenVerificationKbMissingCnf",
+                        "TokenVerificationKbSignatureFailed"
                     ]
                 },
                 {
@@ -2289,7 +2429,8 @@
                         "UserReidentificationIssue",
                         "PermissionElementIssue",
                         "PerformanceIssue",
-                        "SelectivePermissionsInterventionIssue"
+                        "SelectivePermissionsInterventionIssue",
+                        "EmailVerificationRequestIssue"
                     ]
                 },
                 {
@@ -2442,6 +2583,11 @@
                             "name": "selectivePermissionsInterventionIssueDetails",
                             "optional": true,
                             "$ref": "SelectivePermissionsInterventionIssueDetails"
+                        },
+                        {
+                            "name": "emailVerificationRequestIssueDetails",
+                            "optional": true,
+                            "$ref": "EmailVerificationRequestIssueDetails"
                         }
                     ]
                 },
@@ -4891,7 +5037,8 @@
                     "properties": [
                         {
                             "name": "text",
-                            "description": "Container query text.",
+                            "description": "Container query text.\nContains the query part without the container name for a single query.\nDeprecated in favor of conditionText which contains the full prelude\nafter @container.",
+                            "deprecated": true,
                             "type": "string"
                         },
                         {
@@ -4935,6 +5082,11 @@
                             "description": "true if the query contains anchored() queries.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "conditionText",
+                            "description": "CSSContainerRule.conditionText",
+                            "type": "string"
                         }
                     ]
                 },
@@ -5327,7 +5479,8 @@
                             "enum": [
                                 "font-face",
                                 "font-feature-values",
-                                "font-palette-values"
+                                "font-palette-values",
+                                "counter-style"
                             ]
                         },
                         {
@@ -6253,7 +6406,33 @@
                 },
                 {
                     "name": "setContainerQueryText",
-                    "description": "Modifies the expression of a container query.",
+                    "description": "Modifies the expression of a container query.\nDeprecated. Use setContainerQueryConditionText instead.",
+                    "experimental": true,
+                    "deprecated": true,
+                    "parameters": [
+                        {
+                            "name": "styleSheetId",
+                            "$ref": "DOM.StyleSheetId"
+                        },
+                        {
+                            "name": "range",
+                            "$ref": "SourceRange"
+                        },
+                        {
+                            "name": "text",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "containerQuery",
+                            "description": "The resulting CSS container query rule after modification.",
+                            "$ref": "CSSContainerQuery"
+                        }
+                    ]
+                },
+                {
+                    "name": "setContainerQueryConditionText",
                     "experimental": true,
                     "parameters": [
                         {
@@ -11368,7 +11547,7 @@
                 },
                 {
                     "name": "setPressureStateOverride",
-                    "description": "TODO: OBSOLETE: To remove when setPressureDataOverride is merged.\nProvides a given pressure state that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
+                    "description": "Provides a given pressure state that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -11378,26 +11557,6 @@
                         {
                             "name": "state",
                             "$ref": "PressureState"
-                        }
-                    ]
-                },
-                {
-                    "name": "setPressureDataOverride",
-                    "description": "Provides a given pressure data set that will be processed and eventually be\ndelivered to PressureObserver users. |source| must have been previously\noverridden by setPressureSourceOverrideEnabled.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "source",
-                            "$ref": "PressureSource"
-                        },
-                        {
-                            "name": "state",
-                            "$ref": "PressureState"
-                        },
-                        {
-                            "name": "ownContributionEstimate",
-                            "optional": true,
-                            "type": "number"
                         }
                     ]
                 },
@@ -17851,7 +18010,8 @@
                         "InvalidConfigJson",
                         "InvalidFederatedSessionProviderFailedToRestoreKey",
                         "FailedToUnwrapKey",
-                        "SessionDeletedDuringRefresh"
+                        "SessionDeletedDuringRefresh",
+                        "CrossOriginRegistrationSiteNotIncluded"
                     ]
                 },
                 {
@@ -25560,7 +25720,8 @@
                         "PrefetchProxyNotAvailable",
                         "PrefetchResponseUsed",
                         "PrefetchSuccessfulButNotUsed",
-                        "PrefetchNotUsedProbeFailed"
+                        "PrefetchNotUsedProbeFailed",
+                        "PrefetchCancelledOnUserNavigation"
                     ]
                 },
                 {
@@ -28714,6 +28875,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "embedderData",
+                            "description": "Embedder-specific target metadata. This is only set for targets of\ntype \"tab\".",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "object"
                         }
                     ]
                 },
@@ -29235,7 +29403,7 @@
                         },
                         {
                             "name": "panelId",
-                            "description": "The id of the panel we want DevTools to open initially. Currently\nsupported panels are elements, console, network, sources, resources\nand performance.",
+                            "description": "The id of the panel we want DevTools to open initially. Currently\nsupported panels are elements, console, network, sources, resources,\ntimeline, chrome-recorder, heap-profiler, lighthouse, and security.",
                             "optional": true,
                             "type": "string"
                         }

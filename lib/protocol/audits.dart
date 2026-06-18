@@ -1013,6 +1013,7 @@ enum SharedDictionaryError {
   writeErrorNonSecureContext('WriteErrorNonSecureContext'),
   writeErrorNonStringIdField('WriteErrorNonStringIdField'),
   writeErrorNonStringInMatchDestList('WriteErrorNonStringInMatchDestList'),
+  writeErrorInvalidMatchDestList('WriteErrorInvalidMatchDestList'),
   writeErrorNonStringMatchField('WriteErrorNonStringMatchField'),
   writeErrorNonTokenTypeField('WriteErrorNonTokenTypeField'),
   writeErrorRequestAborted('WriteErrorRequestAborted'),
@@ -1072,7 +1073,11 @@ enum SRIMessageSignatureError {
   validationFailedSignatureExpired('ValidationFailedSignatureExpired'),
   validationFailedInvalidLength('ValidationFailedInvalidLength'),
   validationFailedSignatureMismatch('ValidationFailedSignatureMismatch'),
-  validationFailedIntegrityMismatch('ValidationFailedIntegrityMismatch');
+  validationFailedIntegrityMismatch('ValidationFailedIntegrityMismatch'),
+  signatureBaseUnknownDerivedComponent('SignatureBaseUnknownDerivedComponent'),
+  signatureBaseMissingHeader('SignatureBaseMissingHeader'),
+  signatureBaseInvalidUnencodedDigest('SignatureBaseInvalidUnencodedDigest'),
+  signatureBaseUnsupportedComponent('SignatureBaseUnsupportedComponent');
 
   final String value;
 
@@ -1374,6 +1379,7 @@ enum GenericIssueErrorType {
   ),
   responseWasBlockedByOrb('ResponseWasBlockedByORB'),
   navigationEntryMarkedSkippable('NavigationEntryMarkedSkippable'),
+  backUiNavigationWouldSkipAd('BackUINavigationWouldSkipAd'),
   autofillAndManualTextPolicyControlledFeaturesInfo(
     'AutofillAndManualTextPolicyControlledFeaturesInfo',
   ),
@@ -1715,6 +1721,126 @@ enum FederatedAuthUserInfoRequestIssueReason {
 
   factory FederatedAuthUserInfoRequestIssueReason.fromJson(String value) =>
       FederatedAuthUserInfoRequestIssueReason.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class EmailVerificationRequestIssueDetails {
+  final EmailVerificationRequestIssueReason emailVerificationRequestIssueReason;
+
+  EmailVerificationRequestIssueDetails({
+    required this.emailVerificationRequestIssueReason,
+  });
+
+  factory EmailVerificationRequestIssueDetails.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return EmailVerificationRequestIssueDetails(
+      emailVerificationRequestIssueReason:
+          EmailVerificationRequestIssueReason.fromJson(
+            json['emailVerificationRequestIssueReason'] as String,
+          ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'emailVerificationRequestIssueReason': emailVerificationRequestIssueReason
+          .toJson(),
+    };
+  }
+}
+
+/// Represents the failure reason when an email verification request fails.
+/// Should be updated alongside EmailVerificationRequestResult in
+/// third_party/blink/public/mojom/devtools/inspector_issue.mojom.
+enum EmailVerificationRequestIssueReason {
+  invalidEmail('InvalidEmail'),
+  dnsFetchFailed('DnsFetchFailed'),
+  dnsInvalidRecord('DnsInvalidRecord'),
+  wellKnownHttpNotFound('WellKnownHttpNotFound'),
+  wellKnownNoResponse('WellKnownNoResponse'),
+  wellKnownInvalidResponse('WellKnownInvalidResponse'),
+  wellKnownListEmpty('WellKnownListEmpty'),
+  wellKnownInvalidContentType('WellKnownInvalidContentType'),
+  wellKnownMissingIssuanceEndpoint('WellKnownMissingIssuanceEndpoint'),
+  wellKnownIssuanceEndpointCrossOrigin('WellKnownIssuanceEndpointCrossOrigin'),
+  wellKnownUnsupportedSigningAlgorithm('WellKnownUnsupportedSigningAlgorithm'),
+  tokenHttpNotFound('TokenHttpNotFound'),
+  tokenNoResponse('TokenNoResponse'),
+  tokenInvalidResponse('TokenInvalidResponse'),
+  tokenInvalidContentType('TokenInvalidContentType'),
+  tokenMalformedSdJwt('TokenMalformedSdJwt'),
+  tokenInvalidSdJwt('TokenInvalidSdJwt'),
+  keyBindingSigningFailed('KeyBindingSigningFailed'),
+  rpOriginIsOpaque('RpOriginIsOpaque'),
+  wellKnownMissingAccountsEndpoint('WellKnownMissingAccountsEndpoint'),
+  userLoggedOut('UserLoggedOut'),
+  wellKnownAccountsEndpointCrossOrigin('WellKnownAccountsEndpointCrossOrigin'),
+  accountsHttpNotFound('AccountsHttpNotFound'),
+  accountsNoResponse('AccountsNoResponse'),
+  accountsInvalidResponse('AccountsInvalidResponse'),
+  accountsInvalidContentType('AccountsInvalidContentType'),
+  accountsEmptyList('AccountsEmptyList'),
+  emailVerificationWellKnownHttpNotFound(
+    'EmailVerificationWellKnownHttpNotFound',
+  ),
+  emailVerificationWellKnownNoResponse('EmailVerificationWellKnownNoResponse'),
+  emailVerificationWellKnownInvalidResponse(
+    'EmailVerificationWellKnownInvalidResponse',
+  ),
+  emailVerificationWellKnownInvalidContentType(
+    'EmailVerificationWellKnownInvalidContentType',
+  ),
+  jwksHttpNotFound('JwksHttpNotFound'),
+  jwksInvalidResponse('JwksInvalidResponse'),
+  tokenVerificationSdJwtUnsupportedHeaderAlg(
+    'TokenVerificationSdJwtUnsupportedHeaderAlg',
+  ),
+  tokenVerificationSdJwtMissingIss('TokenVerificationSdJwtMissingIss'),
+  tokenVerificationSdJwtMissingIat('TokenVerificationSdJwtMissingIat'),
+  tokenVerificationSdJwtMissingCnf('TokenVerificationSdJwtMissingCnf'),
+  tokenVerificationSdJwtMissingEmail('TokenVerificationSdJwtMissingEmail'),
+  tokenVerificationSdJwtInvalidIssuedAt(
+    'TokenVerificationSdJwtInvalidIssuedAt',
+  ),
+  tokenVerificationSdJwtInvalidIssuer('TokenVerificationSdJwtInvalidIssuer'),
+  tokenVerificationSdJwtJwksMissingKeys(
+    'TokenVerificationSdJwtJwksMissingKeys',
+  ),
+  tokenVerificationSdJwtSignatureFailed(
+    'TokenVerificationSdJwtSignatureFailed',
+  ),
+  tokenVerificationSdJwtInvalidEmailVerified(
+    'TokenVerificationSdJwtInvalidEmailVerified',
+  ),
+  tokenVerificationSdJwtInvalidEmail('TokenVerificationSdJwtInvalidEmail'),
+  tokenVerificationSdJwtInvalidHolderKey(
+    'TokenVerificationSdJwtInvalidHolderKey',
+  ),
+  tokenVerificationKbInvalidTyp('TokenVerificationKbInvalidTyp'),
+  tokenVerificationKbMissingAud('TokenVerificationKbMissingAud'),
+  tokenVerificationKbMissingNonce('TokenVerificationKbMissingNonce'),
+  tokenVerificationKbMissingIat('TokenVerificationKbMissingIat'),
+  tokenVerificationKbMissingSdHash('TokenVerificationKbMissingSdHash'),
+  tokenVerificationKbInvalidIssuedAt('TokenVerificationKbInvalidIssuedAt'),
+  tokenVerificationKbInvalidAudience('TokenVerificationKbInvalidAudience'),
+  tokenVerificationKbInvalidNonce('TokenVerificationKbInvalidNonce'),
+  tokenVerificationKbInvalidSdHash('TokenVerificationKbInvalidSdHash'),
+  tokenVerificationKbMissingCnf('TokenVerificationKbMissingCnf'),
+  tokenVerificationKbSignatureFailed('TokenVerificationKbSignatureFailed');
+
+  final String value;
+
+  const EmailVerificationRequestIssueReason(this.value);
+
+  factory EmailVerificationRequestIssueReason.fromJson(String value) =>
+      EmailVerificationRequestIssueReason.values.firstWhere(
         (e) => e.value == value,
       );
 
@@ -2264,7 +2390,8 @@ enum InspectorIssueCode {
   performanceIssue('PerformanceIssue'),
   selectivePermissionsInterventionIssue(
     'SelectivePermissionsInterventionIssue',
-  );
+  ),
+  emailVerificationRequestIssue('EmailVerificationRequestIssue');
 
   final String value;
 
@@ -2342,6 +2469,9 @@ class InspectorIssueDetails {
   final SelectivePermissionsInterventionIssueDetails?
   selectivePermissionsInterventionIssueDetails;
 
+  final EmailVerificationRequestIssueDetails?
+  emailVerificationRequestIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2371,6 +2501,7 @@ class InspectorIssueDetails {
     this.permissionElementIssueDetails,
     this.performanceIssueDetails,
     this.selectivePermissionsInterventionIssueDetails,
+    this.emailVerificationRequestIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2535,6 +2666,13 @@ class InspectorIssueDetails {
                   as Map<String, dynamic>,
             )
           : null,
+      emailVerificationRequestIssueDetails:
+          json.containsKey('emailVerificationRequestIssueDetails')
+          ? EmailVerificationRequestIssueDetails.fromJson(
+              json['emailVerificationRequestIssueDetails']
+                  as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2611,6 +2749,9 @@ class InspectorIssueDetails {
       if (selectivePermissionsInterventionIssueDetails != null)
         'selectivePermissionsInterventionIssueDetails':
             selectivePermissionsInterventionIssueDetails!.toJson(),
+      if (emailVerificationRequestIssueDetails != null)
+        'emailVerificationRequestIssueDetails':
+            emailVerificationRequestIssueDetails!.toJson(),
     };
   }
 }

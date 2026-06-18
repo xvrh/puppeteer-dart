@@ -5992,7 +5992,10 @@ enum DeviceBoundSessionFetchResult {
     'InvalidFederatedSessionProviderFailedToRestoreKey',
   ),
   failedToUnwrapKey('FailedToUnwrapKey'),
-  sessionDeletedDuringRefresh('SessionDeletedDuringRefresh');
+  sessionDeletedDuringRefresh('SessionDeletedDuringRefresh'),
+  crossOriginRegistrationSiteNotIncluded(
+    'CrossOriginRegistrationSiteNotIncluded',
+  );
 
   final String value;
 
