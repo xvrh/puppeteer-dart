@@ -1,3 +1,19 @@
+## 3.24.0
+- Add the Locator API (`page.locator()` / `frame.locator()`). A locator
+  auto-waits for the element to be visible, stable and enabled, then retries the
+  whole action on failure. Supports `click`, `hover`, `fill`, `scroll`, `wait`
+  and `waitHandle`; the composable `map`, `filter` and `Locator.race`; and
+  configuration via `setTimeout`, `setVisibility`, `setWaitForEnabled`,
+  `setEnsureElementIsInTheViewport` and `setWaitForStableBoundingBox`. Also adds
+  `ElementHandle.asLocator()` and `page.locatorFunction()` /
+  `frame.locatorFunction()`.
+- Add Puppeteer-specific ("P") selectors, usable anywhere a selector is accepted
+  (`$`, `$$`, `$eval`, `$$eval`, `waitForSelector`, locators): `::-p-text(...)`,
+  `::-p-xpath(...)`, the deep combinators `>>>` and `>>>>` that pierce shadow
+  DOM, the legacy `text/`, `xpath/` and `pierce/` prefixes, and comma selector
+  lists. (`::-p-aria` and custom query handlers are not yet supported.)
+- `waitForFunction` now awaits asynchronous (`Promise`-returning) predicates.
+
 ## 3.23.0
 - Update to Chrome 148.0.7778.97.
 - `downloadChrome` is now safe to call concurrently across isolates and
