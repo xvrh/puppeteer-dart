@@ -69,6 +69,8 @@
   * [page.goto](#pagegoto)
   * [page.hover](#pagehoverstring-selector)
   * [page.isClosed](#pageisclosed)
+  * [page.locator](#pagelocatorstring-selector)
+  * [page.locatorFunction](#pagelocatorfunctionlanguagejs-string-pagefunction)
   * [page.mainFrame](#pagemainframe)
   * [page.metrics](#pagemetrics)
   * [page.onClose](#pageonclose)
@@ -168,6 +170,8 @@
   * [frame.goto](#framegoto)
   * [frame.hover](#framehoverstring-selector)
   * [frame.isDetached](#frameisdetached)
+  * [frame.locator](#framelocatorstring-selector)
+  * [frame.locatorFunction](#framelocatorfunctionlanguagejs-string-pagefunction)
   * [frame.name](#framename)
   * [frame.parentFrame](#frameparentframe)
   * [frame.select](#frameselectstring-selector-liststring-values)
@@ -200,6 +204,7 @@
   * [elementHandle.$$eval](#elementhandleeval)
   * [elementHandle.$eval](#elementhandleeval)
   * [elementHandle.$x](#elementhandlexstring-expression)
+  * [elementHandle.asLocator](#elementhandleaslocator)
   * [elementHandle.boundingBox](#elementhandleboundingbox)
   * [elementHandle.boxModel](#elementhandleboxmodel)
   * [elementHandle.click](#elementhandleclick)
@@ -213,6 +218,7 @@
   * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
   * [elementHandle.press](#elementhandlepress)
   * [elementHandle.screenshot](#elementhandlescreenshot)
+  * [elementHandle.scrollIntoViewIfNeeded](#elementhandlescrollintoviewifneeded)
   * [elementHandle.select](#elementhandleselectliststring-values)
   * [elementHandle.tap](#elementhandletap)
   * [elementHandle.type](#elementhandletypestring-text-duration-delay)
@@ -1355,6 +1361,37 @@ Indicates that the page has been closed.
 
 ```dart
 page.isClosed → bool
+```
+
+#### page.locator(String selector)
+Creates a [Locator] for the provided [selector].
+
+A locator auto-waits for the element to be present, visible and actionable
+and retries the whole action if it fails. See [Locator] for details.
+
+```dart
+await page.locator('button').click();
+```
+
+```dart
+page.locator(String selector) → Locator 
+```
+
+#### page.locatorFunction(@Language('js') String pageFunction)
+Creates a [Locator] for the provided JavaScript [pageFunction].
+
+The function is evaluated in the page repeatedly until it returns a truthy
+value; the locator then resolves to a handle for that value. The function
+may be asynchronous (return a `Promise`).
+
+```dart
+var ready = await page
+    .locatorFunction('() => document.querySelector(".ready")')
+    .waitHandle();
+```
+
+```dart
+page.locatorFunction(@Language('js') String pageFunction) → Locator 
 ```
 
 #### page.mainFrame
@@ -2989,6 +3026,23 @@ Returns `true` if the frame has been detached, or `false` otherwise.
 frame.isDetached → bool
 ```
 
+#### frame.locator(String selector)
+Creates a [Locator] for the provided [selector], scoped to this frame.
+
+See [Locator] and [Page.locator] for details.
+
+```dart
+frame.locator(String selector) → Locator 
+```
+
+#### frame.locatorFunction(@Language('js') String pageFunction)
+Creates a [Locator] for the provided JavaScript [pageFunction], scoped to
+this frame. See [Page.locatorFunction] for details.
+
+```dart
+frame.locatorFunction(@Language('js') String pageFunction) → Locator 
+```
+
 #### frame.name
 Returns frame's name attribute as specified in the tag.
 
@@ -3563,6 +3617,15 @@ If there are no such elements, the method will resolve to an empty array.
 elementHandle.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
+#### elementHandle.asLocator()
+Returns a [Locator] for this element handle. The locator applies the usual
+actionability preconditions (visibility, stability, etc.) when an action
+is performed.
+
+```dart
+elementHandle.asLocator() → Locator 
+```
+
 #### elementHandle.boundingBox
 This method returns the bounding box of the element (relative to the main
 frame), or `null` if the element is not visible.
@@ -3683,6 +3746,14 @@ See [Page.screenshot] for more info.
 
 ```dart
 elementHandle.screenshot({ScreenshotFormat? format, int? quality, bool? omitBackground}) → Future<List<int>> 
+```
+
+#### elementHandle.scrollIntoViewIfNeeded()
+Scrolls the element into view if it is not already, using the same
+actionability logic as [click].
+
+```dart
+elementHandle.scrollIntoViewIfNeeded() → Future<void> 
 ```
 
 #### elementHandle.select(List\<String> values)
