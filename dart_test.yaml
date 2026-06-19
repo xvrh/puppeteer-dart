@@ -3,11 +3,13 @@ tags:
 
 presets:
   ci:
-    # CI runs against a real Chrome on shared, CPU-contended runners. Several
-    # tests time out (30s) under event-loop starvation when many browser suites
-    # run at once — flakes that don't reproduce locally. Cap how many suites run
-    # in parallel to relieve the contention, and retry the rest before failing.
-    # A genuinely broken test still fails after all attempts; local `dart test`
-    # (no preset) keeps full concurrency and no retries so flakes stay visible.
-    concurrency: 2
+    # CI runs against a real Chrome on shared, CPU-contended runners. With
+    # parallel browser suites the event loop starves and timing-sensitive tests
+    # time out (e.g. a renderer-crash event queued behind a busy isolate) —
+    # flakes that don't reproduce locally and that retry can't fix because the
+    # contention persists across attempts. Run suites serially to remove the
+    # contention, and keep a retry as a safety net for anything residual. Local
+    # `dart test` (no preset) keeps full concurrency and no retries so flakes
+    # stay visible during development.
+    concurrency: 1
     retry: 3
