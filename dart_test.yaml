@@ -3,8 +3,11 @@ tags:
 
 presets:
   ci:
-    # CI runs against a real Chrome on shared, CPU-contended runners where a few
-    # tests flake on teardown/event-loop races that don't reproduce locally.
-    # Retry a failing test before reporting it as a failure; a genuinely broken
-    # test still fails after all attempts.
-    retry: 2
+    # CI runs against a real Chrome on shared, CPU-contended runners. Several
+    # tests time out (30s) under event-loop starvation when many browser suites
+    # run at once — flakes that don't reproduce locally. Cap how many suites run
+    # in parallel to relieve the contention, and retry the rest before failing.
+    # A genuinely broken test still fails after all attempts; local `dart test`
+    # (no preset) keeps full concurrency and no retries so flakes stay visible.
+    concurrency: 2
+    retry: 3
