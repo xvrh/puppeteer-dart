@@ -102,6 +102,14 @@ class Target {
 
   bool get isPage => _isPageTarget(_info);
 
+  /// Whether this is a browser-internal UI target rather than a user-facing one.
+  /// Newer Chrome exposes WebUI surfaces (the tab strip, toolbar, side panel) as
+  /// `browser_ui` targets at `chrome://<name>.top-chrome/`; they should not show
+  /// up in [Browser.targets], the target event streams or [Browser.pages].
+  bool get isInternalUi =>
+      _info.type == 'browser_ui' ||
+      (Uri.tryParse(url)?.host.endsWith('.top-chrome') ?? false);
+
   /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
   Future<Page?> get pageOrNull async {
     if (_isPageTarget(_info) && _pageFuture == null) {
