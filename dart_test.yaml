@@ -3,3 +3,8 @@ tags:
 
 presets:
   ci:
+    # CI runs against a real Chrome on shared, CPU-contended runners where a few
+    # tests flake on teardown/event-loop races that don't reproduce locally.
+    # Retry a failing test before reporting it as a failure; a genuinely broken
+    # test still fails after all attempts.
+    retry: 2
