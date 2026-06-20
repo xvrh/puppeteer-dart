@@ -1,0 +1,20 @@
+name: Pana
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  pana:
+    name: Check pana score
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 'stable'
+      - uses: actions/checkout@v4
+      - run: dart pub get
+      - run: dart pub global activate pana
+      - run: dart tool/check_pana.dart

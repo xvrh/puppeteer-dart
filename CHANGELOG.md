@@ -1,3 +1,6 @@
+## 3.25.1
+- Complete WASM compatibility: route `dart:isolate` through the same shim.
+
 ## 3.25.0
 - The package is now WASM-compatible, so `web` keeps full marks for platform
   support. `puppeteer.connect()` and page interaction over the DevTools
