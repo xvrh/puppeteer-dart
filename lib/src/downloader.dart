@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'io/io.dart';
 import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;

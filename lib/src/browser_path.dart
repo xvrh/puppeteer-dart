@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'io/io.dart';
 import 'package:path/path.dart' as p;
 import 'downloader.dart';
 

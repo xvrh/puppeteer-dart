@@ -1,4 +1,4 @@
-import 'dart:io';
+import '../io/io.dart';
 import 'dart:math';
 import '../../protocol/dom.dart';
 import '../../protocol/input.dart';

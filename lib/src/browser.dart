@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'io/io.dart';
 import 'package:async/async.dart';
 import 'package:pool/pool.dart';
 import '../plugin.dart';

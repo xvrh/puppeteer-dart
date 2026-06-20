@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import '../io/io.dart';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:async/async.dart';

@@ -1,4 +1,6 @@
-import 'websocket_io.dart' if (dart.library.html) 'websocket_html.dart' as ws;
+import 'websocket_io.dart'
+    if (dart.library.js_interop) 'websocket_html.dart'
+    as ws;
 
 abstract class WebSocket {
   static Future<WebSocket> connect(String url) {

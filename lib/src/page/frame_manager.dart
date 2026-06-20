@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import '../io/io.dart';
 import '../../protocol/network.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';

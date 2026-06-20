@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import '../io/io.dart';
 import 'package:logging/logging.dart';
 import '../../protocol/io.dart';
 import '../../protocol/runtime.dart';
