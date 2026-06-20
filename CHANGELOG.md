@@ -2,9 +2,10 @@
 - Fix `downloadChrome` on Windows: download coordination is now keyed per
   platform, so fetching multiple platforms of the same Chrome version (e.g.
   `windows32` and `windows64`) no longer collides on the `.downloading` rename.
-- Drop the `web` platform declaration: the package depends on `dart:io` to
-  launch and talk to Chrome and never actually ran on web. Supported platforms
-  are now Windows, Linux and macOS.
+- No longer advertise `web` in the `platforms` metadata. The package still
+  compiles under dart2js for the `puppeteer.connect()` use case, but it depends
+  on `dart:io` and is not WASM-compatible, so `web` is no longer listed as a
+  supported platform. Supported platforms are now Windows, Linux and macOS.
 
 ## 3.24.0
 - Add the Locator API (`page.locator()` / `frame.locator()`): auto-waits for the
