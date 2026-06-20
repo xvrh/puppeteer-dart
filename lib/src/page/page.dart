@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import '../io/io.dart';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:async/async.dart';
@@ -16,6 +15,7 @@ import '../../protocol/runtime.dart';
 import '../../protocol/target.dart';
 import '../browser.dart';
 import '../connection.dart';
+import '../io/io.dart';
 import '../target.dart';
 import '../utils/take_until.dart';
 import 'accessibility.dart';

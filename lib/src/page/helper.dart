@@ -1,8 +1,8 @@
 import 'dart:convert';
-import '../io/io.dart';
 import 'package:logging/logging.dart';
 import '../../protocol/io.dart';
 import '../../protocol/runtime.dart';
+import '../io/io.dart';
 import '../javascript_function_parser.dart';
 
 final _logger = Logger('puppeteer.helper');
