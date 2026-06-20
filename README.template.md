@@ -35,6 +35,7 @@ See [limitations with Flutter](#limitations-with-flutter) section.
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
+* [Use locators to interact with the page](#use-locators-to-interact-with-the-page)
 * [Execute JavaScript code](#execute-javascript-code)
 
 ### Launch Chrome
@@ -64,6 +65,15 @@ import 'example/screenshot_element.dart';
 ### Interact with the page and scrap content
 ```dart
 import 'example/search.dart';
+```
+
+### Use locators to interact with the page
+A `Locator` auto-waits for the element to be visible, stable and enabled before
+acting, and retries the whole action on failure. It also supports
+Puppeteer-specific selectors such as `::-p-text(...)`, `::-p-xpath(...)` and the
+deep `>>>` combinator that pierces shadow DOM.
+```dart
+import 'example/locator.dart';
 ```
 
 ### Create a static version of a Single Page Application

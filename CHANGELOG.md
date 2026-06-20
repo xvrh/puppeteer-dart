@@ -1,3 +1,16 @@
+## 3.24.0
+- Add the Locator API (`page.locator()` / `frame.locator()`): auto-waits for the
+  element and retries the whole action on failure. Includes `map`/`filter`/
+  `Locator.race`, `ElementHandle.asLocator()` and `page.locatorFunction()`.
+- Add Puppeteer-specific selectors anywhere a selector is accepted:
+  `::-p-text(...)`, `::-p-xpath(...)`, deep combinators `>>>`/`>>>>` (pierce
+  shadow DOM) and the `text/`/`xpath/`/`pierce/` prefixes. (`::-p-aria` not yet.)
+- `waitForFunction` now awaits asynchronous (`Promise`-returning) predicates.
+
+```dart
+await page.locator('::-p-text(Sign in)').click();
+```
+
 ## 3.23.0
 - Update to Chrome 148.0.7778.97.
 - `downloadChrome` is now safe to call concurrently across isolates and

@@ -8,7 +8,9 @@ import 'execution_context.dart';
 import 'frame_manager.dart';
 import 'helper.dart';
 import 'keyboard.dart';
+import 'locator.dart';
 import 'page.dart';
+import 'query_handler.dart' as query_handler;
 
 export '../../protocol/dom.dart' show BoxModel;
 
@@ -363,6 +365,16 @@ async function _(element, pageJavascriptEnabled) {
     return area.abs();
   }
 
+  /// Scrolls the element into view if it is not already, using the same
+  /// actionability logic as [click].
+  Future<void> scrollIntoViewIfNeeded() => _scrollIntoViewIfNeeded();
+
+  /// Returns a [Locator] for this element handle. The locator applies the usual
+  /// actionability preconditions (visibility, stability, etc.) when an action
+  /// is performed.
+  Locator asLocator() =>
+      NodeLocator.fromHandle(page, frame ?? page.mainFrame, this);
+
   Future<void> hover() async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
@@ -673,6 +685,9 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<ElementHandle?> $OrNull(String selector) async {
+    if (query_handler.isSpecialSelector(selector)) {
+      return query_handler.querySelectorOne(this, selector);
+    }
     var handle = await evaluateHandle(
       //language=js
       '(element, selector) => element.querySelector(selector);',
@@ -687,6 +702,9 @@ async function _(element, pageJavascriptEnabled) {
   /// The method runs `element.querySelectorAll` within the page. If no elements
   /// match the selector, the return value resolves to `[]`.
   Future<List<ElementHandle>> $$(String selector) async {
+    if (query_handler.isSpecialSelector(selector)) {
+      return query_handler.querySelectorAll(this, selector);
+    }
     var arrayHandle = await evaluateHandle(
       //language=js
       'function _(element, selector) {return element.querySelectorAll(selector);}',
@@ -772,11 +790,13 @@ async function _(element, pageJavascriptEnabled) {
     @Language('js') String pageFunction, {
     List<dynamic>? args,
   }) async {
-    var arrayHandle = await evaluateHandle(
-      //language=js
-      'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
-      args: [selector],
-    );
+    var arrayHandle = query_handler.isSpecialSelector(selector)
+        ? await query_handler.querySelectorAllHandle(this, selector)
+        : await evaluateHandle(
+            //language=js
+            'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
+            args: [selector],
+          );
 
     var result = await arrayHandle.evaluate<T>(pageFunction, args: args);
     await arrayHandle.dispose();

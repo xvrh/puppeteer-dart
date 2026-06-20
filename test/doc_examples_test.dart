@@ -238,6 +238,21 @@ void main() {
         ]);
       });
     });
+    test('locator', () async {
+      await page.setContent('<button>Click me</button>');
+      //---
+      await page.locator('button').click();
+      //---
+    });
+    test('locatorFunction', () async {
+      await page.setContent('<div class="ready"></div>');
+      //---
+      var ready = await page
+          .locatorFunction('() => document.querySelector(".ready")')
+          .waitHandle();
+      //---
+      expect(ready, isNotNull);
+    });
     test('emulate', () async {
       var iPhone = puppeteer.devices.iPhone6;
 
@@ -555,6 +570,14 @@ void main() {
         File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf')),
       ]);
       //----
+    });
+  });
+  group('Locator', () {
+    test('class', () async {
+      await page.setContent('<button>Click me</button>');
+      //---
+      await page.locator('button').click();
+      //---
     });
   });
   group('Frame', () {

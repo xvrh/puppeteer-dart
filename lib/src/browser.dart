@@ -156,6 +156,12 @@ class Browser {
 
   void _onAttachedToTarget(Target target) async {
     if (await target.initialized) {
+      // The internal `browser_ui` toolbar attaches as a urlless `other` target
+      // and only later reclassifies to `browser_ui`/`chrome://...top-chrome/`,
+      // so it isn't caught by [Target.isInternalUi] yet. A real page/worker
+      // always reaches here with a url (pages aren't "initialized" until then),
+      // so a urlless target at this point is the internal surface.
+      if (target.isInternalUi || target.url.isEmpty) return;
       if (!_onTargetCreatedController.isClosed) {
         _onTargetCreatedController.add(target);
       }
@@ -165,6 +171,7 @@ class Browser {
   void _onDetachedFromTarget(Target target) async {
     target.onDestroyed();
     if (await target.initialized) {
+      if (target.isInternalUi) return;
       _onTargetDestroyedController.add(target);
     }
   }
@@ -176,6 +183,7 @@ class Browser {
     var previousURL = target.url;
     var wasInitialized = target.isInitialized;
     target.changeInfo(info);
+    if (target.isInternalUi) return;
     if (wasInitialized && previousURL != target.url) {
       _onTargetChangedController.add(target);
     }
@@ -214,7 +222,7 @@ class Browser {
   List<Target> get targets => _targetManager
       .availableTargets()
       .values
-      .where((target) => target.isInitialized)
+      .where((target) => target.isInitialized && !target.isInternalUi)
       .toList();
 
   /// A target associated with the browser.

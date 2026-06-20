@@ -6,6 +6,7 @@ import 'frame_manager.dart';
 import 'js_handle.dart';
 import 'lifecycle_watcher.dart';
 import 'mouse.dart';
+import 'query_handler.dart' as query_handler;
 
 class DomWorld {
   final FrameManager frameManager;
@@ -366,6 +367,14 @@ async function _(content) {
     bool? hidden,
     Duration? timeout,
   }) {
+    if (query_handler.isSpecialSelector(selector)) {
+      return _waitForPSelector(
+        selector,
+        visible: visible,
+        hidden: hidden,
+        timeout: timeout,
+      );
+    }
     return _waitForSelectorOrXPath(
       selector,
       isXPath: false,
@@ -373,6 +382,38 @@ async function _(content) {
       hidden: hidden,
       timeout: timeout,
     );
+  }
+
+  Future<ElementHandle?> _waitForPSelector(
+    String selector, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) async {
+    query_handler.checkSelectorSupported(selector);
+    var kind = query_handler.legacyKind(selector);
+    var value = kind != null ? selector.substring(kind.length + 1) : selector;
+    var waitForVisible = visible ?? false;
+    var waitForHidden = hidden ?? false;
+
+    var polling = waitForVisible || waitForHidden
+        ? Polling.everyFrame
+        : Polling.mutation;
+    var title = 'selector "$selector"${waitForHidden ? ' to be hidden' : ''}';
+    var waitTask = WaitTask(
+      this,
+      query_handler.pSelectorWaitPredicate,
+      title: title,
+      polling: polling,
+      timeout: timeout ?? frameManager.page.defaultTimeout,
+      predicateArgs: [value, kind ?? '', waitForVisible, waitForHidden],
+    );
+    var handle = await waitTask.future;
+    if (handle.asElement == null) {
+      await handle.dispose();
+      return null;
+    }
+    return handle.asElement;
   }
 
   Future<ElementHandle?> waitForXPath(
@@ -591,22 +632,28 @@ async function _(predicateBody, polling, timeout, ...args) {
   /**
    * @return {!Promise<*>}
    */
-  function pollMutation() {
-    const success = predicate.apply(null, args);
+  async function pollMutation() {
+    const success = await predicate.apply(null, args);
     if (success)
-      return Promise.resolve(success);
+      return success;
 
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
-    const observer = new MutationObserver(mutations => {
-      if (timedOut) {
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
+    const observer = new MutationObserver(async () => {
+      try {
+        if (timedOut) {
+          observer.disconnect();
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success) {
+          observer.disconnect();
+          fulfill(success);
+        }
+      } catch (error) {
         observer.disconnect();
-        fulfill();
-      }
-      const success = predicate.apply(null, args);
-      if (success) {
-        observer.disconnect();
-        fulfill(success);
+        reject(error);
       }
     });
     observer.observe(document, {
@@ -621,21 +668,25 @@ async function _(predicateBody, polling, timeout, ...args) {
    * @return {!Promise<*>}
    */
   function pollRaf() {
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
     onRaf();
     return result;
 
-    function onRaf() {
-      if (timedOut) {
-        fulfill();
-        return;
+    async function onRaf() {
+      try {
+        if (timedOut) {
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success)
+          fulfill(success);
+        else
+          requestAnimationFrame(onRaf);
+      } catch (error) {
+        reject(error);
       }
-      const success = predicate.apply(null, args);
-      if (success)
-        fulfill(success);
-      else
-        requestAnimationFrame(onRaf);
     }
   }
 
@@ -644,21 +695,25 @@ async function _(predicateBody, polling, timeout, ...args) {
    * @return {!Promise<*>}
    */
   function pollInterval(pollInterval) {
-    let fulfill;
-    const result = new Promise(x => fulfill = x);
+    let fulfill, reject;
+    const result = new Promise((res, rej) => { fulfill = res; reject = rej; });
     onTimeout();
     return result;
 
-    function onTimeout() {
-      if (timedOut) {
-        fulfill();
-        return;
+    async function onTimeout() {
+      try {
+        if (timedOut) {
+          fulfill();
+          return;
+        }
+        const success = await predicate.apply(null, args);
+        if (success)
+          fulfill(success);
+        else
+          setTimeout(onTimeout, pollInterval);
+      } catch (error) {
+        reject(error);
       }
-      const success = predicate.apply(null, args);
-      if (success)
-        fulfill(success);
-      else
-        setTimeout(onTimeout, pollInterval);
     }
   }
 }
