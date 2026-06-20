@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:async/async.dart';
 import 'package:pool/pool.dart';
 import '../plugin.dart';
@@ -7,6 +6,7 @@ import '../protocol/browser.dart';
 import '../protocol/system_info.dart';
 import '../protocol/target.dart';
 import 'connection.dart';
+import 'io/io.dart';
 import 'page/emulation_manager.dart';
 import 'page/page.dart';
 import 'target.dart';

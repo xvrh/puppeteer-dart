@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import '../io/io.dart';
 import '../javascript_function_parser.dart';
 import 'execution_context.dart';
 import 'frame_manager.dart';

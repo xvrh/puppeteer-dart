@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
+import 'io/io.dart';
 
 const _lastVersion = '150.0.7871.24';
 

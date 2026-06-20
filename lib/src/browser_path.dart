@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'downloader.dart';
+import 'io/io.dart';
 
 class BrowserPath {
   static final _chrome = _BrowserPath(

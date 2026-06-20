@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:math';
 import '../../protocol/dom.dart';
 import '../../protocol/input.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
+import '../io/io.dart';
 import 'execution_context.dart';
 import 'frame_manager.dart';
 import 'helper.dart';

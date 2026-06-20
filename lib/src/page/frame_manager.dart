@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import '../../protocol/network.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
+import '../io/io.dart';
 import 'dom_world.dart';
 import 'execution_context.dart';
 import 'js_handle.dart';

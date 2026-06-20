@@ -1,3 +1,13 @@
+## 3.25.0
+- The package is now WASM-compatible, so `web` keeps full marks for platform
+  support. `puppeteer.connect()` and page interaction over the DevTools
+  websocket can be compiled to WebAssembly (`dart compile wasm`). Internally,
+  `dart:io` is now reached through a conditional shim that re-exports the real
+  `dart:io` on native platforms (so the public API is unchanged there) and a
+  stub on web/WASM. On web/WASM, `puppeteer.launch()`, `downloadChrome` and the
+  `File`/`IOSink` convenience overloads throw `UnsupportedError` — only
+  `connect()` and CDP-based page interaction are supported.
+
 ## 3.24.1
 - Fix `downloadChrome` on Windows: download coordination is now keyed per
   platform, so fetching multiple platforms of the same Chrome version (e.g.

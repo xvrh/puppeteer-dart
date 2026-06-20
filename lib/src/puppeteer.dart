@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
@@ -10,6 +9,7 @@ import 'connection.dart';
 import 'devices.dart';
 import 'devices.dart' as devices_lib;
 import 'downloader.dart';
+import 'io/io.dart';
 import 'page/emulation_manager.dart';
 import 'plugin.dart';
 import 'target.dart';
