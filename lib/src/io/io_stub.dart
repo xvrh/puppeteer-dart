@@ -238,3 +238,6 @@ IOSink get stdout => _unsupported('stdout');
 IOSink get stderr => _unsupported('stderr');
 
 int exitCode = 0;
+
+/// No package config is available on the web/WASM platform.
+Uri? packageConfigSync() => null;

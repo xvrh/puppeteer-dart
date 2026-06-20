@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
@@ -31,7 +30,7 @@ class DownloadedBrowserInfo {
 /// When no package config is available — which is the case for AOT-compiled
 /// executables — this falls back to an OS-appropriate user cache directory.
 String defaultBrowserCachePath() {
-  final config = Isolate.packageConfigSync;
+  final config = packageConfigSync();
   if (config != null) {
     return config.resolve('puppeteer/local-chrome/').toFilePath();
   }
