@@ -1,11 +1,4 @@
 @Timeout.factor(4)
-// On Windows the Chrome download fails to rename its `.downloading` temp dir
-// (OS Error 183 — the dir is locked/already exists), so this test is broken on
-// Windows runners. Downloading every platform's Chrome is still exercised on
-// Linux and macOS.
-@OnPlatform({
-  'windows': Skip('Chrome download .downloading rename collides on Windows'),
-})
 library;
 
 import 'dart:io';
