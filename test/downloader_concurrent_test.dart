@@ -192,7 +192,7 @@ void main() {
     );
 
     test('stale lock file is recovered after staleThreshold', () async {
-      File(p.join(tmp.path, '1.0.0.downloading.lock')).createSync();
+      File(p.join(tmp.path, '1.0.0.chrome.downloading.lock')).createSync();
       // Wait so the lock file's mtime is older than the staleThreshold below.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 

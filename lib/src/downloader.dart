@@ -143,15 +143,25 @@ Future<DownloadedBrowserInfo> downloadChrome({
 /// Coordinates a browser download into [cachePath]/[version], ensuring at most
 /// one caller (across isolates and processes) actually runs [download].
 ///
-/// Coordination uses the filesystem so it works across processes: the owning
-/// caller creates a `<version>.downloading` directory (atomic mkdir), runs
-/// [download] inside it, then atomically renames it to `<version>`. Other
-/// concurrent callers detect the existing directory and poll until the
-/// executable appears (or until the dir is cleaned up after a failure).
+/// Coordination uses the filesystem so it works across processes, and is keyed
+/// per-platform: the install lives in `<version>/<subfolder>` where `subfolder`
+/// is the first path segment of [executableRelPath] (e.g. `chrome-win64`).
+/// Several platforms of the same Chrome version therefore share a single
+/// `<version>/` directory but never contend, which matters when (for example)
+/// `windows32` and `windows64` of one version are fetched at once.
 ///
-/// [staleThreshold] guards against orphaned `<version>.downloading` directories
-/// left behind by a crashed prior caller; if the directory's mtime is older
-/// than this, it is removed and ownership is retried.
+/// The owning caller grabs a per-platform lock file (atomic create-exclusive),
+/// runs [download] inside a `<version>.<subfolder>.downloading` directory, then
+/// publishes the result: if `<version>/` does not exist yet it atomically
+/// renames the whole temp directory into place (so `<version>` appears only
+/// when fully populated); otherwise it moves just its own `<subfolder>` into the
+/// existing `<version>/`. Other concurrent callers for the same platform poll
+/// until the executable appears (or until the lock is cleaned up after a
+/// failure).
+///
+/// [staleThreshold] guards against an orphaned lock file left behind by a
+/// crashed prior caller; if the lock's mtime is older than this, it is removed
+/// and ownership is retried.
 ///
 /// [waitTimeout] caps the total time a waiter will block.
 Future<DownloadedBrowserInfo> ensureBrowserDownloaded({
@@ -201,11 +211,18 @@ Future<DownloadedBrowserInfo> _runEnsureDownloaded({
 }) async {
   final versionDir = Directory(p.join(cachePath, version));
   final exeFile = File(p.join(versionDir.path, executableRelPath));
-  final downloadingDir = Directory(p.join(cachePath, '$version.downloading'));
+  // Top-level folder the archive extracts into, e.g. `chrome-win64`. Each
+  // platform of a given version owns a distinct subfolder, so coordination is
+  // keyed on it: `windows32` and `windows64` of the same version share the
+  // `<version>/` directory but never collide on the marker/lock below.
+  final installSubdir = p.split(executableRelPath).first;
+  final installDir = Directory(p.join(versionDir.path, installSubdir));
+  final marker = '$version.$installSubdir';
+  final downloadingDir = Directory(p.join(cachePath, '$marker.downloading'));
   // Lock file is the atomic mutex. File.createSync(exclusive: true) maps to
   // O_CREAT|O_EXCL on POSIX and CREATE_NEW on Windows, both atomic across
   // processes and isolates.
-  final lockFile = File(p.join(cachePath, '$version.downloading.lock'));
+  final lockFile = File(p.join(cachePath, '$marker.downloading.lock'));
 
   DownloadedBrowserInfo result() => DownloadedBrowserInfo(
     executablePath: exeFile.path,
@@ -238,12 +255,13 @@ Future<DownloadedBrowserInfo> _runEnsureDownloaded({
 
     if (weOwn) {
       try {
-        // Clean any leftover state from a prior failed attempt.
+        // Clean any leftover state from a prior failed attempt. Only touch our
+        // own platform's subfolder — sibling platforms share <version>/.
         _safeDelete(downloadingDir);
-        if (versionDir.existsSync() && !exeFile.existsSync()) {
-          // <version>/ exists without exe — anomalous (rename is atomic).
-          // Clean it up so our atomic rename below can succeed.
-          _safeDelete(versionDir);
+        if (installDir.existsSync() && !exeFile.existsSync()) {
+          // Our <version>/<subfolder> exists without exe — anomalous (the
+          // publish step is atomic). Clean it so we can republish below.
+          _safeDelete(installDir);
         }
         downloadingDir.createSync(recursive: true);
 
@@ -256,15 +274,13 @@ Future<DownloadedBrowserInfo> _runEnsureDownloaded({
           );
         }
 
-        try {
-          await downloadingDir.rename(versionDir.path);
-        } on FileSystemException {
-          if (versionDir.existsSync() && exeFile.existsSync()) {
-            _safeDelete(downloadingDir);
-          } else {
-            rethrow;
-          }
-        }
+        await _publish(
+          downloadingDir: downloadingDir,
+          versionDir: versionDir,
+          installDir: installDir,
+          installSubdir: installSubdir,
+          exeFile: exeFile,
+        );
         return result();
       } finally {
         _safeDelete(downloadingDir); // no-op if rename succeeded
@@ -298,6 +314,44 @@ Future<DownloadedBrowserInfo> _runEnsureDownloaded({
       }
     }
   }
+}
+
+/// Moves a freshly downloaded platform from [downloadingDir] into the shared
+/// `<version>/` cache.
+///
+/// When `<version>/` doesn't exist yet, the whole temp directory is renamed
+/// atomically so the version directory only ever appears fully populated (the
+/// common single-platform case). When it already exists — because another
+/// platform of the same version is installed or installing — only this
+/// platform's `<subfolder>` is moved in, leaving siblings untouched.
+Future<void> _publish({
+  required Directory downloadingDir,
+  required Directory versionDir,
+  required Directory installDir,
+  required String installSubdir,
+  required File exeFile,
+}) async {
+  if (!versionDir.existsSync()) {
+    try {
+      await downloadingDir.rename(versionDir.path);
+      return;
+    } on FileSystemException {
+      // A sibling platform created <version>/ in between, or the rename across
+      // the (now-existing) target failed; fall through to the per-subfolder
+      // move below.
+    }
+  }
+
+  // <version>/ already holds another platform — graft just our subfolder in.
+  versionDir.createSync(recursive: true);
+  if (installDir.existsSync() && exeFile.existsSync()) {
+    // Another caller already produced our platform's install; nothing to do.
+    return;
+  }
+  _safeDelete(installDir); // clear any partial leftover
+  await Directory(
+    p.join(downloadingDir.path, installSubdir),
+  ).rename(installDir.path);
 }
 
 bool _isStaleFile(File f, Duration threshold) {
