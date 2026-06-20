@@ -10,7 +10,6 @@ funding:
 platforms:
   linux:
   macos:
-  web:
   windows:
 
 environment:
