@@ -10677,7 +10677,7 @@
             "experimental": true,
             "types": [
                 {
-                    "id": "VirtualWalletBehavior",
+                    "id": "VirtualWalletAction",
                     "description": "The type of virtual wallet action.",
                     "type": "string",
                     "enum": [
@@ -10694,21 +10694,27 @@
                     "description": "Sets the behavior of the virtual wallet for digital credential requests\nissued from this frame.",
                     "parameters": [
                         {
-                            "name": "behavior",
-                            "description": "The behavior of the virtual wallet.",
-                            "$ref": "VirtualWalletBehavior"
+                            "name": "action",
+                            "description": "The action of the virtual wallet.",
+                            "$ref": "VirtualWalletAction"
                         },
                         {
                             "name": "protocol",
-                            "description": "The protocol identifier (e.g. \"openid4vp\"). Required when |behavior| is\n\"respond\", forbidden otherwise.",
+                            "description": "The protocol identifier (e.g. \"openid4vp\"). Required when |action| is\n\"respond\", forbidden otherwise.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "response",
-                            "description": "The response data object returned by the wallet.\nRequired when |behavior| is \"respond\", forbidden otherwise.",
+                            "description": "The response data object returned by the wallet.\nRequired when |action| is \"respond\", forbidden otherwise.",
                             "optional": true,
                             "type": "object"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The frame to scope the virtual wallet behavior to.",
+                            "optional": true,
+                            "$ref": "Page.FrameId"
                         }
                     ]
                 }
@@ -18145,7 +18151,10 @@
                         "InvalidFederatedSessionProviderFailedToRestoreKey",
                         "FailedToUnwrapKey",
                         "SessionDeletedDuringRefresh",
-                        "CrossOriginRegistrationSiteNotIncluded"
+                        "CrossOriginRegistrationSiteNotIncluded",
+                        "InvalidPreProvisionedKeyInitiatorMissing",
+                        "PreProvisionedKeyAccessNotGranted",
+                        "PreProvisionedKeyNotFound"
                     ]
                 },
                 {
