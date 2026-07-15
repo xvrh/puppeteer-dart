@@ -1616,33 +1616,6 @@
                     ]
                 },
                 {
-                    "id": "AttributionReportingIssueType",
-                    "type": "string",
-                    "enum": [
-                        "PermissionPolicyDisabled",
-                        "UntrustworthyReportingOrigin",
-                        "InsecureContext",
-                        "InvalidHeader",
-                        "InvalidRegisterTriggerHeader",
-                        "SourceAndTriggerHeaders",
-                        "SourceIgnored",
-                        "TriggerIgnored",
-                        "OsSourceIgnored",
-                        "OsTriggerIgnored",
-                        "InvalidRegisterOsSourceHeader",
-                        "InvalidRegisterOsTriggerHeader",
-                        "WebAndOsHeaders",
-                        "NoWebOrOsSupport",
-                        "NavigationRegistrationWithoutTransientUserActivation",
-                        "InvalidInfoHeader",
-                        "NoRegisterSourceHeader",
-                        "NoRegisterTriggerHeader",
-                        "NoRegisterOsSourceHeader",
-                        "NoRegisterOsTriggerHeader",
-                        "NavigationRegistrationUniqueScopeAlreadySet"
-                    ]
-                },
-                {
                     "id": "SharedDictionaryError",
                     "type": "string",
                     "enum": [
@@ -1725,32 +1698,6 @@
                         "InvalidAllowlistItemType",
                         "ReportingEndpointNotToken",
                         "InvalidUrlPattern"
-                    ]
-                },
-                {
-                    "id": "AttributionReportingIssueDetails",
-                    "description": "Details for issues around \"Attribution Reporting API\" usage.\nExplainer: https://github.com/WICG/attribution-reporting-api",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "violationType",
-                            "$ref": "AttributionReportingIssueType"
-                        },
-                        {
-                            "name": "request",
-                            "optional": true,
-                            "$ref": "AffectedRequest"
-                        },
-                        {
-                            "name": "violatingNodeId",
-                            "optional": true,
-                            "$ref": "DOM.BackendNodeId"
-                        },
-                        {
-                            "name": "invalidParameter",
-                            "optional": true,
-                            "type": "string"
-                        }
                     ]
                 },
                 {
@@ -2444,6 +2391,28 @@
                     ]
                 },
                 {
+                    "id": "LazyLoadImageIssueDetails",
+                    "description": "Details for issues about lazy-loaded images without explicit dimensions.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "nodeId",
+                            "description": "DOM node of the problematic HTMLImageElement.",
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "url",
+                            "description": "URL or src attribute of the image.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame containing the image.",
+                            "$ref": "Page.FrameId"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -2455,7 +2424,6 @@
                         "ContentSecurityPolicyIssue",
                         "SharedArrayBufferIssue",
                         "CorsIssue",
-                        "AttributionReportingIssue",
                         "QuirksModeIssue",
                         "PartitioningBlobURLIssue",
                         "NavigatorUserAgentIssue",
@@ -2477,7 +2445,8 @@
                         "PermissionElementIssue",
                         "PerformanceIssue",
                         "SelectivePermissionsInterventionIssue",
-                        "EmailVerificationRequestIssue"
+                        "EmailVerificationRequestIssue",
+                        "LazyLoadImageIssue"
                     ]
                 },
                 {
@@ -2519,11 +2488,6 @@
                             "name": "corsIssueDetails",
                             "optional": true,
                             "$ref": "CorsIssueDetails"
-                        },
-                        {
-                            "name": "attributionReportingIssueDetails",
-                            "optional": true,
-                            "$ref": "AttributionReportingIssueDetails"
                         },
                         {
                             "name": "quirksModeIssueDetails",
@@ -2635,6 +2599,11 @@
                             "name": "emailVerificationRequestIssueDetails",
                             "optional": true,
                             "$ref": "EmailVerificationRequestIssueDetails"
+                        },
+                        {
+                            "name": "lazyLoadImageIssueDetails",
+                            "optional": true,
+                            "$ref": "LazyLoadImageIssueDetails"
                         }
                     ]
                 },
@@ -18228,7 +18197,6 @@
                                 "InitializedService",
                                 "Unreachable",
                                 "ServerError",
-                                "RefreshQuotaExceeded",
                                 "FatalError",
                                 "SigningQuotaExceeded",
                                 "RefreshedAsWaiter",
@@ -22000,7 +21968,6 @@
                         "all-screens-capture",
                         "ambient-light-sensor",
                         "aria-notify",
-                        "attribution-reporting",
                         "autofill",
                         "autoplay",
                         "bluetooth",
