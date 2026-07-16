@@ -835,11 +835,20 @@ class DOMApi {
   /// [nodeId] Id of the popover HTMLElement
   /// [enable] If true, opens the popover and keeps it open. If false, closes the
   /// popover if it was previously force-opened.
+  /// [invokerNodeId] Optional ID of the element invoking this popover, used to establish the implicit anchor.
+  /// If not provided, it will fall back to the first invoker in the document, preferring
+  /// elements with a popovertarget attribute over those with a commandfor attribute. Note that
+  /// if there are multiple invokers, this is just an estimate.
   /// Returns: List of popovers that were closed in order to respect popover stacking order.
-  Future<List<NodeId>> forceShowPopover(NodeId nodeId, bool enable) async {
+  Future<List<NodeId>> forceShowPopover(
+    NodeId nodeId,
+    bool enable, {
+    BackendNodeId? invokerNodeId,
+  }) async {
     var result = await _client.send('DOM.forceShowPopover', {
       'nodeId': nodeId,
       'enable': enable,
+      if (invokerNodeId != null) 'invokerNodeId': invokerNodeId,
     });
     return (result['nodeIds'] as List)
         .map((e) => NodeId.fromJson(e as int))
@@ -1333,8 +1342,11 @@ enum PseudoType {
   fileSelectorButton('file-selector-button'),
   detailsContent('details-content'),
   picker('picker'),
+  selectListbox('select-listbox'),
   permissionIcon('permission-icon'),
-  overscrollAreaParent('overscroll-area-parent');
+  overscrollAreaParent('overscroll-area-parent'),
+  overscrollBackdrop('overscroll-backdrop'),
+  skeleton('skeleton');
 
   final String value;
 

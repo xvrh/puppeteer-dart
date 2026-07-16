@@ -296,17 +296,26 @@ class PageApi {
   /// [worldName] An optional name which is reported in the Execution Context.
   /// [grantUniveralAccess] Whether or not universal access should be granted to the isolated world. This is a powerful
   /// option, use with caution.
+  /// [contentSecurityPolicy] An optional content security policy to set for the isolated world.
+  /// If omitted, any existing CSP for the world will be cleared.
+  /// Note that clearing or updating the CSP does not immediately affect the active
+  /// context in the same document because LocalDOMWindow caches the
+  /// ContentSecurityPolicy object. The change takes effect on subsequent
+  /// navigations when a new window context is created.
   /// Returns: Execution context of the isolated world.
   Future<runtime.ExecutionContextId> createIsolatedWorld(
     FrameId frameId, {
     String? worldName,
     bool? grantUniveralAccess,
+    String? contentSecurityPolicy,
   }) async {
     var result = await _client.send('Page.createIsolatedWorld', {
       'frameId': frameId,
       if (worldName != null) 'worldName': worldName,
       if (grantUniveralAccess != null)
         'grantUniveralAccess': grantUniveralAccess,
+      if (contentSecurityPolicy != null)
+        'contentSecurityPolicy': contentSecurityPolicy,
     });
     return runtime.ExecutionContextId.fromJson(
       result['executionContextId'] as int,
@@ -1829,7 +1838,6 @@ enum PermissionsPolicyFeature {
   digitalCredentialsGet('digital-credentials-get'),
   directSockets('direct-sockets'),
   directSocketsMulticast('direct-sockets-multicast'),
-  directSocketsPrivate('direct-sockets-private'),
   displayCapture('display-capture'),
   documentDomain('document-domain'),
   encryptedMedia('encrypted-media'),
@@ -1887,6 +1895,7 @@ enum PermissionsPolicyFeature {
   usbUnrestricted('usb-unrestricted'),
   verticalScroll('vertical-scroll'),
   webAppInstallation('web-app-installation'),
+  webnn('webnn'),
   webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
