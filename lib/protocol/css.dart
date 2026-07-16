@@ -1078,6 +1078,41 @@ class Value {
   }
 }
 
+/// Contribution of an individual simple selector to specificity.
+class SpecificityComponent {
+  /// The simple selector text that contributes to specificity.
+  final String text;
+
+  /// The a component contribution.
+  final int a;
+
+  /// The b component contribution.
+  final int b;
+
+  /// The c component contribution.
+  final int c;
+
+  SpecificityComponent({
+    required this.text,
+    required this.a,
+    required this.b,
+    required this.c,
+  });
+
+  factory SpecificityComponent.fromJson(Map<String, dynamic> json) {
+    return SpecificityComponent(
+      text: json['text'] as String,
+      a: json['a'] as int,
+      b: json['b'] as int,
+      c: json['c'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'text': text, 'a': a, 'b': b, 'c': c};
+  }
+}
+
 /// Specificity:
 /// https://drafts.csswg.org/selectors/#specificity-rules
 class Specificity {
@@ -1091,18 +1126,40 @@ class Specificity {
   /// The c component, which represents the number of type selectors and pseudo-elements.
   final int c;
 
-  Specificity({required this.a, required this.b, required this.c});
+  /// Per-simple-selector contributions used to explain this specificity.
+  final List<SpecificityComponent>? components;
+
+  Specificity({
+    required this.a,
+    required this.b,
+    required this.c,
+    this.components,
+  });
 
   factory Specificity.fromJson(Map<String, dynamic> json) {
     return Specificity(
       a: json['a'] as int,
       b: json['b'] as int,
       c: json['c'] as int,
+      components: json.containsKey('components')
+          ? (json['components'] as List)
+                .map(
+                  (e) =>
+                      SpecificityComponent.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'a': a, 'b': b, 'c': c};
+    return {
+      'a': a,
+      'b': b,
+      'c': c,
+      if (components != null)
+        'components': components!.map((e) => e.toJson()).toList(),
+    };
   }
 }
 

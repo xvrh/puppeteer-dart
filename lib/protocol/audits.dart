@@ -1802,6 +1802,7 @@ enum EmailVerificationRequestIssueReason {
   tokenVerificationSdJwtUnsupportedHeaderAlg(
     'TokenVerificationSdJwtUnsupportedHeaderAlg',
   ),
+  tokenVerificationSdJwtInvalidTyp('TokenVerificationSdJwtInvalidTyp'),
   tokenVerificationSdJwtMissingIss('TokenVerificationSdJwtMissingIss'),
   tokenVerificationSdJwtMissingIat('TokenVerificationSdJwtMissingIat'),
   tokenVerificationSdJwtMissingCnf('TokenVerificationSdJwtMissingCnf'),
@@ -2219,7 +2220,9 @@ enum PermissionElementIssueType {
   lowContrast('LowContrast'),
   fontSizeTooSmall('FontSizeTooSmall'),
   fontSizeTooLarge('FontSizeTooLarge'),
-  invalidSizeValue('InvalidSizeValue');
+  invalidSizeValue('InvalidSizeValue'),
+  nonSecureContext('NonSecureContext'),
+  missingTransientUserActivation('MissingTransientUserActivation');
 
   final String value;
 

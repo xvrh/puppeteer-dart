@@ -622,6 +622,9 @@ enum PrefetchStatus {
   prefetchIneligibleRetryAfter('PrefetchIneligibleRetryAfter'),
   prefetchIsPrivacyDecoy('PrefetchIsPrivacyDecoy'),
   prefetchIsStale('PrefetchIsStale'),
+  prefetchNotEligibleBlockedByConnectionAllowlist(
+    'PrefetchNotEligibleBlockedByConnectionAllowlist',
+  ),
   prefetchNotEligibleBrowserContextOffTheRecord(
     'PrefetchNotEligibleBrowserContextOffTheRecord',
   ),

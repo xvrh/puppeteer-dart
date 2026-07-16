@@ -169,13 +169,11 @@ class TargetApi {
   /// [hidden] Whether to create a hidden target. The hidden target is observable via protocol, but not
   /// present in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or
   /// `background: false`. The life-time of the tab is limited to the life-time of the session.
-  /// [focus] If specified, the option is used to determine if the new target should
-  /// be focused or not. By default, the focus behavior depends on the
-  /// value of the background field. For example, background=false and focus=false
-  /// will result in the target tab being opened but the browser window remain
-  /// unchanged (if it was in the background, it will remain in the background)
-  /// and background=false with focus=undefined will result in the window being focused.
-  /// Using background: true and focus: true is not supported and will result in an error.
+  /// [focus] If specified, determines whether the new target should be focused.
+  /// By default, the focus behavior depends on the `background` parameter:
+  /// - If `background` is false (default) and `focus` is omitted, the new target is focused and the browser window is brought to the foreground.
+  /// - If `background` is false and `focus` is false, the target is opened but the browser window's focus remains unchanged (e.g., if the window was in the background, it stays there).
+  /// - If `background` is true, setting `focus` to true is not supported and will result in an error.
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {

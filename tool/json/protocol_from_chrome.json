@@ -609,6 +609,34 @@
             ],
             "types": [
                 {
+                    "id": "AdFrameData",
+                    "description": "Ad frame data.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "frameId",
+                            "description": "The DevTools frame token.",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "initialOrigin",
+                            "description": "The initial origin of the frame. To minimize the payload size, this is\nonly sent once per frame.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "networkBytes",
+                            "description": "The network bytes of the frame.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "cpuTime",
+                            "description": "The CPU time of the frame, in milliseconds.",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
                     "id": "AdMetrics",
                     "description": "Ad metrics for a page.",
                     "type": "object",
@@ -642,6 +670,22 @@
                             "name": "totalAdNetworkBytes",
                             "description": "The total ad network bytes.",
                             "type": "number"
+                        },
+                        {
+                            "name": "updateAdFrames",
+                            "description": "The list of ad frames that have been updated since the last event.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdFrameData"
+                            }
+                        },
+                        {
+                            "name": "removeAdFrames",
+                            "description": "The list of ad frame IDs that have been removed since the last event.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Page.FrameId"
+                            }
                         }
                     ]
                 }
@@ -2082,6 +2126,7 @@
                         "JwksHttpNotFound",
                         "JwksInvalidResponse",
                         "TokenVerificationSdJwtUnsupportedHeaderAlg",
+                        "TokenVerificationSdJwtInvalidTyp",
                         "TokenVerificationSdJwtMissingIss",
                         "TokenVerificationSdJwtMissingIat",
                         "TokenVerificationSdJwtMissingCnf",
@@ -2317,7 +2362,9 @@
                         "LowContrast",
                         "FontSizeTooSmall",
                         "FontSizeTooLarge",
-                        "InvalidSizeValue"
+                        "InvalidSizeValue",
+                        "NonSecureContext",
+                        "MissingTransientUserActivation"
                     ]
                 },
                 {
@@ -4433,6 +4480,34 @@
                     ]
                 },
                 {
+                    "id": "SpecificityComponent",
+                    "description": "Contribution of an individual simple selector to specificity.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "text",
+                            "description": "The simple selector text that contributes to specificity.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "a",
+                            "description": "The a component contribution.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "b",
+                            "description": "The b component contribution.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "c",
+                            "description": "The c component contribution.",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "Specificity",
                     "description": "Specificity:\nhttps://drafts.csswg.org/selectors/#specificity-rules",
                     "experimental": true,
@@ -4452,6 +4527,16 @@
                             "name": "c",
                             "description": "The c component, which represents the number of type selectors and pseudo-elements.",
                             "type": "integer"
+                        },
+                        {
+                            "name": "components",
+                            "description": "Per-simple-selector contributions used to explain this specificity.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "SpecificityComponent"
+                            }
                         }
                     ]
                 },
@@ -7240,8 +7325,11 @@
                         "file-selector-button",
                         "details-content",
                         "picker",
+                        "select-listbox",
                         "permission-icon",
-                        "overscroll-area-parent"
+                        "overscroll-area-parent",
+                        "overscroll-backdrop",
+                        "skeleton"
                     ]
                 },
                 {
@@ -8852,6 +8940,12 @@
                             "name": "enable",
                             "description": "If true, opens the popover and keeps it open. If false, closes the\npopover if it was previously force-opened.",
                             "type": "boolean"
+                        },
+                        {
+                            "name": "invokerNodeId",
+                            "description": "Optional ID of the element invoking this popover, used to establish the implicit anchor.\nIf not provided, it will fall back to the first invoker in the document, preferring\nelements with a popovertarget attribute over those with a commandfor attribute. Note that\nif there are multiple invokers, this is just an estimate.",
+                            "optional": true,
+                            "$ref": "BackendNodeId"
                         }
                     ],
                     "returns": [
@@ -16752,10 +16846,6 @@
                     "enum": [
                         "None",
                         "UserSetting",
-                        "TPCDMetadata",
-                        "TPCDDeprecationTrial",
-                        "TopLevelTPCDDeprecationTrial",
-                        "TPCDHeuristics",
                         "EnterprisePolicy",
                         "StorageAccess",
                         "TopLevelStorageAccess",
@@ -20828,6 +20918,76 @@
                     ]
                 },
                 {
+                    "id": "DisplayCutoutShape",
+                    "description": "Supported display cutout shapes.",
+                    "type": "string",
+                    "enum": [
+                        "pill",
+                        "notch",
+                        "circle",
+                        "rectangle"
+                    ]
+                },
+                {
+                    "id": "DisplayCutoutConfig",
+                    "description": "Configuration for a display cutout.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "rect",
+                            "description": "A rectangle representing the cutout bounds.",
+                            "$ref": "DOM.Rect"
+                        },
+                        {
+                            "name": "shape",
+                            "description": "Shape used to draw the cutout.",
+                            "$ref": "DisplayCutoutShape"
+                        },
+                        {
+                            "name": "borderRadius",
+                            "description": "Border radius for rounded cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "upperRadius",
+                            "description": "Upper shoulder radius for notch cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "lowerRadius",
+                            "description": "Lower transition radius for notch cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "cx",
+                            "description": "Center x coordinate for circle cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "cy",
+                            "description": "Center y coordinate for circle cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "radius",
+                            "description": "Radius for circle cutout shapes.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "contentColor",
+                            "description": "The cutout fill color (default: black).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        }
+                    ]
+                },
+                {
                     "id": "WindowControlsOverlayConfig",
                     "description": "Configuration for Window Controls Overlay",
                     "type": "object",
@@ -21399,6 +21559,18 @@
                     ]
                 },
                 {
+                    "name": "setShowDisplayCutout",
+                    "description": "Add a display cutout overlay.",
+                    "parameters": [
+                        {
+                            "name": "displayCutoutConfig",
+                            "description": "display cutout data, null means hide display cutout",
+                            "optional": true,
+                            "$ref": "DisplayCutoutConfig"
+                        }
+                    ]
+                },
+                {
                     "name": "setShowIsolatedElements",
                     "description": "Show elements in isolation mode with overlays.",
                     "parameters": [
@@ -21818,7 +21990,6 @@
                         "digital-credentials-get",
                         "direct-sockets",
                         "direct-sockets-multicast",
-                        "direct-sockets-private",
                         "display-capture",
                         "document-domain",
                         "encrypted-media",
@@ -21876,6 +22047,7 @@
                         "usb-unrestricted",
                         "vertical-scroll",
                         "web-app-installation",
+                        "webnn",
                         "web-printing",
                         "web-share",
                         "window-management",
@@ -23520,6 +23692,12 @@
                             "description": "Whether or not universal access should be granted to the isolated world. This is a powerful\noption, use with caution.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "contentSecurityPolicy",
+                            "description": "An optional content security policy to set for the isolated world.\nIf omitted, any existing CSP for the world will be cleared.\nNote that clearing or updating the CSP does not immediately affect the active\ncontext in the same document because LocalDOMWindow caches the\nContentSecurityPolicy object. The change takes effect on subsequent\nnavigations when a new window context is created.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ],
                     "returns": [
@@ -25700,6 +25878,7 @@
                         "PrefetchIneligibleRetryAfter",
                         "PrefetchIsPrivacyDecoy",
                         "PrefetchIsStale",
+                        "PrefetchNotEligibleBlockedByConnectionAllowlist",
                         "PrefetchNotEligibleBrowserContextOffTheRecord",
                         "PrefetchNotEligibleDataSaverEnabled",
                         "PrefetchNotEligibleExistingProxy",
@@ -29177,7 +29356,7 @@
                         },
                         {
                             "name": "focus",
-                            "description": "If specified, the option is used to determine if the new target should\nbe focused or not. By default, the focus behavior depends on the\nvalue of the background field. For example, background=false and focus=false\nwill result in the target tab being opened but the browser window remain\nunchanged (if it was in the background, it will remain in the background)\nand background=false with focus=undefined will result in the window being focused.\nUsing background: true and focus: true is not supported and will result in an error.",
+                            "description": "If specified, determines whether the new target should be focused.\nBy default, the focus behavior depends on the `background` parameter:\n- If `background` is false (default) and `focus` is omitted, the new target is focused and the browser window is brought to the foreground.\n- If `background` is false and `focus` is false, the target is opened but the browser window's focus remains unchanged (e.g., if the window was in the background, it stays there).\n- If `background` is true, setting `focus` to true is not supported and will result in an error.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -29858,6 +30037,20 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "TracingBackend"
+                        },
+                        {
+                            "name": "screenshotMaxSize",
+                            "description": "Maximum width and height (in pixels) of each captured screenshot.\nOnly used when the `disabled-by-default-devtools.screenshot` category is\nenabled. Defaults to 500. The combined memory footprint of screenshots\n(`screenshotMaxSize` * `screenshotMaxSize` * 4 * `screenshotMaxCount`)\nis clamped to the existing per-session budget.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "screenshotMaxCount",
+                            "description": "Maximum number of screenshots captured during a single tracing session.\nOnly used when the `disabled-by-default-devtools.screenshot` category is\nenabled. Defaults to 450. Clamped together with `screenshotMaxSize` to\nstay within the per-session screenshot memory budget.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 }

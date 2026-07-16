@@ -362,6 +362,17 @@ class OverlayApi {
     });
   }
 
+  /// Add a display cutout overlay.
+  /// [displayCutoutConfig] display cutout data, null means hide display cutout
+  Future<void> setShowDisplayCutout({
+    DisplayCutoutConfig? displayCutoutConfig,
+  }) async {
+    await _client.send('Overlay.setShowDisplayCutout', {
+      if (displayCutoutConfig != null)
+        'displayCutoutConfig': displayCutoutConfig,
+    });
+  }
+
   /// Show elements in isolation mode with overlays.
   /// [isolatedElementHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
   Future<void> setShowIsolatedElements(
@@ -1182,6 +1193,104 @@ class HingeConfig {
       'rect': rect.toJson(),
       if (contentColor != null) 'contentColor': contentColor!.toJson(),
       if (outlineColor != null) 'outlineColor': outlineColor!.toJson(),
+    };
+  }
+}
+
+/// Supported display cutout shapes.
+enum DisplayCutoutShape {
+  pill('pill'),
+  notch('notch'),
+  circle('circle'),
+  rectangle('rectangle');
+
+  final String value;
+
+  const DisplayCutoutShape(this.value);
+
+  factory DisplayCutoutShape.fromJson(String value) =>
+      DisplayCutoutShape.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Configuration for a display cutout.
+class DisplayCutoutConfig {
+  /// A rectangle representing the cutout bounds.
+  final dom.Rect rect;
+
+  /// Shape used to draw the cutout.
+  final DisplayCutoutShape shape;
+
+  /// Border radius for rounded cutout shapes.
+  final int? borderRadius;
+
+  /// Upper shoulder radius for notch cutout shapes.
+  final int? upperRadius;
+
+  /// Lower transition radius for notch cutout shapes.
+  final int? lowerRadius;
+
+  /// Center x coordinate for circle cutout shapes.
+  final int? cx;
+
+  /// Center y coordinate for circle cutout shapes.
+  final int? cy;
+
+  /// Radius for circle cutout shapes.
+  final int? radius;
+
+  /// The cutout fill color (default: black).
+  final dom.RGBA? contentColor;
+
+  DisplayCutoutConfig({
+    required this.rect,
+    required this.shape,
+    this.borderRadius,
+    this.upperRadius,
+    this.lowerRadius,
+    this.cx,
+    this.cy,
+    this.radius,
+    this.contentColor,
+  });
+
+  factory DisplayCutoutConfig.fromJson(Map<String, dynamic> json) {
+    return DisplayCutoutConfig(
+      rect: dom.Rect.fromJson(json['rect'] as Map<String, dynamic>),
+      shape: DisplayCutoutShape.fromJson(json['shape'] as String),
+      borderRadius: json.containsKey('borderRadius')
+          ? json['borderRadius'] as int
+          : null,
+      upperRadius: json.containsKey('upperRadius')
+          ? json['upperRadius'] as int
+          : null,
+      lowerRadius: json.containsKey('lowerRadius')
+          ? json['lowerRadius'] as int
+          : null,
+      cx: json.containsKey('cx') ? json['cx'] as int : null,
+      cy: json.containsKey('cy') ? json['cy'] as int : null,
+      radius: json.containsKey('radius') ? json['radius'] as int : null,
+      contentColor: json.containsKey('contentColor')
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rect': rect.toJson(),
+      'shape': shape.toJson(),
+      if (borderRadius != null) 'borderRadius': borderRadius,
+      if (upperRadius != null) 'upperRadius': upperRadius,
+      if (lowerRadius != null) 'lowerRadius': lowerRadius,
+      if (cx != null) 'cx': cx,
+      if (cy != null) 'cy': cy,
+      if (radius != null) 'radius': radius,
+      if (contentColor != null) 'contentColor': contentColor!.toJson(),
     };
   }
 }
