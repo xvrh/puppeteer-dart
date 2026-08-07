@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:math';                                        // for Random()
+import 'package:puppeteer/lib/src/plugins/lib/random_user_agents.dart'; // for RandomUserAgents.random()
 import '../../puppeteer.dart';
 import '../plugin.dart';
 import '../puppeteer.dart';
 
-/// Applies various techniques to make detection of headless puppeteer harder.
 class StealthPlugin extends Plugin {
+  String? _sessionUa;            // Holds the one UA for this browser session
+  List<int>? _sessionViewport;   // Holds the one viewport [width, height]
+
   @override
   Future<void> pageCreated(Page page) async {
     var jsOnNewDocument = StringBuffer();
@@ -22,23 +26,46 @@ class StealthPlugin extends Plugin {
     }
     await page.evaluateOnNewDocument('function() { $jsOnNewDocument; }');
 
-    await _anonymizeUserAgent(page);
+    // Apply the session-wide random UA
+    await _setRandomUserAgent(page);
   }
 
-  Future<void> _anonymizeUserAgent(Page page) async {
-    var userAgent = await page.browser.userAgent;
-    userAgent = userAgent.replaceAll('HeadlessChrome/', 'Chrome/');
-    await page.setUserAgent(userAgent);
+  // Generates one UA per session and reuses it for all pages.
+  Future<void> _setRandomUserAgent(Page page) async {
+    _sessionUa ??= RandomUserAgents.random();           // first call picks UA
+    await page.setUserAgent(_sessionUa!);                // then always reuse it
   }
 
   @override
   LaunchOptions willLaunchBrowser(LaunchOptions options) {
-    // Have viewport match window size, unless specified by user
     if (options.defaultViewport == LaunchOptions.viewportNotSpecified) {
       options = options.replace(defaultViewport: null);
     }
 
+    //Pick one random resolution for the whole session
+    _sessionViewport ??= _pickRandomViewport();
+    options = options.replace(
+      defaultViewport: Viewport(
+        width: _sessionViewport![0],
+        height: _sessionViewport![1],
+      ),
+    );
+
     return options;
+  }
+
+  /// Returns one of the predefined resolutions at random.
+  List<int> _pickRandomViewport() {
+    const resolutions = [
+      [1920, 1080],
+      [1536, 864],
+      [1366, 768],
+      [1280, 720],
+      [1440, 900],
+      [2560, 1440],
+      [3840, 2160],
+    ];
+    return resolutions[Random().nextInt(resolutions.length)]; // dart:math Random()
   }
 }
 
