@@ -122,14 +122,15 @@ class FrameManager {
       return null;
     }
 
+    Object? error;
     try {
-      var error = await Future.any([navigate(), watcher.timeoutOrTermination]);
-
-      if (error != null) {
-        return Future.error(error);
-      }
+      error = await Future.any([navigate(), watcher.timeoutOrTermination]);
     } finally {
       watcher.dispose();
+    }
+
+    if (error != null) {
+      return Future.error(error);
     }
 
     return watcher.navigationResponse ??
@@ -147,18 +148,19 @@ class FrameManager {
       wait: wait,
       timeout: timeout ?? page.navigationTimeoutOrDefault,
     );
+    Exception? error;
     try {
-      var error = await Future.any([
+      error = await Future.any([
         watcher.timeoutOrTermination,
         watcher.sameDocumentNavigation,
         watcher.newDocumentNavigation,
       ]);
-
-      if (error != null) {
-        return Future.error(error);
-      }
     } finally {
       watcher.dispose();
+    }
+
+    if (error != null) {
+      return Future.error(error);
     }
 
     return watcher.navigationResponse ??
