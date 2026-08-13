@@ -22,8 +22,8 @@ class IOApi {
   Future<ReadResult> read(StreamHandle handle, {int? offset, int? size}) async {
     var result = await _client.send('IO.read', {
       'handle': handle,
-      if (offset != null) 'offset': offset,
-      if (size != null) 'size': size,
+      'offset': ?offset,
+      'size': ?size,
     });
     return ReadResult.fromJson(result);
   }

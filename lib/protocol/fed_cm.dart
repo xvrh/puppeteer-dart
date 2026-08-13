@@ -22,8 +22,7 @@ class FedCmApi {
   /// (step 4 of https://fedidcg.github.io/FedCM/#browser-api-rp-sign-in)
   Future<void> enable({bool? disableRejectionDelay}) async {
     await _client.send('FedCm.enable', {
-      if (disableRejectionDelay != null)
-        'disableRejectionDelay': disableRejectionDelay,
+      'disableRejectionDelay': ?disableRejectionDelay,
     });
   }
 
@@ -63,7 +62,7 @@ class FedCmApi {
   Future<void> dismissDialog(String dialogId, {bool? triggerCooldown}) async {
     await _client.send('FedCm.dismissDialog', {
       'dialogId': dialogId,
-      if (triggerCooldown != null) 'triggerCooldown': triggerCooldown,
+      'triggerCooldown': ?triggerCooldown,
     });
   }
 

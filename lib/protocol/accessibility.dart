@@ -53,10 +53,10 @@ class AccessibilityApi {
     bool? fetchRelatives,
   }) async {
     var result = await _client.send('Accessibility.getPartialAXTree', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (fetchRelatives != null) 'fetchRelatives': fetchRelatives,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'fetchRelatives': ?fetchRelatives,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -73,8 +73,8 @@ class AccessibilityApi {
     page.FrameId? frameId,
   }) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
-      if (depth != null) 'depth': depth,
-      if (frameId != null) 'frameId': frameId,
+      'depth': ?depth,
+      'frameId': ?frameId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -87,7 +87,7 @@ class AccessibilityApi {
   /// If omitted, the root frame is used.
   Future<AXNodeData> getRootAXNode({page.FrameId? frameId}) async {
     var result = await _client.send('Accessibility.getRootAXNode', {
-      if (frameId != null) 'frameId': frameId,
+      'frameId': ?frameId,
     });
     return AXNodeData.fromJson(result['node'] as Map<String, dynamic>);
   }
@@ -103,9 +103,9 @@ class AccessibilityApi {
     runtime.RemoteObjectId? objectId,
   }) async {
     var result = await _client.send('Accessibility.getAXNodeAndAncestors', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -122,7 +122,7 @@ class AccessibilityApi {
   }) async {
     var result = await _client.send('Accessibility.getChildAXNodes', {
       'id': id,
-      if (frameId != null) 'frameId': frameId,
+      'frameId': ?frameId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -149,11 +149,11 @@ class AccessibilityApi {
     String? role,
   }) async {
     var result = await _client.send('Accessibility.queryAXTree', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (accessibleName != null) 'accessibleName': accessibleName,
-      if (role != null) 'role': role,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'accessibleName': ?accessibleName,
+      'role': ?role,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))

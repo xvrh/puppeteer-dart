@@ -4,7 +4,6 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:pub_semver/pub_semver.dart' show Version;
 import 'dart_project.dart';
 
 void main() {
@@ -37,7 +36,7 @@ final DartFormatter _dartFormatter = DartFormatter(
 );
 
 final analyzerFeatureSet = FeatureSet.fromEnableFlags2(
-  sdkLanguageVersion: Version(3, 3, 0),
+  sdkLanguageVersion: DartFormatter.latestLanguageVersion,
   flags: ['inline-class'],
 );
 

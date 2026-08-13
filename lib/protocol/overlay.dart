@@ -84,11 +84,10 @@ class OverlayApi {
   }) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
       'nodeId': nodeId,
-      if (includeDistance != null) 'includeDistance': includeDistance,
-      if (includeStyle != null) 'includeStyle': includeStyle,
-      if (colorFormat != null) 'colorFormat': colorFormat,
-      if (showAccessibilityInfo != null)
-        'showAccessibilityInfo': showAccessibilityInfo,
+      'includeDistance': ?includeDistance,
+      'includeStyle': ?includeStyle,
+      'colorFormat': ?colorFormat,
+      'showAccessibilityInfo': ?showAccessibilityInfo,
     });
     return result['highlight'] as Map<String, dynamic>;
   }
@@ -138,9 +137,8 @@ class OverlayApi {
   }) async {
     await _client.send('Overlay.highlightFrame', {
       'frameId': frameId,
-      if (contentColor != null) 'contentColor': contentColor,
-      if (contentOutlineColor != null)
-        'contentOutlineColor': contentOutlineColor,
+      'contentColor': ?contentColor,
+      'contentOutlineColor': ?contentOutlineColor,
     });
   }
 
@@ -160,10 +158,10 @@ class OverlayApi {
   }) async {
     await _client.send('Overlay.highlightNode', {
       'highlightConfig': highlightConfig,
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (selector != null) 'selector': selector,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'selector': ?selector,
     });
   }
 
@@ -178,8 +176,8 @@ class OverlayApi {
   }) async {
     await _client.send('Overlay.highlightQuad', {
       'quad': quad,
-      if (color != null) 'color': color,
-      if (outlineColor != null) 'outlineColor': outlineColor,
+      'color': ?color,
+      'outlineColor': ?outlineColor,
     });
   }
 
@@ -206,8 +204,8 @@ class OverlayApi {
       'y': y,
       'width': width,
       'height': height,
-      if (color != null) 'color': color,
-      if (outlineColor != null) 'outlineColor': outlineColor,
+      'color': ?color,
+      'outlineColor': ?outlineColor,
     });
   }
 
@@ -225,9 +223,9 @@ class OverlayApi {
   }) async {
     await _client.send('Overlay.highlightSourceOrder', {
       'sourceOrderConfig': sourceOrderConfig,
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
   }
 
@@ -242,7 +240,7 @@ class OverlayApi {
   }) async {
     await _client.send('Overlay.setInspectMode', {
       'mode': mode,
-      if (highlightConfig != null) 'highlightConfig': highlightConfig,
+      'highlightConfig': ?highlightConfig,
     });
   }
 
@@ -255,7 +253,7 @@ class OverlayApi {
   /// [message] The message to display, also triggers resume and step over controls.
   Future<void> setPausedInDebuggerMessage({String? message}) async {
     await _client.send('Overlay.setPausedInDebuggerMessage', {
-      if (message != null) 'message': message,
+      'message': ?message,
     });
   }
 
@@ -357,9 +355,7 @@ class OverlayApi {
   /// Add a dual screen device hinge
   /// [hingeConfig] hinge data, null means hideHinge
   Future<void> setShowHinge({HingeConfig? hingeConfig}) async {
-    await _client.send('Overlay.setShowHinge', {
-      if (hingeConfig != null) 'hingeConfig': hingeConfig,
-    });
+    await _client.send('Overlay.setShowHinge', {'hingeConfig': ?hingeConfig});
   }
 
   /// Add a display cutout overlay.
@@ -368,8 +364,7 @@ class OverlayApi {
     DisplayCutoutConfig? displayCutoutConfig,
   }) async {
     await _client.send('Overlay.setShowDisplayCutout', {
-      if (displayCutoutConfig != null)
-        'displayCutoutConfig': displayCutoutConfig,
+      'displayCutoutConfig': ?displayCutoutConfig,
     });
   }
 
@@ -389,8 +384,7 @@ class OverlayApi {
     WindowControlsOverlayConfig? windowControlsOverlayConfig,
   }) async {
     await _client.send('Overlay.setShowWindowControlsOverlay', {
-      if (windowControlsOverlayConfig != null)
-        'windowControlsOverlayConfig': windowControlsOverlayConfig,
+      'windowControlsOverlayConfig': ?windowControlsOverlayConfig,
     });
   }
 }

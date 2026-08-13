@@ -30,9 +30,7 @@ class CastApi {
   /// Also starts observing for issue messages. When an issue is added or removed,
   /// an |issueUpdated| event is fired.
   Future<void> enable({String? presentationUrl}) async {
-    await _client.send('Cast.enable', {
-      if (presentationUrl != null) 'presentationUrl': presentationUrl,
-    });
+    await _client.send('Cast.enable', {'presentationUrl': ?presentationUrl});
   }
 
   /// Stops observing for sinks and issues.

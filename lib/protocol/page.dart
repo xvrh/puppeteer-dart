@@ -219,10 +219,9 @@ class PageApi {
   }) async {
     var result = await _client.send('Page.addScriptToEvaluateOnNewDocument', {
       'source': source,
-      if (worldName != null) 'worldName': worldName,
-      if (includeCommandLineAPI != null)
-        'includeCommandLineAPI': includeCommandLineAPI,
-      if (runImmediately != null) 'runImmediately': runImmediately,
+      'worldName': ?worldName,
+      'includeCommandLineAPI': ?includeCommandLineAPI,
+      'runImmediately': ?runImmediately,
     });
     return ScriptIdentifier.fromJson(result['identifier'] as String);
   }
@@ -250,13 +249,12 @@ class PageApi {
   }) async {
     assert(format == null || const ['jpeg', 'png', 'webp'].contains(format));
     var result = await _client.send('Page.captureScreenshot', {
-      if (format != null) 'format': format,
-      if (quality != null) 'quality': quality,
-      if (clip != null) 'clip': clip,
-      if (fromSurface != null) 'fromSurface': fromSurface,
-      if (captureBeyondViewport != null)
-        'captureBeyondViewport': captureBeyondViewport,
-      if (optimizeForSpeed != null) 'optimizeForSpeed': optimizeForSpeed,
+      'format': ?format,
+      'quality': ?quality,
+      'clip': ?clip,
+      'fromSurface': ?fromSurface,
+      'captureBeyondViewport': ?captureBeyondViewport,
+      'optimizeForSpeed': ?optimizeForSpeed,
     });
     return result['data'] as String;
   }
@@ -268,7 +266,7 @@ class PageApi {
   Future<String> captureSnapshot({@Enum(['mhtml']) String? format}) async {
     assert(format == null || const ['mhtml'].contains(format));
     var result = await _client.send('Page.captureSnapshot', {
-      if (format != null) 'format': format,
+      'format': ?format,
     });
     return result['data'] as String;
   }
@@ -311,11 +309,9 @@ class PageApi {
   }) async {
     var result = await _client.send('Page.createIsolatedWorld', {
       'frameId': frameId,
-      if (worldName != null) 'worldName': worldName,
-      if (grantUniveralAccess != null)
-        'grantUniveralAccess': grantUniveralAccess,
-      if (contentSecurityPolicy != null)
-        'contentSecurityPolicy': contentSecurityPolicy,
+      'worldName': ?worldName,
+      'grantUniveralAccess': ?grantUniveralAccess,
+      'contentSecurityPolicy': ?contentSecurityPolicy,
     });
     return runtime.ExecutionContextId.fromJson(
       result['executionContextId'] as int,
@@ -343,8 +339,7 @@ class PageApi {
   /// `Page.setInterceptFileChooserDialog` command (default: false).
   Future<void> enable({bool? enableFileChooserOpenedEvent}) async {
     await _client.send('Page.enable', {
-      if (enableFileChooserOpenedEvent != null)
-        'enableFileChooserOpenedEvent': enableFileChooserOpenedEvent,
+      'enableFileChooserOpenedEvent': ?enableFileChooserOpenedEvent,
     });
   }
 
@@ -355,7 +350,7 @@ class PageApi {
   ///   If there is not a loaded page, this API errors out immediately.
   Future<GetAppManifestResult> getAppManifest({String? manifestId}) async {
     var result = await _client.send('Page.getAppManifest', {
-      if (manifestId != null) 'manifestId': manifestId,
+      'manifestId': ?manifestId,
     });
     return GetAppManifestResult.fromJson(result);
   }
@@ -449,7 +444,7 @@ class PageApi {
   Future<void> handleJavaScriptDialog(bool accept, {String? promptText}) async {
     await _client.send('Page.handleJavaScriptDialog', {
       'accept': accept,
-      if (promptText != null) 'promptText': promptText,
+      'promptText': ?promptText,
     });
   }
 
@@ -468,10 +463,10 @@ class PageApi {
   }) async {
     var result = await _client.send('Page.navigate', {
       'url': url,
-      if (referrer != null) 'referrer': referrer,
-      if (transitionType != null) 'transitionType': transitionType,
-      if (frameId != null) 'frameId': frameId,
-      if (referrerPolicy != null) 'referrerPolicy': referrerPolicy,
+      'referrer': ?referrer,
+      'transitionType': ?transitionType,
+      'frameId': ?frameId,
+      'referrerPolicy': ?referrerPolicy,
     });
     return NavigateResult.fromJson(result);
   }
@@ -540,25 +535,23 @@ class PageApi {
           const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode),
     );
     var result = await _client.send('Page.printToPDF', {
-      if (landscape != null) 'landscape': landscape,
-      if (displayHeaderFooter != null)
-        'displayHeaderFooter': displayHeaderFooter,
-      if (printBackground != null) 'printBackground': printBackground,
-      if (scale != null) 'scale': scale,
-      if (paperWidth != null) 'paperWidth': paperWidth,
-      if (paperHeight != null) 'paperHeight': paperHeight,
-      if (marginTop != null) 'marginTop': marginTop,
-      if (marginBottom != null) 'marginBottom': marginBottom,
-      if (marginLeft != null) 'marginLeft': marginLeft,
-      if (marginRight != null) 'marginRight': marginRight,
-      if (pageRanges != null) 'pageRanges': pageRanges,
-      if (headerTemplate != null) 'headerTemplate': headerTemplate,
-      if (footerTemplate != null) 'footerTemplate': footerTemplate,
-      if (preferCSSPageSize != null) 'preferCSSPageSize': preferCSSPageSize,
-      if (transferMode != null) 'transferMode': transferMode,
-      if (generateTaggedPDF != null) 'generateTaggedPDF': generateTaggedPDF,
-      if (generateDocumentOutline != null)
-        'generateDocumentOutline': generateDocumentOutline,
+      'landscape': ?landscape,
+      'displayHeaderFooter': ?displayHeaderFooter,
+      'printBackground': ?printBackground,
+      'scale': ?scale,
+      'paperWidth': ?paperWidth,
+      'paperHeight': ?paperHeight,
+      'marginTop': ?marginTop,
+      'marginBottom': ?marginBottom,
+      'marginLeft': ?marginLeft,
+      'marginRight': ?marginRight,
+      'pageRanges': ?pageRanges,
+      'headerTemplate': ?headerTemplate,
+      'footerTemplate': ?footerTemplate,
+      'preferCSSPageSize': ?preferCSSPageSize,
+      'transferMode': ?transferMode,
+      'generateTaggedPDF': ?generateTaggedPDF,
+      'generateDocumentOutline': ?generateDocumentOutline,
     });
     return PrintToPDFResult.fromJson(result);
   }
@@ -576,10 +569,9 @@ class PageApi {
     network.LoaderId? loaderId,
   }) async {
     await _client.send('Page.reload', {
-      if (ignoreCache != null) 'ignoreCache': ignoreCache,
-      if (scriptToEvaluateOnLoad != null)
-        'scriptToEvaluateOnLoad': scriptToEvaluateOnLoad,
-      if (loaderId != null) 'loaderId': loaderId,
+      'ignoreCache': ?ignoreCache,
+      'scriptToEvaluateOnLoad': ?scriptToEvaluateOnLoad,
+      'loaderId': ?loaderId,
     });
   }
 
@@ -624,8 +616,8 @@ class PageApi {
       'frameId': frameId,
       'url': url,
       'query': query,
-      if (caseSensitive != null) 'caseSensitive': caseSensitive,
-      if (isRegex != null) 'isRegex': isRegex,
+      'caseSensitive': ?caseSensitive,
+      'isRegex': ?isRegex,
     });
     return (result['result'] as List)
         .map((e) => debugger.SearchMatch.fromJson(e as Map<String, dynamic>))
@@ -705,14 +697,14 @@ class PageApi {
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
       'mobile': mobile,
-      if (scale != null) 'scale': scale,
-      if (screenWidth != null) 'screenWidth': screenWidth,
-      if (screenHeight != null) 'screenHeight': screenHeight,
-      if (positionX != null) 'positionX': positionX,
-      if (positionY != null) 'positionY': positionY,
-      if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
-      if (screenOrientation != null) 'screenOrientation': screenOrientation,
-      if (viewport != null) 'viewport': viewport,
+      'scale': ?scale,
+      'screenWidth': ?screenWidth,
+      'screenHeight': ?screenHeight,
+      'positionX': ?positionX,
+      'positionY': ?positionY,
+      'dontSetVisibleSize': ?dontSetVisibleSize,
+      'screenOrientation': ?screenOrientation,
+      'viewport': ?viewport,
     });
   }
 
@@ -774,7 +766,7 @@ class PageApi {
     assert(const ['deny', 'allow', 'default'].contains(behavior));
     await _client.send('Page.setDownloadBehavior', {
       'behavior': behavior,
-      if (downloadPath != null) 'downloadPath': downloadPath,
+      'downloadPath': ?downloadPath,
     });
   }
 
@@ -790,9 +782,9 @@ class PageApi {
     num? accuracy,
   }) async {
     await _client.send('Page.setGeolocationOverride', {
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
-      if (accuracy != null) 'accuracy': accuracy,
+      'latitude': ?latitude,
+      'longitude': ?longitude,
+      'accuracy': ?accuracy,
     });
   }
 
@@ -816,7 +808,7 @@ class PageApi {
     );
     await _client.send('Page.setTouchEmulationEnabled', {
       'enabled': enabled,
-      if (configuration != null) 'configuration': configuration,
+      'configuration': ?configuration,
     });
   }
 
@@ -835,11 +827,11 @@ class PageApi {
   }) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
     await _client.send('Page.startScreencast', {
-      if (format != null) 'format': format,
-      if (quality != null) 'quality': quality,
-      if (maxWidth != null) 'maxWidth': maxWidth,
-      if (maxHeight != null) 'maxHeight': maxHeight,
-      if (everyNthFrame != null) 'everyNthFrame': everyNthFrame,
+      'format': ?format,
+      'quality': ?quality,
+      'maxWidth': ?maxWidth,
+      'maxHeight': ?maxHeight,
+      'everyNthFrame': ?everyNthFrame,
     });
   }
 
@@ -939,7 +931,7 @@ class PageApi {
   Future<void> generateTestReport(String message, {String? group}) async {
     await _client.send('Page.generateTestReport', {
       'message': message,
-      if (group != null) 'group': group,
+      'group': ?group,
     });
   }
 
@@ -960,7 +952,7 @@ class PageApi {
   }) async {
     await _client.send('Page.setInterceptFileChooserDialog', {
       'enabled': enabled,
-      if (cancel != null) 'cancel': cancel,
+      'cancel': ?cancel,
     });
   }
 
@@ -985,8 +977,7 @@ class PageApi {
     bool? includeActionableInformation,
   }) async {
     var result = await _client.send('Page.getAnnotatedPageContent', {
-      if (includeActionableInformation != null)
-        'includeActionableInformation': includeActionableInformation,
+      'includeActionableInformation': ?includeActionableInformation,
     });
     return result['content'] as String;
   }

@@ -79,8 +79,7 @@ class CSSApi {
       'styleSheetId': styleSheetId,
       'ruleText': ruleText,
       'location': location,
-      if (nodeForPropertySyntaxValidation != null)
-        'nodeForPropertySyntaxValidation': nodeForPropertySyntaxValidation,
+      'nodeForPropertySyntaxValidation': ?nodeForPropertySyntaxValidation,
     });
     return CSSRule.fromJson(result['rule'] as Map<String, dynamic>);
   }
@@ -107,7 +106,7 @@ class CSSApi {
   }) async {
     var result = await _client.send('CSS.createStyleSheet', {
       'frameId': frameId,
-      if (force != null) 'force': force,
+      'force': ?force,
     });
     return dom.StyleSheetId.fromJson(result['styleSheetId'] as String);
   }
@@ -194,9 +193,9 @@ class CSSApi {
     var result = await _client.send('CSS.resolveValues', {
       'values': [...values],
       'nodeId': nodeId,
-      if (propertyName != null) 'propertyName': propertyName,
-      if (pseudoType != null) 'pseudoType': pseudoType,
-      if (pseudoIdentifier != null) 'pseudoIdentifier': pseudoIdentifier,
+      'propertyName': ?propertyName,
+      'pseudoType': ?pseudoType,
+      'pseudoIdentifier': ?pseudoIdentifier,
     });
     return (result['results'] as List).map((e) => e as String).toList();
   }
@@ -315,7 +314,7 @@ class CSSApi {
   /// Pass `undefined` to disable tracking.
   Future<void> trackComputedStyleUpdatesForNode({dom.NodeId? nodeId}) async {
     await _client.send('CSS.trackComputedStyleUpdatesForNode', {
-      if (nodeId != null) 'nodeId': nodeId,
+      'nodeId': ?nodeId,
     });
   }
 
@@ -523,8 +522,7 @@ class CSSApi {
   }) async {
     var result = await _client.send('CSS.setStyleTexts', {
       'edits': [...edits],
-      if (nodeForPropertySyntaxValidation != null)
-        'nodeForPropertySyntaxValidation': nodeForPropertySyntaxValidation,
+      'nodeForPropertySyntaxValidation': ?nodeForPropertySyntaxValidation,
     });
     return (result['styles'] as List)
         .map((e) => CSSStyle.fromJson(e as Map<String, dynamic>))

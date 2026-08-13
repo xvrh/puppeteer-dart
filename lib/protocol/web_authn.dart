@@ -38,9 +38,7 @@ class WebAuthnApi {
   /// Supported at the embedder's discretion if UI is available.
   /// Defaults to false.
   Future<void> enable({bool? enableUI}) async {
-    await _client.send('WebAuthn.enable', {
-      if (enableUI != null) 'enableUI': enableUI,
-    });
+    await _client.send('WebAuthn.enable', {'enableUI': ?enableUI});
   }
 
   /// Disable the WebAuthn domain.
@@ -73,9 +71,9 @@ class WebAuthnApi {
   }) async {
     await _client.send('WebAuthn.setResponseOverrideBits', {
       'authenticatorId': authenticatorId,
-      if (isBogusSignature != null) 'isBogusSignature': isBogusSignature,
-      if (isBadUV != null) 'isBadUV': isBadUV,
-      if (isBadUP != null) 'isBadUP': isBadUP,
+      'isBogusSignature': ?isBogusSignature,
+      'isBadUV': ?isBadUV,
+      'isBadUP': ?isBadUP,
     });
   }
 
@@ -177,8 +175,8 @@ class WebAuthnApi {
     await _client.send('WebAuthn.setCredentialProperties', {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
-      if (backupEligibility != null) 'backupEligibility': backupEligibility,
-      if (backupState != null) 'backupState': backupState,
+      'backupEligibility': ?backupEligibility,
+      'backupState': ?backupState,
     });
   }
 }

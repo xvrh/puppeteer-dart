@@ -53,8 +53,7 @@ class PWAApi {
   }) async {
     await _client.send('PWA.install', {
       'manifestId': manifestId,
-      if (installUrlOrBundleUrl != null)
-        'installUrlOrBundleUrl': installUrlOrBundleUrl,
+      'installUrlOrBundleUrl': ?installUrlOrBundleUrl,
     });
   }
 
@@ -70,7 +69,7 @@ class PWAApi {
   Future<target.TargetID> launch(String manifestId, {String? url}) async {
     var result = await _client.send('PWA.launch', {
       'manifestId': manifestId,
-      if (url != null) 'url': url,
+      'url': ?url,
     });
     return target.TargetID.fromJson(result['targetId'] as String);
   }
@@ -136,8 +135,8 @@ class PWAApi {
   }) async {
     await _client.send('PWA.changeAppUserSettings', {
       'manifestId': manifestId,
-      if (linkCapturing != null) 'linkCapturing': linkCapturing,
-      if (displayMode != null) 'displayMode': displayMode,
+      'linkCapturing': ?linkCapturing,
+      'displayMode': ?displayMode,
     });
   }
 }

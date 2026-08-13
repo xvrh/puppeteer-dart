@@ -310,9 +310,17 @@ class _Command {
             "'${parameter.name}' : ${_toJsonCode(parameter, needsExplicitToJson: false, isLocalVariable: true)},";
       }
       for (var parameter in optionals) {
-        sendCode += 'if (${parameter.normalizedName} != null)';
-        sendCode +=
-            "'${parameter.name}' : ${_toJsonCode(parameter, needsExplicitToJson: false, isLocalVariable: true)},";
+        var jsonCode = _toJsonCode(
+          parameter,
+          needsExplicitToJson: false,
+          isLocalVariable: true,
+        );
+        if (jsonCode == parameter.normalizedName) {
+          sendCode += "'${parameter.name}' : ?$jsonCode,";
+        } else {
+          sendCode += 'if (${parameter.normalizedName} != null)';
+          sendCode += "'${parameter.name}' : $jsonCode,";
+        }
       }
 
       sendCode += '}';

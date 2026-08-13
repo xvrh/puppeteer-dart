@@ -48,7 +48,7 @@ class DebuggerApi {
     );
     await _client.send('Debugger.continueToLocation', {
       'location': location,
-      if (targetCallFrames != null) 'targetCallFrames': targetCallFrames,
+      'targetCallFrames': ?targetCallFrames,
     });
   }
 
@@ -64,8 +64,7 @@ class DebuggerApi {
   /// Returns: Unique identifier of the debugger.
   Future<runtime.UniqueDebuggerId> enable({num? maxScriptsCacheSize}) async {
     var result = await _client.send('Debugger.enable', {
-      if (maxScriptsCacheSize != null)
-        'maxScriptsCacheSize': maxScriptsCacheSize,
+      'maxScriptsCacheSize': ?maxScriptsCacheSize,
     });
     return runtime.UniqueDebuggerId.fromJson(result['debuggerId'] as String);
   }
@@ -97,14 +96,13 @@ class DebuggerApi {
     var result = await _client.send('Debugger.evaluateOnCallFrame', {
       'callFrameId': callFrameId,
       'expression': expression,
-      if (objectGroup != null) 'objectGroup': objectGroup,
-      if (includeCommandLineAPI != null)
-        'includeCommandLineAPI': includeCommandLineAPI,
-      if (silent != null) 'silent': silent,
-      if (returnByValue != null) 'returnByValue': returnByValue,
-      if (generatePreview != null) 'generatePreview': generatePreview,
-      if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
-      if (timeout != null) 'timeout': timeout,
+      'objectGroup': ?objectGroup,
+      'includeCommandLineAPI': ?includeCommandLineAPI,
+      'silent': ?silent,
+      'returnByValue': ?returnByValue,
+      'generatePreview': ?generatePreview,
+      'throwOnSideEffect': ?throwOnSideEffect,
+      'timeout': ?timeout,
     });
     return EvaluateOnCallFrameResult.fromJson(result);
   }
@@ -123,8 +121,8 @@ class DebuggerApi {
   }) async {
     var result = await _client.send('Debugger.getPossibleBreakpoints', {
       'start': start,
-      if (end != null) 'end': end,
-      if (restrictToFunction != null) 'restrictToFunction': restrictToFunction,
+      'end': ?end,
+      'restrictToFunction': ?restrictToFunction,
     });
     return (result['locations'] as List)
         .map((e) => BreakLocation.fromJson(e as Map<String, dynamic>))
@@ -232,7 +230,7 @@ class DebuggerApi {
     assert(mode == null || const ['StepInto'].contains(mode));
     var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId,
-      if (mode != null) 'mode': mode,
+      'mode': ?mode,
     });
     return RestartFrameResult.fromJson(result);
   }
@@ -245,7 +243,7 @@ class DebuggerApi {
   /// If execution is currently not paused, this parameter has no effect.
   Future<void> resume({bool? terminateOnResume}) async {
     await _client.send('Debugger.resume', {
-      if (terminateOnResume != null) 'terminateOnResume': terminateOnResume,
+      'terminateOnResume': ?terminateOnResume,
     });
   }
 
@@ -264,8 +262,8 @@ class DebuggerApi {
     var result = await _client.send('Debugger.searchInContent', {
       'scriptId': scriptId,
       'query': query,
-      if (caseSensitive != null) 'caseSensitive': caseSensitive,
-      if (isRegex != null) 'isRegex': isRegex,
+      'caseSensitive': ?caseSensitive,
+      'isRegex': ?isRegex,
     });
     return (result['result'] as List)
         .map((e) => SearchMatch.fromJson(e as Map<String, dynamic>))
@@ -302,7 +300,7 @@ class DebuggerApi {
   }) async {
     await _client.send('Debugger.setBlackboxPatterns', {
       'patterns': [...patterns],
-      if (skipAnonymous != null) 'skipAnonymous': skipAnonymous,
+      'skipAnonymous': ?skipAnonymous,
     });
   }
 
@@ -331,7 +329,7 @@ class DebuggerApi {
   }) async {
     var result = await _client.send('Debugger.setBreakpoint', {
       'location': location,
-      if (condition != null) 'condition': condition,
+      'condition': ?condition,
     });
     return SetBreakpointResult.fromJson(result);
   }
@@ -377,11 +375,11 @@ class DebuggerApi {
   }) async {
     var result = await _client.send('Debugger.setBreakpointByUrl', {
       'lineNumber': lineNumber,
-      if (url != null) 'url': url,
-      if (urlRegex != null) 'urlRegex': urlRegex,
-      if (scriptHash != null) 'scriptHash': scriptHash,
-      if (columnNumber != null) 'columnNumber': columnNumber,
-      if (condition != null) 'condition': condition,
+      'url': ?url,
+      'urlRegex': ?urlRegex,
+      'scriptHash': ?scriptHash,
+      'columnNumber': ?columnNumber,
+      'condition': ?condition,
     });
     return SetBreakpointByUrlResult.fromJson(result);
   }
@@ -399,7 +397,7 @@ class DebuggerApi {
   }) async {
     var result = await _client.send('Debugger.setBreakpointOnFunctionCall', {
       'objectId': objectId,
-      if (condition != null) 'condition': condition,
+      'condition': ?condition,
     });
     return BreakpointId.fromJson(result['breakpointId'] as String);
   }
@@ -448,9 +446,8 @@ class DebuggerApi {
     var result = await _client.send('Debugger.setScriptSource', {
       'scriptId': scriptId,
       'scriptSource': scriptSource,
-      if (dryRun != null) 'dryRun': dryRun,
-      if (allowTopFrameEditing != null)
-        'allowTopFrameEditing': allowTopFrameEditing,
+      'dryRun': ?dryRun,
+      'allowTopFrameEditing': ?allowTopFrameEditing,
     });
     return SetScriptSourceResult.fromJson(result);
   }
@@ -491,7 +488,7 @@ class DebuggerApi {
     List<LocationRange>? skipList,
   }) async {
     await _client.send('Debugger.stepInto', {
-      if (breakOnAsyncCall != null) 'breakOnAsyncCall': breakOnAsyncCall,
+      'breakOnAsyncCall': ?breakOnAsyncCall,
       if (skipList != null) 'skipList': [...skipList],
     });
   }

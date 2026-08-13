@@ -72,10 +72,9 @@ class ProfilerApi {
     bool? allowTriggeredUpdates,
   }) async {
     var result = await _client.send('Profiler.startPreciseCoverage', {
-      if (callCount != null) 'callCount': callCount,
-      if (detailed != null) 'detailed': detailed,
-      if (allowTriggeredUpdates != null)
-        'allowTriggeredUpdates': allowTriggeredUpdates,
+      'callCount': ?callCount,
+      'detailed': ?detailed,
+      'allowTriggeredUpdates': ?allowTriggeredUpdates,
     });
     return result['timestamp'] as num;
   }

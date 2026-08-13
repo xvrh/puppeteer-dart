@@ -25,9 +25,9 @@ class IndexedDBApi {
     await _client.send('IndexedDB.clearObjectStore', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
   }
 
@@ -45,9 +45,9 @@ class IndexedDBApi {
   }) async {
     await _client.send('IndexedDB.deleteDatabase', {
       'databaseName': databaseName,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
   }
 
@@ -69,9 +69,9 @@ class IndexedDBApi {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'keyRange': keyRange,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
   }
 
@@ -112,11 +112,11 @@ class IndexedDBApi {
       'objectStoreName': objectStoreName,
       'skipCount': skipCount,
       'pageSize': pageSize,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
-      if (indexName != null) 'indexName': indexName,
-      if (keyRange != null) 'keyRange': keyRange,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
+      'indexName': ?indexName,
+      'keyRange': ?keyRange,
     });
     return RequestDataResult.fromJson(result);
   }
@@ -138,9 +138,9 @@ class IndexedDBApi {
     var result = await _client.send('IndexedDB.getMetadata', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
     return GetMetadataResult.fromJson(result);
   }
@@ -160,9 +160,9 @@ class IndexedDBApi {
   }) async {
     var result = await _client.send('IndexedDB.requestDatabase', {
       'databaseName': databaseName,
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
     return DatabaseWithObjectStores.fromJson(
       result['databaseWithObjectStores'] as Map<String, dynamic>,
@@ -181,9 +181,9 @@ class IndexedDBApi {
     storage.StorageBucket? storageBucket,
   }) async {
     var result = await _client.send('IndexedDB.requestDatabaseNames', {
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }

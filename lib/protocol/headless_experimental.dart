@@ -28,10 +28,10 @@ class HeadlessExperimentalApi {
     ScreenshotParams? screenshot,
   }) async {
     var result = await _client.send('HeadlessExperimental.beginFrame', {
-      if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
-      if (interval != null) 'interval': interval,
-      if (noDisplayUpdates != null) 'noDisplayUpdates': noDisplayUpdates,
-      if (screenshot != null) 'screenshot': screenshot,
+      'frameTimeTicks': ?frameTimeTicks,
+      'interval': ?interval,
+      'noDisplayUpdates': ?noDisplayUpdates,
+      'screenshot': ?screenshot,
     });
     return BeginFrameResult.fromJson(result);
   }

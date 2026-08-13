@@ -74,7 +74,7 @@ class TargetApi {
   Future<SessionID> attachToTarget(TargetID targetId, {bool? flatten}) async {
     var result = await _client.send('Target.attachToTarget', {
       'targetId': targetId,
-      if (flatten != null) 'flatten': flatten,
+      'flatten': ?flatten,
     });
     return SessionID.fromJson(result['sessionId'] as String);
   }
@@ -112,8 +112,8 @@ class TargetApi {
   }) async {
     await _client.send('Target.exposeDevToolsProtocol', {
       'targetId': targetId,
-      if (bindingName != null) 'bindingName': bindingName,
-      if (inheritPermissions != null) 'inheritPermissions': inheritPermissions,
+      'bindingName': ?bindingName,
+      'inheritPermissions': ?inheritPermissions,
     });
   }
 
@@ -132,9 +132,9 @@ class TargetApi {
     List<String>? originsWithUniversalNetworkAccess,
   }) async {
     var result = await _client.send('Target.createBrowserContext', {
-      if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
-      if (proxyServer != null) 'proxyServer': proxyServer,
-      if (proxyBypassList != null) 'proxyBypassList': proxyBypassList,
+      'disposeOnDetach': ?disposeOnDetach,
+      'proxyServer': ?proxyServer,
+      'proxyBypassList': ?proxyBypassList,
       if (originsWithUniversalNetworkAccess != null)
         'originsWithUniversalNetworkAccess': [
           ...originsWithUniversalNetworkAccess,
@@ -192,19 +192,18 @@ class TargetApi {
   }) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
-      if (left != null) 'left': left,
-      if (top != null) 'top': top,
-      if (width != null) 'width': width,
-      if (height != null) 'height': height,
-      if (windowState != null) 'windowState': windowState,
-      if (browserContextId != null) 'browserContextId': browserContextId,
-      if (enableBeginFrameControl != null)
-        'enableBeginFrameControl': enableBeginFrameControl,
-      if (newWindow != null) 'newWindow': newWindow,
-      if (background != null) 'background': background,
-      if (forTab != null) 'forTab': forTab,
-      if (hidden != null) 'hidden': hidden,
-      if (focus != null) 'focus': focus,
+      'left': ?left,
+      'top': ?top,
+      'width': ?width,
+      'height': ?height,
+      'windowState': ?windowState,
+      'browserContextId': ?browserContextId,
+      'enableBeginFrameControl': ?enableBeginFrameControl,
+      'newWindow': ?newWindow,
+      'background': ?background,
+      'forTab': ?forTab,
+      'hidden': ?hidden,
+      'focus': ?focus,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }
@@ -216,8 +215,8 @@ class TargetApi {
     @Deprecated('This parameter is deprecated') TargetID? targetId,
   }) async {
     await _client.send('Target.detachFromTarget', {
-      if (sessionId != null) 'sessionId': sessionId,
-      if (targetId != null) 'targetId': targetId,
+      'sessionId': ?sessionId,
+      'targetId': ?targetId,
     });
   }
 
@@ -234,7 +233,7 @@ class TargetApi {
   /// Returns information about a target.
   Future<TargetInfo> getTargetInfo({TargetID? targetId}) async {
     var result = await _client.send('Target.getTargetInfo', {
-      if (targetId != null) 'targetId': targetId,
+      'targetId': ?targetId,
     });
     return TargetInfo.fromJson(result['targetInfo'] as Map<String, dynamic>);
   }
@@ -245,9 +244,7 @@ class TargetApi {
   /// is used for consistency.
   /// Returns: The list of targets.
   Future<List<TargetInfo>> getTargets({TargetFilter? filter}) async {
-    var result = await _client.send('Target.getTargets', {
-      if (filter != null) 'filter': filter,
-    });
+    var result = await _client.send('Target.getTargets', {'filter': ?filter});
     return (result['targetInfos'] as List)
         .map((e) => TargetInfo.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -265,8 +262,8 @@ class TargetApi {
   }) async {
     await _client.send('Target.sendMessageToTarget', {
       'message': message,
-      if (sessionId != null) 'sessionId': sessionId,
-      if (targetId != null) 'targetId': targetId,
+      'sessionId': ?sessionId,
+      'targetId': ?targetId,
     });
   }
 
@@ -294,8 +291,8 @@ class TargetApi {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
-      if (flatten != null) 'flatten': flatten,
-      if (filter != null) 'filter': filter,
+      'flatten': ?flatten,
+      'filter': ?filter,
     });
   }
 
@@ -315,7 +312,7 @@ class TargetApi {
     await _client.send('Target.autoAttachRelated', {
       'targetId': targetId,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
-      if (filter != null) 'filter': filter,
+      'filter': ?filter,
     });
   }
 
@@ -327,7 +324,7 @@ class TargetApi {
   Future<void> setDiscoverTargets(bool discover, {TargetFilter? filter}) async {
     await _client.send('Target.setDiscoverTargets', {
       'discover': discover,
-      if (filter != null) 'filter': filter,
+      'filter': ?filter,
     });
   }
 
@@ -360,7 +357,7 @@ class TargetApi {
   Future<TargetID> openDevTools(TargetID targetId, {String? panelId}) async {
     var result = await _client.send('Target.openDevTools', {
       'targetId': targetId,
-      if (panelId != null) 'panelId': panelId,
+      'panelId': ?panelId,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }
