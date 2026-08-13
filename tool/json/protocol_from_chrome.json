@@ -1325,7 +1325,6 @@
                     "id": "MixedContentResourceType",
                     "type": "string",
                     "enum": [
-                        "AttributionSrc",
                         "Audio",
                         "Beacon",
                         "CSPReport",
@@ -1616,33 +1615,6 @@
                     ]
                 },
                 {
-                    "id": "AttributionReportingIssueType",
-                    "type": "string",
-                    "enum": [
-                        "PermissionPolicyDisabled",
-                        "UntrustworthyReportingOrigin",
-                        "InsecureContext",
-                        "InvalidHeader",
-                        "InvalidRegisterTriggerHeader",
-                        "SourceAndTriggerHeaders",
-                        "SourceIgnored",
-                        "TriggerIgnored",
-                        "OsSourceIgnored",
-                        "OsTriggerIgnored",
-                        "InvalidRegisterOsSourceHeader",
-                        "InvalidRegisterOsTriggerHeader",
-                        "WebAndOsHeaders",
-                        "NoWebOrOsSupport",
-                        "NavigationRegistrationWithoutTransientUserActivation",
-                        "InvalidInfoHeader",
-                        "NoRegisterSourceHeader",
-                        "NoRegisterTriggerHeader",
-                        "NoRegisterOsSourceHeader",
-                        "NoRegisterOsTriggerHeader",
-                        "NavigationRegistrationUniqueScopeAlreadySet"
-                    ]
-                },
-                {
                     "id": "SharedDictionaryError",
                     "type": "string",
                     "enum": [
@@ -1725,32 +1697,6 @@
                         "InvalidAllowlistItemType",
                         "ReportingEndpointNotToken",
                         "InvalidUrlPattern"
-                    ]
-                },
-                {
-                    "id": "AttributionReportingIssueDetails",
-                    "description": "Details for issues around \"Attribution Reporting API\" usage.\nExplainer: https://github.com/WICG/attribution-reporting-api",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "violationType",
-                            "$ref": "AttributionReportingIssueType"
-                        },
-                        {
-                            "name": "request",
-                            "optional": true,
-                            "$ref": "AffectedRequest"
-                        },
-                        {
-                            "name": "violatingNodeId",
-                            "optional": true,
-                            "$ref": "DOM.BackendNodeId"
-                        },
-                        {
-                            "name": "invalidParameter",
-                            "optional": true,
-                            "type": "string"
-                        }
                     ]
                 },
                 {
@@ -2444,6 +2390,28 @@
                     ]
                 },
                 {
+                    "id": "LazyLoadImageIssueDetails",
+                    "description": "Details for issues about lazy-loaded images without explicit dimensions.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "nodeId",
+                            "description": "DOM node of the problematic HTMLImageElement.",
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "url",
+                            "description": "URL or src attribute of the image.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame containing the image.",
+                            "$ref": "Page.FrameId"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -2455,7 +2423,6 @@
                         "ContentSecurityPolicyIssue",
                         "SharedArrayBufferIssue",
                         "CorsIssue",
-                        "AttributionReportingIssue",
                         "QuirksModeIssue",
                         "PartitioningBlobURLIssue",
                         "NavigatorUserAgentIssue",
@@ -2477,7 +2444,8 @@
                         "PermissionElementIssue",
                         "PerformanceIssue",
                         "SelectivePermissionsInterventionIssue",
-                        "EmailVerificationRequestIssue"
+                        "EmailVerificationRequestIssue",
+                        "LazyLoadImageIssue"
                     ]
                 },
                 {
@@ -2519,11 +2487,6 @@
                             "name": "corsIssueDetails",
                             "optional": true,
                             "$ref": "CorsIssueDetails"
-                        },
-                        {
-                            "name": "attributionReportingIssueDetails",
-                            "optional": true,
-                            "$ref": "AttributionReportingIssueDetails"
                         },
                         {
                             "name": "quirksModeIssueDetails",
@@ -2635,6 +2598,11 @@
                             "name": "emailVerificationRequestIssueDetails",
                             "optional": true,
                             "$ref": "EmailVerificationRequestIssueDetails"
+                        },
+                        {
+                            "name": "lazyLoadImageIssueDetails",
+                            "optional": true,
+                            "$ref": "LazyLoadImageIssueDetails"
                         }
                     ]
                 },
@@ -3840,15 +3808,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "id": "PrivacySandboxAPI",
-                    "experimental": true,
-                    "type": "string",
-                    "enum": [
-                        "BiddingAndAuctionServices",
-                        "TrustedKeyValue"
-                    ]
                 }
             ],
             "commands": [
@@ -4215,30 +4174,6 @@
                         {
                             "name": "url",
                             "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "name": "addPrivacySandboxCoordinatorKeyConfig",
-                    "description": "Configures encryption keys used with a given privacy sandbox API to talk\nto a trusted coordinator.  Since this is intended for test automation only,\ncoordinatorOrigin must be a .test domain. No existing coordinator\nconfiguration for the origin may exist.",
-                    "parameters": [
-                        {
-                            "name": "api",
-                            "$ref": "PrivacySandboxAPI"
-                        },
-                        {
-                            "name": "coordinatorOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "keyConfig",
-                            "type": "string"
-                        },
-                        {
-                            "name": "browserContextId",
-                            "description": "BrowserContext to perform the action in. When omitted, default browser\ncontext is used.",
-                            "optional": true,
-                            "$ref": "BrowserContextID"
                         }
                     ]
                 }
@@ -10666,6 +10601,55 @@
                             "name": "gamma",
                             "description": "Mock gamma",
                             "type": "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain": "DigitalCredentials",
+            "description": "This domain allows interacting with the Digital Credentials API for automation.",
+            "experimental": true,
+            "types": [
+                {
+                    "id": "VirtualWalletAction",
+                    "description": "The type of virtual wallet action.",
+                    "type": "string",
+                    "enum": [
+                        "respond",
+                        "decline",
+                        "wait",
+                        "clear"
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "setVirtualWalletBehavior",
+                    "description": "Sets the behavior of the virtual wallet for digital credential requests\nissued from this frame.",
+                    "parameters": [
+                        {
+                            "name": "action",
+                            "description": "The action of the virtual wallet.",
+                            "$ref": "VirtualWalletAction"
+                        },
+                        {
+                            "name": "protocol",
+                            "description": "The protocol identifier (e.g. \"openid4vp\"). Required when |action| is\n\"respond\", forbidden otherwise.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "response",
+                            "description": "The response data object returned by the wallet.\nRequired when |action| is \"respond\", forbidden otherwise.",
+                            "optional": true,
+                            "type": "object"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The frame to scope the virtual wallet behavior to.",
+                            "optional": true,
+                            "$ref": "Page.FrameId"
                         }
                     ]
                 }
@@ -18028,12 +18012,13 @@
                 },
                 {
                     "id": "DeviceBoundSessionFetchResult",
-                    "description": "A fetch result for a device bound session creation or refresh.",
+                    "description": "A fetch result for a device bound session creation or refresh.\nLINT.IfChange(DeviceBoundSessionFetchResult)",
                     "experimental": true,
                     "type": "string",
                     "enum": [
                         "Success",
-                        "KeyError",
+                        "SigningKeyGenerationError",
+                        "AttestationKeyGenerationError",
                         "SigningError",
                         "TransientSigningError",
                         "ServerRequestedTermination",
@@ -18101,7 +18086,10 @@
                         "InvalidFederatedSessionProviderFailedToRestoreKey",
                         "FailedToUnwrapKey",
                         "SessionDeletedDuringRefresh",
-                        "CrossOriginRegistrationSiteNotIncluded"
+                        "CrossOriginRegistrationSiteNotIncluded",
+                        "InvalidPreProvisionedKeyInitiatorMissing",
+                        "PreProvisionedKeyAccessNotGranted",
+                        "PreProvisionedKeyNotFound"
                     ]
                 },
                 {
@@ -18175,7 +18163,6 @@
                                 "InitializedService",
                                 "Unreachable",
                                 "ServerError",
-                                "RefreshQuotaExceeded",
                                 "FatalError",
                                 "SigningQuotaExceeded",
                                 "RefreshedAsWaiter",
@@ -21947,7 +21934,6 @@
                         "all-screens-capture",
                         "ambient-light-sensor",
                         "aria-notify",
-                        "attribution-reporting",
                         "autofill",
                         "autoplay",
                         "bluetooth",
@@ -27451,7 +27437,6 @@
                         "websql",
                         "service_workers",
                         "cache_storage",
-                        "interest_groups",
                         "shared_storage",
                         "storage_buckets",
                         "all",
@@ -27492,57 +27477,12 @@
                     ]
                 },
                 {
-                    "id": "InterestGroupAuctionId",
-                    "description": "Protected audience interest group auction identifier.",
-                    "type": "string"
-                },
-                {
-                    "id": "InterestGroupAccessType",
-                    "description": "Enum of interest group access types.",
-                    "type": "string",
-                    "enum": [
-                        "join",
-                        "leave",
-                        "update",
-                        "loaded",
-                        "bid",
-                        "win",
-                        "additionalBid",
-                        "additionalBidWin",
-                        "topLevelBid",
-                        "topLevelAdditionalBid",
-                        "clear"
-                    ]
-                },
-                {
-                    "id": "InterestGroupAuctionEventType",
-                    "description": "Enum of auction events.",
-                    "type": "string",
-                    "enum": [
-                        "started",
-                        "configResolved"
-                    ]
-                },
-                {
-                    "id": "InterestGroupAuctionFetchType",
-                    "description": "Enum of network fetches auctions can do.",
-                    "type": "string",
-                    "enum": [
-                        "bidderJs",
-                        "bidderWasm",
-                        "sellerJs",
-                        "bidderTrustedSignals",
-                        "sellerTrustedSignals"
-                    ]
-                },
-                {
                     "id": "SharedStorageAccessScope",
                     "description": "Enum of shared storage access scopes.",
                     "type": "string",
                     "enum": [
                         "window",
                         "sharedStorageWorklet",
-                        "protectedAudienceWorklet",
                         "header"
                     ]
                 },
@@ -28172,50 +28112,6 @@
                     ]
                 },
                 {
-                    "name": "getInterestGroupDetails",
-                    "description": "Gets details for a named interest group.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "ownerOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "type": "string"
-                        }
-                    ],
-                    "returns": [
-                        {
-                            "name": "details",
-                            "description": "This largely corresponds to:\nhttps://wicg.github.io/turtledove/#dictdef-generatebidinterestgroup\nbut has absolute expirationTime instead of relative lifetimeMs and\nalso adds joiningOrigin.",
-                            "type": "object"
-                        }
-                    ]
-                },
-                {
-                    "name": "setInterestGroupTracking",
-                    "description": "Enables/Disables issuing of interestGroupAccessed events.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "enable",
-                            "type": "boolean"
-                        }
-                    ]
-                },
-                {
-                    "name": "setInterestGroupAuctionTracking",
-                    "description": "Enables/Disables issuing of interestGroupAuctionEventOccurred and\ninterestGroupAuctionNetworkRequestCreated.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "enable",
-                            "type": "boolean"
-                        }
-                    ]
-                },
-                {
                     "name": "getSharedStorageMetadata",
                     "description": "Gets metadata for an origin's shared storage.",
                     "experimental": true,
@@ -28378,26 +28274,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "name": "setProtectedAudienceKAnonymity",
-                    "parameters": [
-                        {
-                            "name": "owner",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "type": "string"
-                        },
-                        {
-                            "name": "hashes",
-                            "type": "array",
-                            "items": {
-                                "type": "binary"
-                            }
-                        }
-                    ]
                 }
             ],
             "events": [
@@ -28497,103 +28373,6 @@
                             "name": "bucketId",
                             "description": "Storage bucket to update.",
                             "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "name": "interestGroupAccessed",
-                    "description": "One of the interest groups was accessed. Note that these events are global\nto all targets sharing an interest group store.",
-                    "parameters": [
-                        {
-                            "name": "accessTime",
-                            "$ref": "Network.TimeSinceEpoch"
-                        },
-                        {
-                            "name": "type",
-                            "$ref": "InterestGroupAccessType"
-                        },
-                        {
-                            "name": "ownerOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "type": "string"
-                        },
-                        {
-                            "name": "componentSellerOrigin",
-                            "description": "For topLevelBid/topLevelAdditionalBid, and when appropriate,\nwin and additionalBidWin",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "bid",
-                            "description": "For bid or somethingBid event, if done locally and not on a server.",
-                            "optional": true,
-                            "type": "number"
-                        },
-                        {
-                            "name": "bidCurrency",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "uniqueAuctionId",
-                            "description": "For non-global events --- links to interestGroupAuctionEvent",
-                            "optional": true,
-                            "$ref": "InterestGroupAuctionId"
-                        }
-                    ]
-                },
-                {
-                    "name": "interestGroupAuctionEventOccurred",
-                    "description": "An auction involving interest groups is taking place. These events are\ntarget-specific.",
-                    "parameters": [
-                        {
-                            "name": "eventTime",
-                            "$ref": "Network.TimeSinceEpoch"
-                        },
-                        {
-                            "name": "type",
-                            "$ref": "InterestGroupAuctionEventType"
-                        },
-                        {
-                            "name": "uniqueAuctionId",
-                            "$ref": "InterestGroupAuctionId"
-                        },
-                        {
-                            "name": "parentAuctionId",
-                            "description": "Set for child auctions.",
-                            "optional": true,
-                            "$ref": "InterestGroupAuctionId"
-                        },
-                        {
-                            "name": "auctionConfig",
-                            "description": "Set for started and configResolved",
-                            "optional": true,
-                            "type": "object"
-                        }
-                    ]
-                },
-                {
-                    "name": "interestGroupAuctionNetworkRequestCreated",
-                    "description": "Specifies which auctions a particular network fetch may be related to, and\nin what role. Note that it is not ordered with respect to\nNetwork.requestWillBeSent (but will happen before loadingFinished\nloadingFailed).",
-                    "parameters": [
-                        {
-                            "name": "type",
-                            "$ref": "InterestGroupAuctionFetchType"
-                        },
-                        {
-                            "name": "requestId",
-                            "$ref": "Network.RequestId"
-                        },
-                        {
-                            "name": "auctions",
-                            "description": "This is the set of the auctions using the worklet that issued this\nrequest.  In the case of trusted signals, it's possible that only some of\nthem actually care about the keys being queried.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "InterestGroupAuctionId"
-                            }
                         }
                     ]
                 },
@@ -30694,6 +30473,12 @@
                             "type": "boolean"
                         },
                         {
+                            "name": "hasCmtgKey",
+                            "description": "If set to true, the authenticator will support the cmtgKey (Credential\nManager Trust Group Key) extension.\nhttps://github.com/w3c/webauthn/pull/2377\nDefaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
                             "name": "automaticPresenceSimulation",
                             "description": "If set to true, tests of user presence will succeed immediately.\nOtherwise, they will not be resolved. Defaults to true.",
                             "optional": true,
@@ -30750,7 +30535,8 @@
                         },
                         {
                             "name": "signCount",
-                            "description": "Signature counter. This is incremented by one for each successful\nassertion.\nSee https://w3c.github.io/webauthn/#signature-counter",
+                            "description": "Signature counter. Must be equal to or greater than -1.\nIf -1, the credential won't have an associated signature counter, and\nevery assertion operation will report a value of 0.\nSee https://w3c.github.io/webauthn/#signature-counter",
+                            "optional": true,
                             "type": "integer"
                         },
                         {
@@ -30782,6 +30568,27 @@
                             "description": "The credential's user.displayName property. Equivalent to empty if\nnot set.\nhttps://w3c.github.io/webauthn/#dom-publickeycredentialuserentity-displayname",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "cmtgKeys",
+                            "description": "The CMTG keys associated with the credential.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "binary"
+                            }
+                        },
+                        {
+                            "name": "activeCmtgKeyIndex",
+                            "description": "The 0-based index of the active key in cmtgKeys.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "generateCmtgKeyOnNextOperation",
+                            "description": "If true, the authenticator will generate a new CMTG key on the next operation.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 }
@@ -30983,6 +30790,22 @@
                             "name": "backupState",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "activeCmtgKeyIndex",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "generateCmtgKeyOnNextOperation",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "signCount",
+                            "description": "Must be equal to or greater than -1.\nIf -1, the signature counter is removed from the credential, and every\nassertion operation will report a value of 0.\nSee https://w3c.github.io/webauthn/#signature-counter",
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 }

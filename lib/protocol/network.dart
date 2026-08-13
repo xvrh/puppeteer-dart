@@ -5891,9 +5891,11 @@ extension type DeviceBoundSessionEventId(String value) {
 }
 
 /// A fetch result for a device bound session creation or refresh.
+/// LINT.IfChange(DeviceBoundSessionFetchResult)
 enum DeviceBoundSessionFetchResult {
   success('Success'),
-  keyError('KeyError'),
+  signingKeyGenerationError('SigningKeyGenerationError'),
+  attestationKeyGenerationError('AttestationKeyGenerationError'),
   signingError('SigningError'),
   transientSigningError('TransientSigningError'),
   serverRequestedTermination('ServerRequestedTermination'),
@@ -5985,7 +5987,12 @@ enum DeviceBoundSessionFetchResult {
   sessionDeletedDuringRefresh('SessionDeletedDuringRefresh'),
   crossOriginRegistrationSiteNotIncluded(
     'CrossOriginRegistrationSiteNotIncluded',
-  );
+  ),
+  invalidPreProvisionedKeyInitiatorMissing(
+    'InvalidPreProvisionedKeyInitiatorMissing',
+  ),
+  preProvisionedKeyAccessNotGranted('PreProvisionedKeyAccessNotGranted'),
+  preProvisionedKeyNotFound('PreProvisionedKeyNotFound');
 
   final String value;
 
@@ -6162,7 +6169,6 @@ enum RefreshEventDetailsRefreshResult {
   initializedService('InitializedService'),
   unreachable('Unreachable'),
   serverError('ServerError'),
-  refreshQuotaExceeded('RefreshQuotaExceeded'),
   fatalError('FatalError'),
   signingQuotaExceeded('SigningQuotaExceeded'),
   refreshedAsWaiter('RefreshedAsWaiter'),
