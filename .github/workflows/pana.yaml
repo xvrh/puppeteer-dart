@@ -15,6 +15,10 @@ jobs:
         with:
           sdk: 'stable'
       - uses: actions/checkout@v4
-      - run: dart pub get
+      # pub.dev analyses the published package against the newest resolvable
+      # versions, ignoring pubspec.lock. Upgrade so this check sees what the
+      # published score will see — e.g. a lint newly added to
+      # package:lints/recommended.yaml.
+      - run: dart pub upgrade
       - run: dart pub global activate pana
       - run: dart tool/check_pana.dart
