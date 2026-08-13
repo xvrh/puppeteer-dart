@@ -1,3 +1,6 @@
+## 3.26.0
+- Update to Chrome 152.0.7977.42.
+
 ## 3.25.1
 - Complete WASM compatibility: route `dart:isolate` through the same shim.
 
