@@ -118,15 +118,13 @@ class BluetoothEmulationApi {
     int code, {
     String? data,
   }) async {
-    await _client.send(
-      'BluetoothEmulation.simulateCharacteristicOperationResponse',
-      {
-        'characteristicId': characteristicId,
-        'type': type,
-        'code': code,
-        'data': ?data,
-      },
-    );
+    await _client
+        .send('BluetoothEmulation.simulateCharacteristicOperationResponse', {
+          'characteristicId': characteristicId,
+          'type': type,
+          'code': code,
+          'data': ?data,
+        });
   }
 
   /// Simulates the response from the descriptor with |descriptorId| for a

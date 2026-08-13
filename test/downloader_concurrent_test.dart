@@ -72,84 +72,80 @@ void main() {
       }
     });
 
-    test(
-      'cross-process concurrent download deduplicates',
-      () async {
-        final logDir = Directory(p.join(tmp.path, '_log'))..createSync();
-        final barrier = File(p.join(tmp.path, '_go'));
-        final workerScript = p.join(
-          Directory.current.path,
-          'test',
-          'utils',
-          'concurrent_download_worker.dart',
+    test('cross-process concurrent download deduplicates', () async {
+      final logDir = Directory(p.join(tmp.path, '_log'))..createSync();
+      final barrier = File(p.join(tmp.path, '_go'));
+      final workerScript = p.join(
+        Directory.current.path,
+        'test',
+        'utils',
+        'concurrent_download_worker.dart',
+      );
+
+      const workerCount = 4;
+      final processes = await Future.wait(
+        List.generate(
+          workerCount,
+          (i) => Process.start(Platform.executable, [
+            workerScript,
+            tmp.path,
+            logDir.path,
+            i.toString(),
+            barrier.path,
+          ]),
+        ),
+      );
+
+      // Wait until every worker reports "ready" before flipping the barrier,
+      // so they all hit ensureBrowserDownloaded near-simultaneously.
+      final outputs = List.generate(workerCount, (_) => StringBuffer());
+      final readyFutures = <Future<void>>[];
+      for (var i = 0; i < workerCount; i++) {
+        final lines = processes[i].stdout
+            .transform(const SystemEncoding().decoder)
+            .transform(const LineSplitter())
+            .asBroadcastStream();
+        final readyCompleter = Completer<void>();
+        lines.listen(
+          (line) {
+            if (line == 'ready' && !readyCompleter.isCompleted) {
+              readyCompleter.complete();
+            } else {
+              outputs[i].writeln(line);
+            }
+          },
+          onDone: () {
+            if (!readyCompleter.isCompleted) {
+              readyCompleter.complete();
+            }
+          },
         );
+        readyFutures.add(readyCompleter.future);
+      }
+      await Future.wait(readyFutures);
 
-        const workerCount = 4;
-        final processes = await Future.wait(
-          List.generate(
-            workerCount,
-            (i) => Process.start(Platform.executable, [
-              workerScript,
-              tmp.path,
-              logDir.path,
-              i.toString(),
-              barrier.path,
-            ]),
-          ),
-        );
+      barrier.writeAsStringSync('go');
 
-        // Wait until every worker reports "ready" before flipping the barrier,
-        // so they all hit ensureBrowserDownloaded near-simultaneously.
-        final outputs = List.generate(workerCount, (_) => StringBuffer());
-        final readyFutures = <Future<void>>[];
-        for (var i = 0; i < workerCount; i++) {
-          final lines = processes[i].stdout
-              .transform(const SystemEncoding().decoder)
-              .transform(const LineSplitter())
-              .asBroadcastStream();
-          final readyCompleter = Completer<void>();
-          lines.listen(
-            (line) {
-              if (line == 'ready' && !readyCompleter.isCompleted) {
-                readyCompleter.complete();
-              } else {
-                outputs[i].writeln(line);
-              }
-            },
-            onDone: () {
-              if (!readyCompleter.isCompleted) {
-                readyCompleter.complete();
-              }
-            },
-          );
-          readyFutures.add(readyCompleter.future);
-        }
-        await Future.wait(readyFutures);
+      final exitCodes = await Future.wait(processes.map((p) => p.exitCode));
+      for (var i = 0; i < workerCount; i++) {
+        expect(exitCodes[i], 0, reason: 'worker $i exited non-zero');
+      }
 
-        barrier.writeAsStringSync('go');
+      final downloadCount = logDir.listSync().length;
+      expect(
+        downloadCount,
+        1,
+        reason: 'Exactly one process should do the actual download',
+      );
 
-        final exitCodes = await Future.wait(processes.map((p) => p.exitCode));
-        for (var i = 0; i < workerCount; i++) {
-          expect(exitCodes[i], 0, reason: 'worker $i exited non-zero');
-        }
-
-        final downloadCount = logDir.listSync().length;
-        expect(
-          downloadCount,
-          1,
-          reason: 'Exactly one process should do the actual download',
-        );
-
-        final paths = outputs.map((b) => b.toString().trim()).toSet();
-        expect(
-          paths.length,
-          1,
-          reason: 'All workers should report the same path; got $paths',
-        );
-        expect(File(paths.single).existsSync(), isTrue);
-      },
-      timeout: const Timeout(Duration(seconds: 60)),
-    );
+      final paths = outputs.map((b) => b.toString().trim()).toSet();
+      expect(
+        paths.length,
+        1,
+        reason: 'All workers should report the same path; got $paths',
+      );
+      expect(File(paths.single).existsSync(), isTrue);
+    }, timeout: const Timeout(Duration(seconds: 60)));
 
     test(
       'atomic rename: <version> never visible until download completes',

@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dart_style/dart_style.dart';
+import 'code_style/language_version.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject
 // it in the source code
@@ -34,18 +35,16 @@ void main() {
   }
 }
 
-final _formatter = DartFormatter(
-  languageVersion: DartFormatter.latestLanguageVersion,
-);
+final _formatter = DartFormatter(languageVersion: packageLanguageVersion);
 
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
   var unit = parseString(content: sourceFile).unit;
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
-    var className = aClass.name.toString();
+    var className = aClass.namePart.typeName.toString();
 
-    for (var member in aClass.members.reversed) {
+    for (var member in aClass.body.members.reversed) {
       var comment = member.documentationComment;
 
       if (comment != null) {

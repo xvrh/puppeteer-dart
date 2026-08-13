@@ -108,29 +108,21 @@ void main() {
         ),
       );
     });
-    test(
-      'should fail when navigating to bad SSL',
-      () async {
-        // Make sure that network events do not emit 'undefined'.
-        // @see https://crbug.com/750469
-        page.onRequest.listen((request) => expect(request, isNotNull));
-        page.onRequestFinished.listen((request) => expect(request, isNotNull));
-        page.onRequestFailed.listen((request) => expect(request, isNotNull));
+    test('should fail when navigating to bad SSL', () async {
+      // Make sure that network events do not emit 'undefined'.
+      // @see https://crbug.com/750469
+      page.onRequest.listen((request) => expect(request, isNotNull));
+      page.onRequestFinished.listen((request) => expect(request, isNotNull));
+      page.onRequestFailed.listen((request) => expect(request, isNotNull));
 
-        //expect(() => page.goto(httpsServer.emptyPage), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
-      },
-      skip: "Test server doesn't support https yet",
-    );
-    test(
-      'should fail when navigating to bad SSL after redirects',
-      () async {
-        server.setRedirect('/redirect/1.html', '/redirect/2.html');
-        server.setRedirect('/redirect/2.html', '/empty.html');
+      //expect(() => page.goto(httpsServer.emptyPage), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
+    }, skip: "Test server doesn't support https yet");
+    test('should fail when navigating to bad SSL after redirects', () async {
+      server.setRedirect('/redirect/1.html', '/redirect/2.html');
+      server.setRedirect('/redirect/2.html', '/empty.html');
 
-        //expect(() => page.goto(httpsServer.prefix + '/redirect/1.html'), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
-      },
-      skip: "Test server doesn't support https yet",
-    );
+      //expect(() => page.goto(httpsServer.prefix + '/redirect/1.html'), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
+    }, skip: "Test server doesn't support https yet");
     test('should fail when main resources failed to load', () async {
       expect(
         () => page.goto('http://localhost:44123/non-existing-url'),

@@ -213,17 +213,13 @@ void main() {
           contains('--user-data-dir=${Uri.base.resolve('foo').toFilePath()}'),
         );
       });
-      test(
-        'should work with no default arguments',
-        () async {
-          var browser = await puppeteer.launch(ignoreDefaultArgs: true);
-          var page = await browser.newPage();
-          expect(await page.evaluate('11 * 11'), 121);
-          await page.close();
-          await browser.close();
-        },
-        skip: 'manual test, it launches a browser headful',
-      );
+      test('should work with no default arguments', () async {
+        var browser = await puppeteer.launch(ignoreDefaultArgs: true);
+        var page = await browser.newPage();
+        expect(await page.evaluate('11 * 11'), 121);
+        await page.close();
+        await browser.close();
+      }, skip: 'manual test, it launches a browser headful');
       test('should filter out ignored default arguments', () async {
         //TODO(xha): implement the feature and find a way to test it;
       });
