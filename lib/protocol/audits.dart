@@ -35,8 +35,8 @@ class AuditsApi {
     var result = await _client.send('Audits.getEncodedResponse', {
       'requestId': requestId,
       'encoding': encoding,
-      if (quality != null) 'quality': quality,
-      if (sizeOnly != null) 'sizeOnly': sizeOnly,
+      'quality': ?quality,
+      'sizeOnly': ?sizeOnly,
     });
     return GetEncodedResponseResult.fromJson(result);
   }

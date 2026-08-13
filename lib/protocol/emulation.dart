@@ -61,7 +61,7 @@ class EmulationApi {
   /// If not specified, any existing override will be cleared.
   Future<void> setAutoDarkModeOverride({bool? enabled}) async {
     await _client.send('Emulation.setAutoDarkModeOverride', {
-      if (enabled != null) 'enabled': enabled,
+      'enabled': ?enabled,
     });
   }
 
@@ -77,7 +77,7 @@ class EmulationApi {
   /// cleared.
   Future<void> setDefaultBackgroundColorOverride({dom.RGBA? color}) async {
     await _client.send('Emulation.setDefaultBackgroundColorOverride', {
-      if (color != null) 'color': color,
+      'color': ?color,
     });
   }
 
@@ -141,19 +141,18 @@ class EmulationApi {
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
       'mobile': mobile,
-      if (scale != null) 'scale': scale,
-      if (screenWidth != null) 'screenWidth': screenWidth,
-      if (screenHeight != null) 'screenHeight': screenHeight,
-      if (positionX != null) 'positionX': positionX,
-      if (positionY != null) 'positionY': positionY,
-      if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
-      if (screenOrientation != null) 'screenOrientation': screenOrientation,
-      if (viewport != null) 'viewport': viewport,
-      if (displayFeature != null) 'displayFeature': displayFeature,
-      if (devicePosture != null) 'devicePosture': devicePosture,
-      if (scrollbarType != null) 'scrollbarType': scrollbarType,
-      if (screenOrientationLockEmulation != null)
-        'screenOrientationLockEmulation': screenOrientationLockEmulation,
+      'scale': ?scale,
+      'screenWidth': ?screenWidth,
+      'screenHeight': ?screenHeight,
+      'positionX': ?positionX,
+      'positionY': ?positionY,
+      'dontSetVisibleSize': ?dontSetVisibleSize,
+      'screenOrientation': ?screenOrientation,
+      'viewport': ?viewport,
+      'displayFeature': ?displayFeature,
+      'devicePosture': ?devicePosture,
+      'scrollbarType': ?scrollbarType,
+      'screenOrientationLockEmulation': ?screenOrientationLockEmulation,
     });
   }
 
@@ -213,7 +212,7 @@ class EmulationApi {
     );
     await _client.send('Emulation.setEmitTouchEventsForMouse', {
       'enabled': enabled,
-      if (configuration != null) 'configuration': configuration,
+      'configuration': ?configuration,
     });
   }
 
@@ -225,7 +224,7 @@ class EmulationApi {
     List<MediaFeature>? features,
   }) async {
     await _client.send('Emulation.setEmulatedMedia', {
-      if (media != null) 'media': media,
+      'media': ?media,
       if (features != null) 'features': [...features],
     });
   }
@@ -261,9 +260,7 @@ class EmulationApi {
 
   /// Emulates the given OS text scale.
   Future<void> setEmulatedOSTextScale({num? scale}) async {
-    await _client.send('Emulation.setEmulatedOSTextScale', {
-      if (scale != null) 'scale': scale,
-    });
+    await _client.send('Emulation.setEmulatedOSTextScale', {'scale': ?scale});
   }
 
   /// Overrides the Geolocation Position or Error. Omitting latitude, longitude or
@@ -285,13 +282,13 @@ class EmulationApi {
     num? speed,
   }) async {
     await _client.send('Emulation.setGeolocationOverride', {
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
-      if (accuracy != null) 'accuracy': accuracy,
-      if (altitude != null) 'altitude': altitude,
-      if (altitudeAccuracy != null) 'altitudeAccuracy': altitudeAccuracy,
-      if (heading != null) 'heading': heading,
-      if (speed != null) 'speed': speed,
+      'latitude': ?latitude,
+      'longitude': ?longitude,
+      'accuracy': ?accuracy,
+      'altitude': ?altitude,
+      'altitudeAccuracy': ?altitudeAccuracy,
+      'heading': ?heading,
+      'speed': ?speed,
     });
   }
 
@@ -316,7 +313,7 @@ class EmulationApi {
     await _client.send('Emulation.setSensorOverrideEnabled', {
       'enabled': enabled,
       'type': type,
-      if (metadata != null) 'metadata': metadata,
+      'metadata': ?metadata,
     });
   }
 
@@ -344,7 +341,7 @@ class EmulationApi {
     await _client.send('Emulation.setPressureSourceOverrideEnabled', {
       'enabled': enabled,
       'source': source,
-      if (metadata != null) 'metadata': metadata,
+      'metadata': ?metadata,
     });
   }
 
@@ -410,7 +407,7 @@ class EmulationApi {
   }) async {
     await _client.send('Emulation.setTouchEmulationEnabled', {
       'enabled': enabled,
-      if (maxTouchPoints != null) 'maxTouchPoints': maxTouchPoints,
+      'maxTouchPoints': ?maxTouchPoints,
     });
   }
 
@@ -430,10 +427,9 @@ class EmulationApi {
   }) async {
     var result = await _client.send('Emulation.setVirtualTimePolicy', {
       'policy': policy,
-      if (budget != null) 'budget': budget,
-      if (maxVirtualTimeTaskStarvationCount != null)
-        'maxVirtualTimeTaskStarvationCount': maxVirtualTimeTaskStarvationCount,
-      if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
+      'budget': ?budget,
+      'maxVirtualTimeTaskStarvationCount': ?maxVirtualTimeTaskStarvationCount,
+      'initialVirtualTime': ?initialVirtualTime,
     });
     return result['virtualTimeTicksBase'] as num;
   }
@@ -442,9 +438,7 @@ class EmulationApi {
   /// [locale] ICU style C locale (e.g. "en_US"). If not specified or empty, disables the override and
   /// restores default host system locale.
   Future<void> setLocaleOverride({String? locale}) async {
-    await _client.send('Emulation.setLocaleOverride', {
-      if (locale != null) 'locale': locale,
-    });
+    await _client.send('Emulation.setLocaleOverride', {'locale': ?locale});
   }
 
   /// Overrides default host system timezone with the specified one.
@@ -481,7 +475,7 @@ class EmulationApi {
   /// [dataSaverEnabled] Override value. Omitting the parameter disables the override.
   Future<void> setDataSaverOverride({bool? dataSaverEnabled}) async {
     await _client.send('Emulation.setDataSaverOverride', {
-      if (dataSaverEnabled != null) 'dataSaverEnabled': dataSaverEnabled,
+      'dataSaverEnabled': ?dataSaverEnabled,
     });
   }
 
@@ -506,9 +500,9 @@ class EmulationApi {
   }) async {
     await _client.send('Emulation.setUserAgentOverride', {
       'userAgent': userAgent,
-      if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
-      if (platform != null) 'platform': platform,
-      if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
+      'acceptLanguage': ?acceptLanguage,
+      'platform': ?platform,
+      'userAgentMetadata': ?userAgentMetadata,
     });
   }
 
@@ -565,12 +559,12 @@ class EmulationApi {
       'top': top,
       'width': width,
       'height': height,
-      if (workAreaInsets != null) 'workAreaInsets': workAreaInsets,
-      if (devicePixelRatio != null) 'devicePixelRatio': devicePixelRatio,
-      if (rotation != null) 'rotation': rotation,
-      if (colorDepth != null) 'colorDepth': colorDepth,
-      if (label != null) 'label': label,
-      if (isInternal != null) 'isInternal': isInternal,
+      'workAreaInsets': ?workAreaInsets,
+      'devicePixelRatio': ?devicePixelRatio,
+      'rotation': ?rotation,
+      'colorDepth': ?colorDepth,
+      'label': ?label,
+      'isInternal': ?isInternal,
     });
     return ScreenInfo.fromJson(result['screenInfo'] as Map<String, dynamic>);
   }
@@ -602,16 +596,16 @@ class EmulationApi {
   }) async {
     var result = await _client.send('Emulation.updateScreen', {
       'screenId': screenId,
-      if (left != null) 'left': left,
-      if (top != null) 'top': top,
-      if (width != null) 'width': width,
-      if (height != null) 'height': height,
-      if (workAreaInsets != null) 'workAreaInsets': workAreaInsets,
-      if (devicePixelRatio != null) 'devicePixelRatio': devicePixelRatio,
-      if (rotation != null) 'rotation': rotation,
-      if (colorDepth != null) 'colorDepth': colorDepth,
-      if (label != null) 'label': label,
-      if (isInternal != null) 'isInternal': isInternal,
+      'left': ?left,
+      'top': ?top,
+      'width': ?width,
+      'height': ?height,
+      'workAreaInsets': ?workAreaInsets,
+      'devicePixelRatio': ?devicePixelRatio,
+      'rotation': ?rotation,
+      'colorDepth': ?colorDepth,
+      'label': ?label,
+      'isInternal': ?isInternal,
     });
     return ScreenInfo.fromJson(result['screenInfo'] as Map<String, dynamic>);
   }

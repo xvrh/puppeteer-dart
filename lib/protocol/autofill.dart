@@ -28,9 +28,9 @@ class AutofillApi {
   }) async {
     await _client.send('Autofill.trigger', {
       'fieldId': fieldId,
-      if (frameId != null) 'frameId': frameId,
-      if (card != null) 'card': card,
-      if (address != null) 'address': address,
+      'frameId': ?frameId,
+      'card': ?card,
+      'address': ?address,
     });
   }
 

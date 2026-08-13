@@ -54,8 +54,8 @@ class MemoryApi {
     bool? suppressRandomness,
   }) async {
     await _client.send('Memory.startSampling', {
-      if (samplingInterval != null) 'samplingInterval': samplingInterval,
-      if (suppressRandomness != null) 'suppressRandomness': suppressRandomness,
+      'samplingInterval': ?samplingInterval,
+      'suppressRandomness': ?suppressRandomness,
     });
   }
 

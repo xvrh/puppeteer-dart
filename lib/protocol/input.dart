@@ -37,7 +37,7 @@ class InputApi {
       'x': x,
       'y': y,
       'data': data,
-      if (modifiers != null) 'modifiers': modifiers,
+      'modifiers': ?modifiers,
     });
   }
 
@@ -84,21 +84,19 @@ class InputApi {
     assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
     await _client.send('Input.dispatchKeyEvent', {
       'type': type,
-      if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp,
-      if (text != null) 'text': text,
-      if (unmodifiedText != null) 'unmodifiedText': unmodifiedText,
-      if (keyIdentifier != null) 'keyIdentifier': keyIdentifier,
-      if (code != null) 'code': code,
-      if (key != null) 'key': key,
-      if (windowsVirtualKeyCode != null)
-        'windowsVirtualKeyCode': windowsVirtualKeyCode,
-      if (nativeVirtualKeyCode != null)
-        'nativeVirtualKeyCode': nativeVirtualKeyCode,
-      if (autoRepeat != null) 'autoRepeat': autoRepeat,
-      if (isKeypad != null) 'isKeypad': isKeypad,
-      if (isSystemKey != null) 'isSystemKey': isSystemKey,
-      if (location != null) 'location': location,
+      'modifiers': ?modifiers,
+      'timestamp': ?timestamp,
+      'text': ?text,
+      'unmodifiedText': ?unmodifiedText,
+      'keyIdentifier': ?keyIdentifier,
+      'code': ?code,
+      'key': ?key,
+      'windowsVirtualKeyCode': ?windowsVirtualKeyCode,
+      'nativeVirtualKeyCode': ?nativeVirtualKeyCode,
+      'autoRepeat': ?autoRepeat,
+      'isKeypad': ?isKeypad,
+      'isSystemKey': ?isSystemKey,
+      'location': ?location,
       if (commands != null) 'commands': [...commands],
     });
   }
@@ -129,8 +127,8 @@ class InputApi {
       'text': text,
       'selectionStart': selectionStart,
       'selectionEnd': selectionEnd,
-      if (replacementStart != null) 'replacementStart': replacementStart,
-      if (replacementEnd != null) 'replacementEnd': replacementEnd,
+      'replacementStart': ?replacementStart,
+      'replacementEnd': ?replacementEnd,
     });
   }
 
@@ -186,19 +184,19 @@ class InputApi {
       'type': type,
       'x': x,
       'y': y,
-      if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp,
-      if (button != null) 'button': button,
-      if (buttons != null) 'buttons': buttons,
-      if (clickCount != null) 'clickCount': clickCount,
-      if (force != null) 'force': force,
-      if (tangentialPressure != null) 'tangentialPressure': tangentialPressure,
-      if (tiltX != null) 'tiltX': tiltX,
-      if (tiltY != null) 'tiltY': tiltY,
-      if (twist != null) 'twist': twist,
-      if (deltaX != null) 'deltaX': deltaX,
-      if (deltaY != null) 'deltaY': deltaY,
-      if (pointerType != null) 'pointerType': pointerType,
+      'modifiers': ?modifiers,
+      'timestamp': ?timestamp,
+      'button': ?button,
+      'buttons': ?buttons,
+      'clickCount': ?clickCount,
+      'force': ?force,
+      'tangentialPressure': ?tangentialPressure,
+      'tiltX': ?tiltX,
+      'tiltY': ?tiltY,
+      'twist': ?twist,
+      'deltaX': ?deltaX,
+      'deltaY': ?deltaY,
+      'pointerType': ?pointerType,
     });
   }
 
@@ -228,8 +226,8 @@ class InputApi {
     await _client.send('Input.dispatchTouchEvent', {
       'type': type,
       'touchPoints': [...touchPoints],
-      if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp,
+      'modifiers': ?modifiers,
+      'timestamp': ?timestamp,
     });
   }
 
@@ -274,11 +272,11 @@ class InputApi {
       'x': x,
       'y': y,
       'button': button,
-      if (timestamp != null) 'timestamp': timestamp,
-      if (deltaX != null) 'deltaX': deltaX,
-      if (deltaY != null) 'deltaY': deltaY,
-      if (modifiers != null) 'modifiers': modifiers,
-      if (clickCount != null) 'clickCount': clickCount,
+      'timestamp': ?timestamp,
+      'deltaX': ?deltaX,
+      'deltaY': ?deltaY,
+      'modifiers': ?modifiers,
+      'clickCount': ?clickCount,
     });
   }
 
@@ -312,8 +310,8 @@ class InputApi {
       'x': x,
       'y': y,
       'scaleFactor': scaleFactor,
-      if (relativeSpeed != null) 'relativeSpeed': relativeSpeed,
-      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
+      'relativeSpeed': ?relativeSpeed,
+      'gestureSourceType': ?gestureSourceType,
     });
   }
 
@@ -350,17 +348,16 @@ class InputApi {
     await _client.send('Input.synthesizeScrollGesture', {
       'x': x,
       'y': y,
-      if (xDistance != null) 'xDistance': xDistance,
-      if (yDistance != null) 'yDistance': yDistance,
-      if (xOverscroll != null) 'xOverscroll': xOverscroll,
-      if (yOverscroll != null) 'yOverscroll': yOverscroll,
-      if (preventFling != null) 'preventFling': preventFling,
-      if (speed != null) 'speed': speed,
-      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
-      if (repeatCount != null) 'repeatCount': repeatCount,
-      if (repeatDelayMs != null) 'repeatDelayMs': repeatDelayMs,
-      if (interactionMarkerName != null)
-        'interactionMarkerName': interactionMarkerName,
+      'xDistance': ?xDistance,
+      'yDistance': ?yDistance,
+      'xOverscroll': ?xOverscroll,
+      'yOverscroll': ?yOverscroll,
+      'preventFling': ?preventFling,
+      'speed': ?speed,
+      'gestureSourceType': ?gestureSourceType,
+      'repeatCount': ?repeatCount,
+      'repeatDelayMs': ?repeatDelayMs,
+      'interactionMarkerName': ?interactionMarkerName,
     });
   }
 
@@ -381,9 +378,9 @@ class InputApi {
     await _client.send('Input.synthesizeTapGesture', {
       'x': x,
       'y': y,
-      if (duration != null) 'duration': duration,
-      if (tapCount != null) 'tapCount': tapCount,
-      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
+      'duration': ?duration,
+      'tapCount': ?tapCount,
+      'gestureSourceType': ?gestureSourceType,
     });
   }
 }

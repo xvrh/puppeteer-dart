@@ -123,7 +123,7 @@ class BluetoothEmulationApi {
           'characteristicId': characteristicId,
           'type': type,
           'code': code,
-          if (data != null) 'data': data,
+          'data': ?data,
         });
   }
 
@@ -138,13 +138,10 @@ class BluetoothEmulationApi {
     int code, {
     String? data,
   }) async {
-    await _client
-        .send('BluetoothEmulation.simulateDescriptorOperationResponse', {
-          'descriptorId': descriptorId,
-          'type': type,
-          'code': code,
-          if (data != null) 'data': data,
-        });
+    await _client.send(
+      'BluetoothEmulation.simulateDescriptorOperationResponse',
+      {'descriptorId': descriptorId, 'type': type, 'code': code, 'data': ?data},
+    );
   }
 
   /// Adds a service with |serviceUuid| to the peripheral with |address|.

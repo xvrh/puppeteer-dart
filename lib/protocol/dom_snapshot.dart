@@ -37,11 +37,9 @@ class DOMSnapshotApi {
   }) async {
     var result = await _client.send('DOMSnapshot.getSnapshot', {
       'computedStyleWhitelist': [...computedStyleWhitelist],
-      if (includeEventListeners != null)
-        'includeEventListeners': includeEventListeners,
-      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
-      if (includeUserAgentShadowTree != null)
-        'includeUserAgentShadowTree': includeUserAgentShadowTree,
+      'includeEventListeners': ?includeEventListeners,
+      'includePaintOrder': ?includePaintOrder,
+      'includeUserAgentShadowTree': ?includeUserAgentShadowTree,
     });
     return GetSnapshotResult.fromJson(result);
   }
@@ -68,12 +66,10 @@ class DOMSnapshotApi {
   }) async {
     var result = await _client.send('DOMSnapshot.captureSnapshot', {
       'computedStyles': [...computedStyles],
-      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
-      if (includeDOMRects != null) 'includeDOMRects': includeDOMRects,
-      if (includeBlendedBackgroundColors != null)
-        'includeBlendedBackgroundColors': includeBlendedBackgroundColors,
-      if (includeTextColorOpacities != null)
-        'includeTextColorOpacities': includeTextColorOpacities,
+      'includePaintOrder': ?includePaintOrder,
+      'includeDOMRects': ?includeDOMRects,
+      'includeBlendedBackgroundColors': ?includeBlendedBackgroundColors,
+      'includeTextColorOpacities': ?includeTextColorOpacities,
     });
     return CaptureSnapshotResult.fromJson(result);
   }

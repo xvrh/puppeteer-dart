@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
+import 'code_style/language_version.dart';
 
 void main() {
   var allFiles = Directory('test')
@@ -27,7 +28,7 @@ void main() {
 
   File('test/test_all.dart').writeAsStringSync(
     DartFormatter(
-      languageVersion: DartFormatter.latestLanguageVersion,
+      languageVersion: packageLanguageVersion,
     ).format(buffer.toString()),
   );
 }

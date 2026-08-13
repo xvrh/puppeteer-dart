@@ -26,7 +26,7 @@ class ExtensionsApi {
   Future<String> loadUnpacked(String path, {bool? enableInIncognito}) async {
     var result = await _client.send('Extensions.loadUnpacked', {
       'path': path,
-      if (enableInIncognito != null) 'enableInIncognito': enableInIncognito,
+      'enableInIncognito': ?enableInIncognito,
     });
     return result['id'] as String;
   }

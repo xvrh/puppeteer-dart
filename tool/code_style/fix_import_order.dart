@@ -4,8 +4,8 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:pub_semver/pub_semver.dart' show Version;
 import 'dart_project.dart';
+import 'language_version.dart';
 
 void main() {
   for (var project in getSubOrContainingProjects(Directory.current.path)) {
@@ -33,11 +33,11 @@ bool fixFile(DartFile dartFile) {
 }
 
 final DartFormatter _dartFormatter = DartFormatter(
-  languageVersion: DartFormatter.latestLanguageVersion,
+  languageVersion: packageLanguageVersion,
 );
 
 final analyzerFeatureSet = FeatureSet.fromEnableFlags2(
-  sdkLanguageVersion: Version(3, 3, 0),
+  sdkLanguageVersion: packageLanguageVersion,
   flags: ['inline-class'],
 );
 

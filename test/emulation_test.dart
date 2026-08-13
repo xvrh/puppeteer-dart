@@ -160,159 +160,151 @@ void main() {
   });
 
   group('Page.emulateMediaFeatures', () {
-    test(
-      'should work ddd',
-      () async {
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersReducedMotion('reduce'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-reduced-motion: reduce)').matches",
-          ),
-          isTrue,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-reduced-motion: no-preference)').matches",
-          ),
-          isFalse,
-        );
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersColorsScheme('light'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: light)').matches",
-          ),
-          isTrue,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isFalse,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
-          ),
-          isFalse,
-        );
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersColorsScheme('dark'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isTrue,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: light)').matches",
-          ),
-          isFalse,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
-          ),
-          isFalse,
-        );
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersReducedMotion('reduce'),
-          MediaFeature.prefersColorsScheme('light'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-reduced-motion: reduce)').matches",
-          ),
-          isTrue,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-reduced-motion: no-preference)').matches",
-          ),
-          isFalse,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: light)').matches",
-          ),
-          isTrue,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isFalse,
-        );
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
-          ),
-          isFalse,
-        );
-      },
-      skip: 'This is not working in headless and flaky in headful',
-    );
+    test('should work ddd', () async {
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersReducedMotion('reduce'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-reduced-motion: reduce)').matches",
+        ),
+        isTrue,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-reduced-motion: no-preference)').matches",
+        ),
+        isFalse,
+      );
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersColorsScheme('light'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: light)').matches",
+        ),
+        isTrue,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isFalse,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
+        ),
+        isFalse,
+      );
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersColorsScheme('dark'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isTrue,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: light)').matches",
+        ),
+        isFalse,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
+        ),
+        isFalse,
+      );
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersReducedMotion('reduce'),
+        MediaFeature.prefersColorsScheme('light'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-reduced-motion: reduce)').matches",
+        ),
+        isTrue,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-reduced-motion: no-preference)').matches",
+        ),
+        isFalse,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: light)').matches",
+        ),
+        isTrue,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isFalse,
+      );
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: no-preference)').matches",
+        ),
+        isFalse,
+      );
+    }, skip: 'This is not working in headless and flaky in headful');
 
-    test(
-      'should not interfer with emulateMediaType',
-      () async {
-        await page.emulateMediaType(MediaType.print);
-        expect(
-          await page.evaluate("() => window.matchMedia('screen').matches"),
-          isFalse,
-        );
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersColorsScheme('dark'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isTrue,
-        );
+    test('should not interfer with emulateMediaType', () async {
+      await page.emulateMediaType(MediaType.print);
+      expect(
+        await page.evaluate("() => window.matchMedia('screen').matches"),
+        isFalse,
+      );
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersColorsScheme('dark'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isTrue,
+      );
 
-        await page.emulateMediaFeatures(null);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isFalse,
-        );
-        expect(
-          await page.evaluate("() => window.matchMedia('screen').matches"),
-          isFalse,
-        );
+      await page.emulateMediaFeatures(null);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isFalse,
+      );
+      expect(
+        await page.evaluate("() => window.matchMedia('screen').matches"),
+        isFalse,
+      );
 
-        await page.emulateMediaType(null);
-        expect(
-          await page.evaluate("() => window.matchMedia('screen').matches"),
-          isTrue,
-        );
+      await page.emulateMediaType(null);
+      expect(
+        await page.evaluate("() => window.matchMedia('screen').matches"),
+        isTrue,
+      );
 
-        await page.emulateMediaFeatures([
-          MediaFeature.prefersColorsScheme('dark'),
-        ]);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isTrue,
-        );
-        await page.emulateMediaType(null);
-        expect(
-          await page.evaluate(
-            "() => matchMedia('(prefers-color-scheme: dark)').matches",
-          ),
-          isTrue,
-        );
-      },
-      skip: 'This is not working in headless and flaky in headful',
-    );
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersColorsScheme('dark'),
+      ]);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isTrue,
+      );
+      await page.emulateMediaType(null);
+      expect(
+        await page.evaluate(
+          "() => matchMedia('(prefers-color-scheme: dark)').matches",
+        ),
+        isTrue,
+      );
+    }, skip: 'This is not working in headless and flaky in headful');
   });
 
   group('Page.emulateTimezone', () {

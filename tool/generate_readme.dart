@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
+import 'code_style/language_version.dart';
 import 'download_protocol_from_repo.dart' show protocols;
 
 final RegExp _importRegex = RegExp(r"import '([^']+)';\r?\n");
@@ -9,7 +10,7 @@ final RegExp _ignoreForFileRegex = RegExp(
 );
 
 final DartFormatter _dartFormatter = DartFormatter(
-  languageVersion: DartFormatter.latestLanguageVersion,
+  languageVersion: packageLanguageVersion,
   lineEnding: Platform.isWindows ? '\r\n' : '\n',
 );
 

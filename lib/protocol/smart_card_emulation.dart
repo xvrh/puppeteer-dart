@@ -274,7 +274,7 @@ class SmartCardEmulationApi {
     await _client.send('SmartCardEmulation.reportConnectResult', {
       'requestId': requestId,
       'handle': handle,
-      if (activeProtocol != null) 'activeProtocol': activeProtocol,
+      'activeProtocol': ?activeProtocol,
     });
   }
 
@@ -317,7 +317,7 @@ class SmartCardEmulationApi {
       'readerName': readerName,
       'state': state,
       'atr': atr,
-      if (protocol != null) 'protocol': protocol,
+      'protocol': ?protocol,
     });
   }
 

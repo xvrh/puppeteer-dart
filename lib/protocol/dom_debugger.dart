@@ -24,8 +24,8 @@ class DOMDebuggerApi {
   }) async {
     var result = await _client.send('DOMDebugger.getEventListeners', {
       'objectId': objectId,
-      if (depth != null) 'depth': depth,
-      if (pierce != null) 'pierce': pierce,
+      'depth': ?depth,
+      'pierce': ?pierce,
     });
     return (result['listeners'] as List)
         .map((e) => EventListener.fromJson(e as Map<String, dynamic>))
@@ -54,7 +54,7 @@ class DOMDebuggerApi {
   }) async {
     await _client.send('DOMDebugger.removeEventListenerBreakpoint', {
       'eventName': eventName,
-      if (targetName != null) 'targetName': targetName,
+      'targetName': ?targetName,
     });
   }
 
@@ -106,7 +106,7 @@ class DOMDebuggerApi {
   }) async {
     await _client.send('DOMDebugger.setEventListenerBreakpoint', {
       'eventName': eventName,
-      if (targetName != null) 'targetName': targetName,
+      'targetName': ?targetName,
     });
   }
 

@@ -36,14 +36,10 @@ void main() {
   });
 
   group('Browser.target', () {
-    test(
-      'should return browser target',
-      () async {
-        var target = browser.target;
-        expect(target.type, 'browser');
-      },
-      skip: 'Investigate to use autoAttach and fix failure',
-    );
+    test('should return browser target', () async {
+      var target = browser.target;
+      expect(target.type, 'browser');
+    }, skip: 'Investigate to use autoAttach and fix failure');
   });
 
   group('Browser.process', () {

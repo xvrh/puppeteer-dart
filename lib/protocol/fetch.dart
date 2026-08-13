@@ -49,7 +49,7 @@ class FetchApi {
   }) async {
     await _client.send('Fetch.enable', {
       if (patterns != null) 'patterns': [...patterns],
-      if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
+      'handleAuthRequests': ?handleAuthRequests,
     });
   }
 
@@ -91,10 +91,9 @@ class FetchApi {
       'requestId': requestId,
       'responseCode': responseCode,
       if (responseHeaders != null) 'responseHeaders': [...responseHeaders],
-      if (binaryResponseHeaders != null)
-        'binaryResponseHeaders': binaryResponseHeaders,
-      if (body != null) 'body': body,
-      if (responsePhrase != null) 'responsePhrase': responsePhrase,
+      'binaryResponseHeaders': ?binaryResponseHeaders,
+      'body': ?body,
+      'responsePhrase': ?responsePhrase,
     });
   }
 
@@ -117,11 +116,11 @@ class FetchApi {
   }) async {
     await _client.send('Fetch.continueRequest', {
       'requestId': requestId,
-      if (url != null) 'url': url,
-      if (method != null) 'method': method,
-      if (postData != null) 'postData': postData,
+      'url': ?url,
+      'method': ?method,
+      'postData': ?postData,
       if (headers != null) 'headers': [...headers],
-      if (interceptResponse != null) 'interceptResponse': interceptResponse,
+      'interceptResponse': ?interceptResponse,
     });
   }
 
@@ -159,11 +158,10 @@ class FetchApi {
   }) async {
     await _client.send('Fetch.continueResponse', {
       'requestId': requestId,
-      if (responseCode != null) 'responseCode': responseCode,
-      if (responsePhrase != null) 'responsePhrase': responsePhrase,
+      'responseCode': ?responseCode,
+      'responsePhrase': ?responsePhrase,
       if (responseHeaders != null) 'responseHeaders': [...responseHeaders],
-      if (binaryResponseHeaders != null)
-        'binaryResponseHeaders': binaryResponseHeaders,
+      'binaryResponseHeaders': ?binaryResponseHeaders,
     });
   }
 

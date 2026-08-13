@@ -71,9 +71,9 @@ class LayerTreeApi {
   }) async {
     var result = await _client.send('LayerTree.profileSnapshot', {
       'snapshotId': snapshotId,
-      if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
-      if (minDuration != null) 'minDuration': minDuration,
-      if (clipRect != null) 'clipRect': clipRect,
+      'minRepeatCount': ?minRepeatCount,
+      'minDuration': ?minDuration,
+      'clipRect': ?clipRect,
     });
     return (result['timings'] as List)
         .map((e) => PaintProfile.fromJson(e as List))
@@ -100,9 +100,9 @@ class LayerTreeApi {
   }) async {
     var result = await _client.send('LayerTree.replaySnapshot', {
       'snapshotId': snapshotId,
-      if (fromStep != null) 'fromStep': fromStep,
-      if (toStep != null) 'toStep': toStep,
-      if (scale != null) 'scale': scale,
+      'fromStep': ?fromStep,
+      'toStep': ?toStep,
+      'scale': ?scale,
     });
     return result['dataURL'] as String;
   }

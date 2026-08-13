@@ -155,7 +155,7 @@ class DOMApi {
     var result = await _client.send('DOM.copyTo', {
       'nodeId': nodeId,
       'targetNodeId': targetNodeId,
-      if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
+      'insertBeforeNodeId': ?insertBeforeNodeId,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -178,11 +178,11 @@ class DOMApi {
     bool? pierce,
   }) async {
     var result = await _client.send('DOM.describeNode', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (depth != null) 'depth': depth,
-      if (pierce != null) 'pierce': pierce,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'depth': ?depth,
+      'pierce': ?pierce,
     });
     return Node.fromJson(result['node'] as Map<String, dynamic>);
   }
@@ -202,10 +202,10 @@ class DOMApi {
     Rect? rect,
   }) async {
     await _client.send('DOM.scrollIntoViewIfNeeded', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (rect != null) 'rect': rect,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'rect': ?rect,
     });
   }
 
@@ -230,9 +230,7 @@ class DOMApi {
       includeWhitespace == null ||
           const ['none', 'all'].contains(includeWhitespace),
     );
-    await _client.send('DOM.enable', {
-      if (includeWhitespace != null) 'includeWhitespace': includeWhitespace,
-    });
+    await _client.send('DOM.enable', {'includeWhitespace': ?includeWhitespace});
   }
 
   /// Focuses the given element.
@@ -245,9 +243,9 @@ class DOMApi {
     runtime.RemoteObjectId? objectId,
   }) async {
     await _client.send('DOM.focus', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
   }
 
@@ -270,9 +268,9 @@ class DOMApi {
     runtime.RemoteObjectId? objectId,
   }) async {
     var result = await _client.send('DOM.getBoxModel', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
     return BoxModel.fromJson(result['model'] as Map<String, dynamic>);
   }
@@ -289,9 +287,9 @@ class DOMApi {
     runtime.RemoteObjectId? objectId,
   }) async {
     var result = await _client.send('DOM.getContentQuads', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
     return (result['quads'] as List)
         .map((e) => Quad.fromJson(e as List))
@@ -307,8 +305,8 @@ class DOMApi {
   /// Returns: Resulting node.
   Future<Node> getDocument({int? depth, bool? pierce}) async {
     var result = await _client.send('DOM.getDocument', {
-      if (depth != null) 'depth': depth,
-      if (pierce != null) 'pierce': pierce,
+      'depth': ?depth,
+      'pierce': ?pierce,
     });
     return Node.fromJson(result['root'] as Map<String, dynamic>);
   }
@@ -324,8 +322,8 @@ class DOMApi {
   @Deprecated('Use DOMSnapshot.captureSnapshot instead')
   Future<List<Node>> getFlattenedDocument({int? depth, bool? pierce}) async {
     var result = await _client.send('DOM.getFlattenedDocument', {
-      if (depth != null) 'depth': depth,
-      if (pierce != null) 'pierce': pierce,
+      'depth': ?depth,
+      'pierce': ?pierce,
     });
     return (result['nodes'] as List)
         .map((e) => Node.fromJson(e as Map<String, dynamic>))
@@ -346,7 +344,7 @@ class DOMApi {
     var result = await _client.send('DOM.getNodesForSubtreeByStyle', {
       'nodeId': nodeId,
       'computedStyles': [...computedStyles],
-      if (pierce != null) 'pierce': pierce,
+      'pierce': ?pierce,
     });
     return (result['nodeIds'] as List)
         .map((e) => NodeId.fromJson(e as int))
@@ -368,10 +366,8 @@ class DOMApi {
     var result = await _client.send('DOM.getNodeForLocation', {
       'x': x,
       'y': y,
-      if (includeUserAgentShadowDOM != null)
-        'includeUserAgentShadowDOM': includeUserAgentShadowDOM,
-      if (ignorePointerEventsNone != null)
-        'ignorePointerEventsNone': ignorePointerEventsNone,
+      'includeUserAgentShadowDOM': ?includeUserAgentShadowDOM,
+      'ignorePointerEventsNone': ?ignorePointerEventsNone,
     });
     return GetNodeForLocationResult.fromJson(result);
   }
@@ -389,10 +385,10 @@ class DOMApi {
     bool? includeShadowDOM,
   }) async {
     var result = await _client.send('DOM.getOuterHTML', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
-      if (includeShadowDOM != null) 'includeShadowDOM': includeShadowDOM,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
+      'includeShadowDOM': ?includeShadowDOM,
     });
     return result['outerHTML'] as String;
   }
@@ -462,7 +458,7 @@ class DOMApi {
     var result = await _client.send('DOM.moveTo', {
       'nodeId': nodeId,
       'targetNodeId': targetNodeId,
-      if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
+      'insertBeforeNodeId': ?insertBeforeNodeId,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -477,8 +473,7 @@ class DOMApi {
   }) async {
     var result = await _client.send('DOM.performSearch', {
       'query': query,
-      if (includeUserAgentShadowDOM != null)
-        'includeUserAgentShadowDOM': includeUserAgentShadowDOM,
+      'includeUserAgentShadowDOM': ?includeUserAgentShadowDOM,
     });
     return PerformSearchResult.fromJson(result);
   }
@@ -600,8 +595,8 @@ class DOMApi {
   }) async {
     await _client.send('DOM.requestChildNodes', {
       'nodeId': nodeId,
-      if (depth != null) 'depth': depth,
-      if (pierce != null) 'pierce': pierce,
+      'depth': ?depth,
+      'pierce': ?pierce,
     });
   }
 
@@ -628,10 +623,10 @@ class DOMApi {
     runtime.ExecutionContextId? executionContextId,
   }) async {
     var result = await _client.send('DOM.resolveNode', {
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectGroup != null) 'objectGroup': objectGroup,
-      if (executionContextId != null) 'executionContextId': executionContextId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectGroup': ?objectGroup,
+      'executionContextId': ?executionContextId,
     });
     return runtime.RemoteObject.fromJson(
       result['object'] as Map<String, dynamic>,
@@ -668,7 +663,7 @@ class DOMApi {
     await _client.send('DOM.setAttributesAsText', {
       'nodeId': nodeId,
       'text': text,
-      if (name != null) 'name': name,
+      'name': ?name,
     });
   }
 
@@ -685,9 +680,9 @@ class DOMApi {
   }) async {
     await _client.send('DOM.setFileInputFiles', {
       'files': [...files],
-      if (nodeId != null) 'nodeId': nodeId,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId,
-      if (objectId != null) 'objectId': objectId,
+      'nodeId': ?nodeId,
+      'backendNodeId': ?backendNodeId,
+      'objectId': ?objectId,
     });
   }
 
@@ -789,11 +784,11 @@ class DOMApi {
   }) async {
     var result = await _client.send('DOM.getContainerForNode', {
       'nodeId': nodeId,
-      if (containerName != null) 'containerName': containerName,
-      if (physicalAxes != null) 'physicalAxes': physicalAxes,
-      if (logicalAxes != null) 'logicalAxes': logicalAxes,
-      if (queriesScrollState != null) 'queriesScrollState': queriesScrollState,
-      if (queriesAnchored != null) 'queriesAnchored': queriesAnchored,
+      'containerName': ?containerName,
+      'physicalAxes': ?physicalAxes,
+      'logicalAxes': ?logicalAxes,
+      'queriesScrollState': ?queriesScrollState,
+      'queriesAnchored': ?queriesAnchored,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -825,7 +820,7 @@ class DOMApi {
   }) async {
     var result = await _client.send('DOM.getAnchorElement', {
       'nodeId': nodeId,
-      if (anchorSpecifier != null) 'anchorSpecifier': anchorSpecifier,
+      'anchorSpecifier': ?anchorSpecifier,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -848,7 +843,7 @@ class DOMApi {
     var result = await _client.send('DOM.forceShowPopover', {
       'nodeId': nodeId,
       'enable': enable,
-      if (invokerNodeId != null) 'invokerNodeId': invokerNodeId,
+      'invokerNodeId': ?invokerNodeId,
     });
     return (result['nodeIds'] as List)
         .map((e) => NodeId.fromJson(e as int))

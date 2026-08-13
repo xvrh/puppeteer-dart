@@ -72,8 +72,8 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.awaitPromise', {
       'promiseObjectId': promiseObjectId,
-      if (returnByValue != null) 'returnByValue': returnByValue,
-      if (generatePreview != null) 'generatePreview': generatePreview,
+      'returnByValue': ?returnByValue,
+      'generatePreview': ?generatePreview,
     });
     return AwaitPromiseResult.fromJson(result);
   }
@@ -123,19 +123,18 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
-      if (objectId != null) 'objectId': objectId,
+      'objectId': ?objectId,
       if (arguments != null) 'arguments': [...arguments],
-      if (silent != null) 'silent': silent,
-      if (returnByValue != null) 'returnByValue': returnByValue,
-      if (generatePreview != null) 'generatePreview': generatePreview,
-      if (userGesture != null) 'userGesture': userGesture,
-      if (awaitPromise != null) 'awaitPromise': awaitPromise,
-      if (executionContextId != null) 'executionContextId': executionContextId,
-      if (objectGroup != null) 'objectGroup': objectGroup,
-      if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
-      if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
-      if (serializationOptions != null)
-        'serializationOptions': serializationOptions,
+      'silent': ?silent,
+      'returnByValue': ?returnByValue,
+      'generatePreview': ?generatePreview,
+      'userGesture': ?userGesture,
+      'awaitPromise': ?awaitPromise,
+      'executionContextId': ?executionContextId,
+      'objectGroup': ?objectGroup,
+      'throwOnSideEffect': ?throwOnSideEffect,
+      'uniqueContextId': ?uniqueContextId,
+      'serializationOptions': ?serializationOptions,
     });
     return CallFunctionOnResult.fromJson(result);
   }
@@ -156,7 +155,7 @@ class RuntimeApi {
       'expression': expression,
       'sourceURL': sourceURL,
       'persistScript': persistScript,
-      if (executionContextId != null) 'executionContextId': executionContextId,
+      'executionContextId': ?executionContextId,
     });
     return CompileScriptResult.fromJson(result);
   }
@@ -233,24 +232,21 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
-      if (objectGroup != null) 'objectGroup': objectGroup,
-      if (includeCommandLineAPI != null)
-        'includeCommandLineAPI': includeCommandLineAPI,
-      if (silent != null) 'silent': silent,
-      if (contextId != null) 'contextId': contextId,
-      if (returnByValue != null) 'returnByValue': returnByValue,
-      if (generatePreview != null) 'generatePreview': generatePreview,
-      if (userGesture != null) 'userGesture': userGesture,
-      if (awaitPromise != null) 'awaitPromise': awaitPromise,
-      if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
-      if (timeout != null) 'timeout': timeout,
-      if (disableBreaks != null) 'disableBreaks': disableBreaks,
-      if (replMode != null) 'replMode': replMode,
-      if (allowUnsafeEvalBlockedByCSP != null)
-        'allowUnsafeEvalBlockedByCSP': allowUnsafeEvalBlockedByCSP,
-      if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
-      if (serializationOptions != null)
-        'serializationOptions': serializationOptions,
+      'objectGroup': ?objectGroup,
+      'includeCommandLineAPI': ?includeCommandLineAPI,
+      'silent': ?silent,
+      'contextId': ?contextId,
+      'returnByValue': ?returnByValue,
+      'generatePreview': ?generatePreview,
+      'userGesture': ?userGesture,
+      'awaitPromise': ?awaitPromise,
+      'throwOnSideEffect': ?throwOnSideEffect,
+      'timeout': ?timeout,
+      'disableBreaks': ?disableBreaks,
+      'replMode': ?replMode,
+      'allowUnsafeEvalBlockedByCSP': ?allowUnsafeEvalBlockedByCSP,
+      'uniqueContextId': ?uniqueContextId,
+      'serializationOptions': ?serializationOptions,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -287,12 +283,10 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.getProperties', {
       'objectId': objectId,
-      if (ownProperties != null) 'ownProperties': ownProperties,
-      if (accessorPropertiesOnly != null)
-        'accessorPropertiesOnly': accessorPropertiesOnly,
-      if (generatePreview != null) 'generatePreview': generatePreview,
-      if (nonIndexedPropertiesOnly != null)
-        'nonIndexedPropertiesOnly': nonIndexedPropertiesOnly,
+      'ownProperties': ?ownProperties,
+      'accessorPropertiesOnly': ?accessorPropertiesOnly,
+      'generatePreview': ?generatePreview,
+      'nonIndexedPropertiesOnly': ?nonIndexedPropertiesOnly,
     });
     return GetPropertiesResult.fromJson(result);
   }
@@ -303,7 +297,7 @@ class RuntimeApi {
     ExecutionContextId? executionContextId,
   }) async {
     var result = await _client.send('Runtime.globalLexicalScopeNames', {
-      if (executionContextId != null) 'executionContextId': executionContextId,
+      'executionContextId': ?executionContextId,
     });
     return (result['names'] as List).map((e) => e as String).toList();
   }
@@ -317,7 +311,7 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.queryObjects', {
       'prototypeObjectId': prototypeObjectId,
-      if (objectGroup != null) 'objectGroup': objectGroup,
+      'objectGroup': ?objectGroup,
     });
     return RemoteObject.fromJson(result['objects'] as Map<String, dynamic>);
   }
@@ -365,14 +359,13 @@ class RuntimeApi {
   }) async {
     var result = await _client.send('Runtime.runScript', {
       'scriptId': scriptId,
-      if (executionContextId != null) 'executionContextId': executionContextId,
-      if (objectGroup != null) 'objectGroup': objectGroup,
-      if (silent != null) 'silent': silent,
-      if (includeCommandLineAPI != null)
-        'includeCommandLineAPI': includeCommandLineAPI,
-      if (returnByValue != null) 'returnByValue': returnByValue,
-      if (generatePreview != null) 'generatePreview': generatePreview,
-      if (awaitPromise != null) 'awaitPromise': awaitPromise,
+      'executionContextId': ?executionContextId,
+      'objectGroup': ?objectGroup,
+      'silent': ?silent,
+      'includeCommandLineAPI': ?includeCommandLineAPI,
+      'returnByValue': ?returnByValue,
+      'generatePreview': ?generatePreview,
+      'awaitPromise': ?awaitPromise,
     });
     return RunScriptResult.fromJson(result);
   }
@@ -421,9 +414,8 @@ class RuntimeApi {
   }) async {
     await _client.send('Runtime.addBinding', {
       'name': name,
-      if (executionContextId != null) 'executionContextId': executionContextId,
-      if (executionContextName != null)
-        'executionContextName': executionContextName,
+      'executionContextId': ?executionContextId,
+      'executionContextName': ?executionContextName,
     });
   }
 

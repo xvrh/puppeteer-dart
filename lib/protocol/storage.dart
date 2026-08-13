@@ -123,7 +123,7 @@ class StorageApi {
   /// the storage key of the target executing this command is returned.
   Future<SerializedStorageKey> getStorageKey({page.FrameId? frameId}) async {
     var result = await _client.send('Storage.getStorageKey', {
-      if (frameId != null) 'frameId': frameId,
+      'frameId': ?frameId,
     });
     return SerializedStorageKey.fromJson(result['storageKey'] as String);
   }
@@ -158,7 +158,7 @@ class StorageApi {
     browser.BrowserContextID? browserContextId,
   }) async {
     var result = await _client.send('Storage.getCookies', {
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
     return (result['cookies'] as List)
         .map((e) => network.Cookie.fromJson(e as Map<String, dynamic>))
@@ -174,7 +174,7 @@ class StorageApi {
   }) async {
     await _client.send('Storage.setCookies', {
       'cookies': [...cookies],
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -184,7 +184,7 @@ class StorageApi {
     browser.BrowserContextID? browserContextId,
   }) async {
     await _client.send('Storage.clearCookies', {
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -209,7 +209,7 @@ class StorageApi {
   Future<void> overrideQuotaForOrigin(String origin, {num? quotaSize}) async {
     await _client.send('Storage.overrideQuotaForOrigin', {
       'origin': origin,
-      if (quotaSize != null) 'quotaSize': quotaSize,
+      'quotaSize': ?quotaSize,
     });
   }
 
@@ -358,7 +358,7 @@ class StorageApi {
       'ownerOrigin': ownerOrigin,
       'key': key,
       'value': value,
-      if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
+      'ignoreIfPresent': ?ignoreIfPresent,
     });
   }
 

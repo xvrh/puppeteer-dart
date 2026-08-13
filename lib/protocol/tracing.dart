@@ -60,8 +60,8 @@ class TracingApi {
     MemoryDumpLevelOfDetail? levelOfDetail,
   }) async {
     var result = await _client.send('Tracing.requestMemoryDump', {
-      if (deterministic != null) 'deterministic': deterministic,
-      if (levelOfDetail != null) 'levelOfDetail': levelOfDetail,
+      'deterministic': ?deterministic,
+      'levelOfDetail': ?levelOfDetail,
     });
     return RequestMemoryDumpResult.fromJson(result);
   }
@@ -105,18 +105,17 @@ class TracingApi {
           const ['ReportEvents', 'ReturnAsStream'].contains(transferMode),
     );
     await _client.send('Tracing.start', {
-      if (categories != null) 'categories': categories,
-      if (options != null) 'options': options,
-      if (bufferUsageReportingInterval != null)
-        'bufferUsageReportingInterval': bufferUsageReportingInterval,
-      if (transferMode != null) 'transferMode': transferMode,
-      if (streamFormat != null) 'streamFormat': streamFormat,
-      if (streamCompression != null) 'streamCompression': streamCompression,
-      if (traceConfig != null) 'traceConfig': traceConfig,
-      if (perfettoConfig != null) 'perfettoConfig': perfettoConfig,
-      if (tracingBackend != null) 'tracingBackend': tracingBackend,
-      if (screenshotMaxSize != null) 'screenshotMaxSize': screenshotMaxSize,
-      if (screenshotMaxCount != null) 'screenshotMaxCount': screenshotMaxCount,
+      'categories': ?categories,
+      'options': ?options,
+      'bufferUsageReportingInterval': ?bufferUsageReportingInterval,
+      'transferMode': ?transferMode,
+      'streamFormat': ?streamFormat,
+      'streamCompression': ?streamCompression,
+      'traceConfig': ?traceConfig,
+      'perfettoConfig': ?perfettoConfig,
+      'tracingBackend': ?tracingBackend,
+      'screenshotMaxSize': ?screenshotMaxSize,
+      'screenshotMaxCount': ?screenshotMaxCount,
     });
   }
 }

@@ -35,9 +35,9 @@ class CacheStorageApi {
     storage.StorageBucket? storageBucket,
   }) async {
     var result = await _client.send('CacheStorage.requestCacheNames', {
-      if (securityOrigin != null) 'securityOrigin': securityOrigin,
-      if (storageKey != null) 'storageKey': storageKey,
-      if (storageBucket != null) 'storageBucket': storageBucket,
+      'securityOrigin': ?securityOrigin,
+      'storageKey': ?storageKey,
+      'storageBucket': ?storageBucket,
     });
     return (result['caches'] as List)
         .map((e) => Cache.fromJson(e as Map<String, dynamic>))
@@ -75,9 +75,9 @@ class CacheStorageApi {
   }) async {
     var result = await _client.send('CacheStorage.requestEntries', {
       'cacheId': cacheId,
-      if (skipCount != null) 'skipCount': skipCount,
-      if (pageSize != null) 'pageSize': pageSize,
-      if (pathFilter != null) 'pathFilter': pathFilter,
+      'skipCount': ?skipCount,
+      'pageSize': ?pageSize,
+      'pathFilter': ?pathFilter,
     });
     return RequestEntriesResult.fromJson(result);
   }

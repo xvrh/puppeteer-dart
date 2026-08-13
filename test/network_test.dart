@@ -204,17 +204,13 @@ void main() {
       var response = await page.goto(server.prefix + '/simple.json');
       expect(await response.text, startsWith('{"foo": "bar"}'));
     });
-    test(
-      'should return uncompressed text',
-      () async {
-        //TODO(xha): add feature to server and enable test
-        //server.enableGzip('/simple.json');
-        var response = await page.goto(server.prefix + '/simple.json');
-        expect(response.headers['content-encoding'], equals('gzip'));
-        expect(await response.text, equals('{"foo": "bar"}\n'));
-      },
-      skip: "Test server doesn't have enableGzip",
-    );
+    test('should return uncompressed text', () async {
+      //TODO(xha): add feature to server and enable test
+      //server.enableGzip('/simple.json');
+      var response = await page.goto(server.prefix + '/simple.json');
+      expect(response.headers['content-encoding'], equals('gzip'));
+      expect(await response.text, equals('{"foo": "bar"}\n'));
+    }, skip: "Test server doesn't have enableGzip");
     test('should throw when requesting body of redirected response', () async {
       server.setRedirect('/foo.html', '/empty.html');
       var response = await page.goto(server.prefix + '/foo.html');

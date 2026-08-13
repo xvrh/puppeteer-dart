@@ -83,7 +83,7 @@ class HeapProfilerApi {
   }) async {
     var result = await _client.send('HeapProfiler.getObjectByHeapObjectId', {
       'objectId': objectId,
-      if (objectGroup != null) 'objectGroup': objectGroup,
+      'objectGroup': ?objectGroup,
     });
     return runtime.RemoteObject.fromJson(
       result['result'] as Map<String, dynamic>,
@@ -122,18 +122,16 @@ class HeapProfilerApi {
     bool? includeObjectsCollectedByMinorGC,
   }) async {
     await _client.send('HeapProfiler.startSampling', {
-      if (samplingInterval != null) 'samplingInterval': samplingInterval,
-      if (stackDepth != null) 'stackDepth': stackDepth,
-      if (includeObjectsCollectedByMajorGC != null)
-        'includeObjectsCollectedByMajorGC': includeObjectsCollectedByMajorGC,
-      if (includeObjectsCollectedByMinorGC != null)
-        'includeObjectsCollectedByMinorGC': includeObjectsCollectedByMinorGC,
+      'samplingInterval': ?samplingInterval,
+      'stackDepth': ?stackDepth,
+      'includeObjectsCollectedByMajorGC': ?includeObjectsCollectedByMajorGC,
+      'includeObjectsCollectedByMinorGC': ?includeObjectsCollectedByMinorGC,
     });
   }
 
   Future<void> startTrackingHeapObjects({bool? trackAllocations}) async {
     await _client.send('HeapProfiler.startTrackingHeapObjects', {
-      if (trackAllocations != null) 'trackAllocations': trackAllocations,
+      'trackAllocations': ?trackAllocations,
     });
   }
 
@@ -156,12 +154,10 @@ class HeapProfilerApi {
     bool? exposeInternals,
   }) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
-      if (reportProgress != null) 'reportProgress': reportProgress,
-      if (treatGlobalObjectsAsRoots != null)
-        'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
-      if (captureNumericValue != null)
-        'captureNumericValue': captureNumericValue,
-      if (exposeInternals != null) 'exposeInternals': exposeInternals,
+      'reportProgress': ?reportProgress,
+      'treatGlobalObjectsAsRoots': ?treatGlobalObjectsAsRoots,
+      'captureNumericValue': ?captureNumericValue,
+      'exposeInternals': ?exposeInternals,
     });
   }
 
@@ -175,12 +171,10 @@ class HeapProfilerApi {
     bool? exposeInternals,
   }) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
-      if (reportProgress != null) 'reportProgress': reportProgress,
-      if (treatGlobalObjectsAsRoots != null)
-        'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
-      if (captureNumericValue != null)
-        'captureNumericValue': captureNumericValue,
-      if (exposeInternals != null) 'exposeInternals': exposeInternals,
+      'reportProgress': ?reportProgress,
+      'treatGlobalObjectsAsRoots': ?treatGlobalObjectsAsRoots,
+      'captureNumericValue': ?captureNumericValue,
+      'exposeInternals': ?exposeInternals,
     });
   }
 }

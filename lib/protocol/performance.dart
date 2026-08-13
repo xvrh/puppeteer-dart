@@ -25,9 +25,7 @@ class PerformanceApi {
       timeDomain == null ||
           const ['timeTicks', 'threadTicks'].contains(timeDomain),
     );
-    await _client.send('Performance.enable', {
-      if (timeDomain != null) 'timeDomain': timeDomain,
-    });
+    await _client.send('Performance.enable', {'timeDomain': ?timeDomain});
   }
 
   /// Sets time domain to use for collecting and reporting duration metrics.

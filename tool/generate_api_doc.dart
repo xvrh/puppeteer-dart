@@ -107,12 +107,12 @@ class Class {
 
   static Class fromDeclaration(ClassDeclaration declaration) {
     var clas = Class(
-      declaration.name.toString(),
+      declaration.namePart.typeName.toString(),
       readComment(declaration.documentationComment),
     );
 
     clas.methods.addAll(
-      declaration.members
+      declaration.body.members
           .where((member) => member.documentationComment != null)
           .map((member) => Method.fromClassMember(clas, member))
           .nonNulls,

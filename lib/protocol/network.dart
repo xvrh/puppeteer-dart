@@ -420,14 +420,13 @@ class NetworkApi {
   }) async {
     await _client.send('Network.continueInterceptedRequest', {
       'interceptionId': interceptionId,
-      if (errorReason != null) 'errorReason': errorReason,
-      if (rawResponse != null) 'rawResponse': rawResponse,
-      if (url != null) 'url': url,
-      if (method != null) 'method': method,
-      if (postData != null) 'postData': postData,
-      if (headers != null) 'headers': headers,
-      if (authChallengeResponse != null)
-        'authChallengeResponse': authChallengeResponse,
+      'errorReason': ?errorReason,
+      'rawResponse': ?rawResponse,
+      'url': ?url,
+      'method': ?method,
+      'postData': ?postData,
+      'headers': ?headers,
+      'authChallengeResponse': ?authChallengeResponse,
     });
   }
 
@@ -448,10 +447,10 @@ class NetworkApi {
   }) async {
     await _client.send('Network.deleteCookies', {
       'name': name,
-      if (url != null) 'url': url,
-      if (domain != null) 'domain': domain,
-      if (path != null) 'path': path,
-      if (partitionKey != null) 'partitionKey': partitionKey,
+      'url': ?url,
+      'domain': ?domain,
+      'path': ?path,
+      'partitionKey': ?partitionKey,
     });
   }
 
@@ -486,10 +485,10 @@ class NetworkApi {
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
-      if (connectionType != null) 'connectionType': connectionType,
-      if (packetLoss != null) 'packetLoss': packetLoss,
-      if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
-      if (packetReordering != null) 'packetReordering': packetReordering,
+      'connectionType': ?connectionType,
+      'packetLoss': ?packetLoss,
+      'packetQueueLength': ?packetQueueLength,
+      'packetReordering': ?packetReordering,
     });
   }
 
@@ -512,9 +511,8 @@ class NetworkApi {
   }) async {
     var result = await _client.send('Network.emulateNetworkConditionsByRule', {
       'matchedNetworkConditions': [...matchedNetworkConditions],
-      if (offline != null) 'offline': offline,
-      if (emulateOfflineServiceWorker != null)
-        'emulateOfflineServiceWorker': emulateOfflineServiceWorker,
+      'offline': ?offline,
+      'emulateOfflineServiceWorker': ?emulateOfflineServiceWorker,
     });
     return (result['ruleIds'] as List).map((e) => e as String).toList();
   }
@@ -537,7 +535,7 @@ class NetworkApi {
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
-      if (connectionType != null) 'connectionType': connectionType,
+      'connectionType': ?connectionType,
     });
   }
 
@@ -561,14 +559,11 @@ class NetworkApi {
     bool? enableDurableMessages,
   }) async {
     await _client.send('Network.enable', {
-      if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
-      if (maxResourceBufferSize != null)
-        'maxResourceBufferSize': maxResourceBufferSize,
-      if (maxPostDataSize != null) 'maxPostDataSize': maxPostDataSize,
-      if (reportDirectSocketTraffic != null)
-        'reportDirectSocketTraffic': reportDirectSocketTraffic,
-      if (enableDurableMessages != null)
-        'enableDurableMessages': enableDurableMessages,
+      'maxTotalBufferSize': ?maxTotalBufferSize,
+      'maxResourceBufferSize': ?maxResourceBufferSize,
+      'maxPostDataSize': ?maxPostDataSize,
+      'reportDirectSocketTraffic': ?reportDirectSocketTraffic,
+      'enableDurableMessages': ?enableDurableMessages,
     });
   }
 
@@ -582,9 +577,8 @@ class NetworkApi {
     int? maxResourceBufferSize,
   }) async {
     await _client.send('Network.configureDurableMessages', {
-      if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
-      if (maxResourceBufferSize != null)
-        'maxResourceBufferSize': maxResourceBufferSize,
+      'maxTotalBufferSize': ?maxTotalBufferSize,
+      'maxResourceBufferSize': ?maxResourceBufferSize,
     });
   }
 
@@ -692,8 +686,8 @@ class NetworkApi {
     var result = await _client.send('Network.searchInResponseBody', {
       'requestId': requestId,
       'query': query,
-      if (caseSensitive != null) 'caseSensitive': caseSensitive,
-      if (isRegex != null) 'isRegex': isRegex,
+      'caseSensitive': ?caseSensitive,
+      'isRegex': ?isRegex,
     });
     return (result['result'] as List)
         .map((e) => debugger.SearchMatch.fromJson(e as Map<String, dynamic>))
@@ -763,17 +757,17 @@ class NetworkApi {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
-      if (url != null) 'url': url,
-      if (domain != null) 'domain': domain,
-      if (path != null) 'path': path,
-      if (secure != null) 'secure': secure,
-      if (httpOnly != null) 'httpOnly': httpOnly,
-      if (sameSite != null) 'sameSite': sameSite,
-      if (expires != null) 'expires': expires,
-      if (priority != null) 'priority': priority,
-      if (sourceScheme != null) 'sourceScheme': sourceScheme,
-      if (sourcePort != null) 'sourcePort': sourcePort,
-      if (partitionKey != null) 'partitionKey': partitionKey,
+      'url': ?url,
+      'domain': ?domain,
+      'path': ?path,
+      'secure': ?secure,
+      'httpOnly': ?httpOnly,
+      'sameSite': ?sameSite,
+      'expires': ?expires,
+      'priority': ?priority,
+      'sourceScheme': ?sourceScheme,
+      'sourcePort': ?sourcePort,
+      'partitionKey': ?partitionKey,
     });
     return result['success'] as bool;
   }
@@ -822,9 +816,9 @@ class NetworkApi {
   }) async {
     await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
-      if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
-      if (platform != null) 'platform': platform,
-      if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
+      'acceptLanguage': ?acceptLanguage,
+      'platform': ?platform,
+      'userAgentMetadata': ?userAgentMetadata,
     });
   }
 
@@ -845,7 +839,7 @@ class NetworkApi {
     page.FrameId? frameId,
   }) async {
     var result = await _client.send('Network.getSecurityIsolationStatus', {
-      if (frameId != null) 'frameId': frameId,
+      'frameId': ?frameId,
     });
     return SecurityIsolationStatus.fromJson(
       result['status'] as Map<String, dynamic>,
@@ -893,7 +887,7 @@ class NetworkApi {
     var result = await _client.send('Network.loadNetworkResource', {
       'url': url,
       'options': options,
-      if (frameId != null) 'frameId': frameId,
+      'frameId': ?frameId,
     });
     return LoadNetworkResourcePageResult.fromJson(
       result['resource'] as Map<String, dynamic>,

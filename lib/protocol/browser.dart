@@ -37,9 +37,9 @@ class BrowserApi {
     await _client.send('Browser.setPermission', {
       'permission': permission,
       'setting': setting,
-      if (origin != null) 'origin': origin,
-      if (embeddedOrigin != null) 'embeddedOrigin': embeddedOrigin,
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'origin': ?origin,
+      'embeddedOrigin': ?embeddedOrigin,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -55,8 +55,8 @@ class BrowserApi {
   }) async {
     await _client.send('Browser.grantPermissions', {
       'permissions': [...permissions],
-      if (origin != null) 'origin': origin,
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'origin': ?origin,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -64,7 +64,7 @@ class BrowserApi {
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
   Future<void> resetPermissions({BrowserContextID? browserContextId}) async {
     await _client.send('Browser.resetPermissions', {
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -87,9 +87,9 @@ class BrowserApi {
     );
     await _client.send('Browser.setDownloadBehavior', {
       'behavior': behavior,
-      if (browserContextId != null) 'browserContextId': browserContextId,
-      if (downloadPath != null) 'downloadPath': downloadPath,
-      if (eventsEnabled != null) 'eventsEnabled': eventsEnabled,
+      'browserContextId': ?browserContextId,
+      'downloadPath': ?downloadPath,
+      'eventsEnabled': ?eventsEnabled,
     });
   }
 
@@ -102,7 +102,7 @@ class BrowserApi {
   }) async {
     await _client.send('Browser.cancelDownload', {
       'guid': guid,
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
   }
 
@@ -143,8 +143,8 @@ class BrowserApi {
   /// Returns: Histograms.
   Future<List<Histogram>> getHistograms({String? query, bool? delta}) async {
     var result = await _client.send('Browser.getHistograms', {
-      if (query != null) 'query': query,
-      if (delta != null) 'delta': delta,
+      'query': ?query,
+      'delta': ?delta,
     });
     return (result['histograms'] as List)
         .map((e) => Histogram.fromJson(e as Map<String, dynamic>))
@@ -158,7 +158,7 @@ class BrowserApi {
   Future<Histogram> getHistogram(String name, {bool? delta}) async {
     var result = await _client.send('Browser.getHistogram', {
       'name': name,
-      if (delta != null) 'delta': delta,
+      'delta': ?delta,
     });
     return Histogram.fromJson(result['histogram'] as Map<String, dynamic>);
   }
@@ -180,7 +180,7 @@ class BrowserApi {
     target.TargetID? targetId,
   }) async {
     var result = await _client.send('Browser.getWindowForTarget', {
-      if (targetId != null) 'targetId': targetId,
+      'targetId': ?targetId,
     });
     return GetWindowForTargetResult.fromJson(result);
   }
@@ -209,8 +209,8 @@ class BrowserApi {
   }) async {
     await _client.send('Browser.setContentsSize', {
       'windowId': windowId,
-      if (width != null) 'width': width,
-      if (height != null) 'height': height,
+      'width': ?width,
+      'height': ?height,
     });
   }
 
@@ -218,8 +218,8 @@ class BrowserApi {
   /// [image] Png encoded image.
   Future<void> setDockTile({String? badgeLabel, String? image}) async {
     await _client.send('Browser.setDockTile', {
-      if (badgeLabel != null) 'badgeLabel': badgeLabel,
-      if (image != null) 'image': image,
+      'badgeLabel': ?badgeLabel,
+      'image': ?image,
     });
   }
 
@@ -254,7 +254,7 @@ class BrowserApi {
       'api': api,
       'coordinatorOrigin': coordinatorOrigin,
       'keyConfig': keyConfig,
-      if (browserContextId != null) 'browserContextId': browserContextId,
+      'browserContextId': ?browserContextId,
     });
   }
 }

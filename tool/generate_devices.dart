@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'code_style/language_version.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
@@ -52,7 +53,7 @@ void main() async {
   buffer.writeln('final devices = Devices._();');
   File('lib/src/devices.dart').writeAsStringSync(
     DartFormatter(
-      languageVersion: DartFormatter.latestLanguageVersion,
+      languageVersion: packageLanguageVersion,
     ).format(buffer.toString()),
   );
 }
