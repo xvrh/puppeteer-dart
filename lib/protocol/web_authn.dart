@@ -168,17 +168,28 @@ class WebAuthnApi {
 
   /// Allows setting credential properties.
   /// https://w3c.github.io/webauthn/#sctn-automation-set-credential-properties
+  /// [signCount] Must be equal to or greater than -1.
+  /// If -1, the signature counter is removed from the credential, and every
+  /// assertion operation will report a value of 0.
+  /// See https://w3c.github.io/webauthn/#signature-counter
   Future<void> setCredentialProperties(
     AuthenticatorId authenticatorId,
     String credentialId, {
     bool? backupEligibility,
     bool? backupState,
+    int? activeCmtgKeyIndex,
+    bool? generateCmtgKeyOnNextOperation,
+    int? signCount,
   }) async {
     await _client.send('WebAuthn.setCredentialProperties', {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
       if (backupEligibility != null) 'backupEligibility': backupEligibility,
       if (backupState != null) 'backupState': backupState,
+      if (activeCmtgKeyIndex != null) 'activeCmtgKeyIndex': activeCmtgKeyIndex,
+      if (generateCmtgKeyOnNextOperation != null)
+        'generateCmtgKeyOnNextOperation': generateCmtgKeyOnNextOperation,
+      if (signCount != null) 'signCount': signCount,
     });
   }
 }
@@ -374,6 +385,12 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool? hasHmacSecretMc;
 
+  /// If set to true, the authenticator will support the cmtgKey (Credential
+  /// Manager Trust Group Key) extension.
+  /// https://github.com/w3c/webauthn/pull/2377
+  /// Defaults to false.
+  final bool? hasCmtgKey;
+
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool? automaticPresenceSimulation;
@@ -404,6 +421,7 @@ class VirtualAuthenticatorOptions {
     this.hasPrf,
     this.hasHmacSecret,
     this.hasHmacSecretMc,
+    this.hasCmtgKey,
     this.automaticPresenceSimulation,
     this.isUserVerified,
     this.defaultBackupEligibility,
@@ -439,6 +457,9 @@ class VirtualAuthenticatorOptions {
       hasHmacSecretMc: json.containsKey('hasHmacSecretMc')
           ? json['hasHmacSecretMc'] as bool
           : null,
+      hasCmtgKey: json.containsKey('hasCmtgKey')
+          ? json['hasCmtgKey'] as bool
+          : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
           ? json['automaticPresenceSimulation'] as bool
@@ -469,6 +490,7 @@ class VirtualAuthenticatorOptions {
       if (hasPrf != null) 'hasPrf': hasPrf,
       if (hasHmacSecret != null) 'hasHmacSecret': hasHmacSecret,
       if (hasHmacSecretMc != null) 'hasHmacSecretMc': hasHmacSecretMc,
+      if (hasCmtgKey != null) 'hasCmtgKey': hasCmtgKey,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,
@@ -495,10 +517,11 @@ class Credential {
   /// credential to a specific user.
   final String? userHandle;
 
-  /// Signature counter. This is incremented by one for each successful
-  /// assertion.
+  /// Signature counter. Must be equal to or greater than -1.
+  /// If -1, the credential won't have an associated signature counter, and
+  /// every assertion operation will report a value of 0.
   /// See https://w3c.github.io/webauthn/#signature-counter
-  final int signCount;
+  final int? signCount;
 
   /// The large blob associated with the credential.
   /// See https://w3c.github.io/webauthn/#sctn-large-blob-extension
@@ -523,18 +546,30 @@ class Credential {
   /// https://w3c.github.io/webauthn/#dom-publickeycredentialuserentity-displayname
   final String? userDisplayName;
 
+  /// The CMTG keys associated with the credential.
+  final List<String>? cmtgKeys;
+
+  /// The 0-based index of the active key in cmtgKeys.
+  final int? activeCmtgKeyIndex;
+
+  /// If true, the authenticator will generate a new CMTG key on the next operation.
+  final bool? generateCmtgKeyOnNextOperation;
+
   Credential({
     required this.credentialId,
     required this.isResidentCredential,
     this.rpId,
     required this.privateKey,
     this.userHandle,
-    required this.signCount,
+    this.signCount,
     this.largeBlob,
     this.backupEligibility,
     this.backupState,
     this.userName,
     this.userDisplayName,
+    this.cmtgKeys,
+    this.activeCmtgKeyIndex,
+    this.generateCmtgKeyOnNextOperation,
   });
 
   factory Credential.fromJson(Map<String, dynamic> json) {
@@ -546,7 +581,9 @@ class Credential {
       userHandle: json.containsKey('userHandle')
           ? json['userHandle'] as String
           : null,
-      signCount: json['signCount'] as int,
+      signCount: json.containsKey('signCount')
+          ? json['signCount'] as int
+          : null,
       largeBlob: json.containsKey('largeBlob')
           ? json['largeBlob'] as String
           : null,
@@ -562,6 +599,16 @@ class Credential {
       userDisplayName: json.containsKey('userDisplayName')
           ? json['userDisplayName'] as String
           : null,
+      cmtgKeys: json.containsKey('cmtgKeys')
+          ? (json['cmtgKeys'] as List).map((e) => e as String).toList()
+          : null,
+      activeCmtgKeyIndex: json.containsKey('activeCmtgKeyIndex')
+          ? json['activeCmtgKeyIndex'] as int
+          : null,
+      generateCmtgKeyOnNextOperation:
+          json.containsKey('generateCmtgKeyOnNextOperation')
+          ? json['generateCmtgKeyOnNextOperation'] as bool
+          : null,
     );
   }
 
@@ -570,14 +617,18 @@ class Credential {
       'credentialId': credentialId,
       'isResidentCredential': isResidentCredential,
       'privateKey': privateKey,
-      'signCount': signCount,
       if (rpId != null) 'rpId': rpId,
       if (userHandle != null) 'userHandle': userHandle,
+      if (signCount != null) 'signCount': signCount,
       if (largeBlob != null) 'largeBlob': largeBlob,
       if (backupEligibility != null) 'backupEligibility': backupEligibility,
       if (backupState != null) 'backupState': backupState,
       if (userName != null) 'userName': userName,
       if (userDisplayName != null) 'userDisplayName': userDisplayName,
+      if (cmtgKeys != null) 'cmtgKeys': [...?cmtgKeys],
+      if (activeCmtgKeyIndex != null) 'activeCmtgKeyIndex': activeCmtgKeyIndex,
+      if (generateCmtgKeyOnNextOperation != null)
+        'generateCmtgKeyOnNextOperation': generateCmtgKeyOnNextOperation,
     };
   }
 }

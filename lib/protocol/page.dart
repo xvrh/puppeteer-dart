@@ -1795,7 +1795,6 @@ enum PermissionsPolicyFeature {
   allScreensCapture('all-screens-capture'),
   ambientLightSensor('ambient-light-sensor'),
   ariaNotify('aria-notify'),
-  attributionReporting('attribution-reporting'),
   autofill('autofill'),
   autoplay('autoplay'),
   bluetooth('bluetooth'),

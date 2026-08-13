@@ -14,6 +14,7 @@ import 'css.dart';
 import 'debugger.dart';
 import 'device_access.dart';
 import 'device_orientation.dart';
+import 'digital_credentials.dart';
 import 'dom.dart';
 import 'dom_debugger.dart';
 import 'dom_snapshot.dart';
@@ -145,6 +146,11 @@ class DevTools {
   DeviceOrientationApi get deviceOrientation =>
       _deviceOrientation ??= DeviceOrientationApi(client);
   DeviceOrientationApi? _deviceOrientation;
+
+  /// This domain allows interacting with the Digital Credentials API for automation.
+  DigitalCredentialsApi get digitalCredentials =>
+      _digitalCredentials ??= DigitalCredentialsApi(client);
+  DigitalCredentialsApi? _digitalCredentials;
 
   /// This domain emulates different environments for the page.
   EmulationApi get emulation => _emulation ??= EmulationApi(client);

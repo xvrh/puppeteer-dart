@@ -37,41 +37,6 @@ class StorageApi {
       .where((event) => event.name == 'Storage.indexedDBListUpdated')
       .map((event) => IndexedDBListUpdatedEvent.fromJson(event.parameters));
 
-  /// One of the interest groups was accessed. Note that these events are global
-  /// to all targets sharing an interest group store.
-  Stream<InterestGroupAccessedEvent> get onInterestGroupAccessed => _client
-      .onEvent
-      .where((event) => event.name == 'Storage.interestGroupAccessed')
-      .map((event) => InterestGroupAccessedEvent.fromJson(event.parameters));
-
-  /// An auction involving interest groups is taking place. These events are
-  /// target-specific.
-  Stream<InterestGroupAuctionEventOccurredEvent>
-  get onInterestGroupAuctionEventOccurred => _client.onEvent
-      .where(
-        (event) => event.name == 'Storage.interestGroupAuctionEventOccurred',
-      )
-      .map(
-        (event) =>
-            InterestGroupAuctionEventOccurredEvent.fromJson(event.parameters),
-      );
-
-  /// Specifies which auctions a particular network fetch may be related to, and
-  /// in what role. Note that it is not ordered with respect to
-  /// Network.requestWillBeSent (but will happen before loadingFinished
-  /// loadingFailed).
-  Stream<InterestGroupAuctionNetworkRequestCreatedEvent>
-  get onInterestGroupAuctionNetworkRequestCreated => _client.onEvent
-      .where(
-        (event) =>
-            event.name == 'Storage.interestGroupAuctionNetworkRequestCreated',
-      )
-      .map(
-        (event) => InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
-          event.parameters,
-        ),
-      );
-
   /// Shared storage was accessed by the associated page.
   /// The following parameters are included in all events.
   Stream<SharedStorageAccessedEvent> get onSharedStorageAccessed => _client
@@ -292,35 +257,6 @@ class StorageApi {
     return result['didDeleteTokens'] as bool;
   }
 
-  /// Gets details for a named interest group.
-  /// Returns: This largely corresponds to:
-  /// https://wicg.github.io/turtledove/#dictdef-generatebidinterestgroup
-  /// but has absolute expirationTime instead of relative lifetimeMs and
-  /// also adds joiningOrigin.
-  Future<Map<String, dynamic>> getInterestGroupDetails(
-    String ownerOrigin,
-    String name,
-  ) async {
-    var result = await _client.send('Storage.getInterestGroupDetails', {
-      'ownerOrigin': ownerOrigin,
-      'name': name,
-    });
-    return result['details'] as Map<String, dynamic>;
-  }
-
-  /// Enables/Disables issuing of interestGroupAccessed events.
-  Future<void> setInterestGroupTracking(bool enable) async {
-    await _client.send('Storage.setInterestGroupTracking', {'enable': enable});
-  }
-
-  /// Enables/Disables issuing of interestGroupAuctionEventOccurred and
-  /// interestGroupAuctionNetworkRequestCreated.
-  Future<void> setInterestGroupAuctionTracking(bool enable) async {
-    await _client.send('Storage.setInterestGroupAuctionTracking', {
-      'enable': enable,
-    });
-  }
-
   /// Gets metadata for an origin's shared storage.
   Future<SharedStorageMetadata> getSharedStorageMetadata(
     String ownerOrigin,
@@ -415,18 +351,6 @@ class StorageApi {
     return (result['sets'] as List)
         .map((e) => RelatedWebsiteSet.fromJson(e as Map<String, dynamic>))
         .toList();
-  }
-
-  Future<void> setProtectedAudienceKAnonymity(
-    String owner,
-    String name,
-    List<String> hashes,
-  ) async {
-    await _client.send('Storage.setProtectedAudienceKAnonymity', {
-      'owner': owner,
-      'name': name,
-      'hashes': [...hashes],
-    });
   }
 }
 
@@ -541,127 +465,6 @@ class IndexedDBListUpdatedEvent {
       origin: json['origin'] as String,
       storageKey: json['storageKey'] as String,
       bucketId: json['bucketId'] as String,
-    );
-  }
-}
-
-class InterestGroupAccessedEvent {
-  final network.TimeSinceEpoch accessTime;
-
-  final InterestGroupAccessType type;
-
-  final String ownerOrigin;
-
-  final String name;
-
-  /// For topLevelBid/topLevelAdditionalBid, and when appropriate,
-  /// win and additionalBidWin
-  final String? componentSellerOrigin;
-
-  /// For bid or somethingBid event, if done locally and not on a server.
-  final num? bid;
-
-  final String? bidCurrency;
-
-  /// For non-global events --- links to interestGroupAuctionEvent
-  final InterestGroupAuctionId? uniqueAuctionId;
-
-  InterestGroupAccessedEvent({
-    required this.accessTime,
-    required this.type,
-    required this.ownerOrigin,
-    required this.name,
-    this.componentSellerOrigin,
-    this.bid,
-    this.bidCurrency,
-    this.uniqueAuctionId,
-  });
-
-  factory InterestGroupAccessedEvent.fromJson(Map<String, dynamic> json) {
-    return InterestGroupAccessedEvent(
-      accessTime: network.TimeSinceEpoch.fromJson(json['accessTime'] as num),
-      type: InterestGroupAccessType.fromJson(json['type'] as String),
-      ownerOrigin: json['ownerOrigin'] as String,
-      name: json['name'] as String,
-      componentSellerOrigin: json.containsKey('componentSellerOrigin')
-          ? json['componentSellerOrigin'] as String
-          : null,
-      bid: json.containsKey('bid') ? json['bid'] as num : null,
-      bidCurrency: json.containsKey('bidCurrency')
-          ? json['bidCurrency'] as String
-          : null,
-      uniqueAuctionId: json.containsKey('uniqueAuctionId')
-          ? InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String)
-          : null,
-    );
-  }
-}
-
-class InterestGroupAuctionEventOccurredEvent {
-  final network.TimeSinceEpoch eventTime;
-
-  final InterestGroupAuctionEventType type;
-
-  final InterestGroupAuctionId uniqueAuctionId;
-
-  /// Set for child auctions.
-  final InterestGroupAuctionId? parentAuctionId;
-
-  /// Set for started and configResolved
-  final Map<String, dynamic>? auctionConfig;
-
-  InterestGroupAuctionEventOccurredEvent({
-    required this.eventTime,
-    required this.type,
-    required this.uniqueAuctionId,
-    this.parentAuctionId,
-    this.auctionConfig,
-  });
-
-  factory InterestGroupAuctionEventOccurredEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return InterestGroupAuctionEventOccurredEvent(
-      eventTime: network.TimeSinceEpoch.fromJson(json['eventTime'] as num),
-      type: InterestGroupAuctionEventType.fromJson(json['type'] as String),
-      uniqueAuctionId: InterestGroupAuctionId.fromJson(
-        json['uniqueAuctionId'] as String,
-      ),
-      parentAuctionId: json.containsKey('parentAuctionId')
-          ? InterestGroupAuctionId.fromJson(json['parentAuctionId'] as String)
-          : null,
-      auctionConfig: json.containsKey('auctionConfig')
-          ? json['auctionConfig'] as Map<String, dynamic>
-          : null,
-    );
-  }
-}
-
-class InterestGroupAuctionNetworkRequestCreatedEvent {
-  final InterestGroupAuctionFetchType type;
-
-  final network.RequestId requestId;
-
-  /// This is the set of the auctions using the worklet that issued this
-  /// request.  In the case of trusted signals, it's possible that only some of
-  /// them actually care about the keys being queried.
-  final List<InterestGroupAuctionId> auctions;
-
-  InterestGroupAuctionNetworkRequestCreatedEvent({
-    required this.type,
-    required this.requestId,
-    required this.auctions,
-  });
-
-  factory InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return InterestGroupAuctionNetworkRequestCreatedEvent(
-      type: InterestGroupAuctionFetchType.fromJson(json['type'] as String),
-      requestId: network.RequestId.fromJson(json['requestId'] as String),
-      auctions: (json['auctions'] as List)
-          .map((e) => InterestGroupAuctionId.fromJson(e as String))
-          .toList(),
     );
   }
 }
@@ -816,7 +619,6 @@ enum StorageType {
   websql('websql'),
   serviceWorkers('service_workers'),
   cacheStorage('cache_storage'),
-  interestGroups('interest_groups'),
   sharedStorage('shared_storage'),
   storageBuckets('storage_buckets'),
   all('all'),
@@ -878,85 +680,10 @@ class TrustTokens {
   }
 }
 
-/// Protected audience interest group auction identifier.
-extension type InterestGroupAuctionId(String value) {
-  factory InterestGroupAuctionId.fromJson(String value) =>
-      InterestGroupAuctionId(value);
-
-  String toJson() => value;
-}
-
-/// Enum of interest group access types.
-enum InterestGroupAccessType {
-  join('join'),
-  leave('leave'),
-  update('update'),
-  loaded('loaded'),
-  bid('bid'),
-  win('win'),
-  additionalBid('additionalBid'),
-  additionalBidWin('additionalBidWin'),
-  topLevelBid('topLevelBid'),
-  topLevelAdditionalBid('topLevelAdditionalBid'),
-  clear('clear');
-
-  final String value;
-
-  const InterestGroupAccessType(this.value);
-
-  factory InterestGroupAccessType.fromJson(String value) =>
-      InterestGroupAccessType.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
-/// Enum of auction events.
-enum InterestGroupAuctionEventType {
-  started('started'),
-  configResolved('configResolved');
-
-  final String value;
-
-  const InterestGroupAuctionEventType(this.value);
-
-  factory InterestGroupAuctionEventType.fromJson(String value) =>
-      InterestGroupAuctionEventType.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
-/// Enum of network fetches auctions can do.
-enum InterestGroupAuctionFetchType {
-  bidderJs('bidderJs'),
-  bidderWasm('bidderWasm'),
-  sellerJs('sellerJs'),
-  bidderTrustedSignals('bidderTrustedSignals'),
-  sellerTrustedSignals('sellerTrustedSignals');
-
-  final String value;
-
-  const InterestGroupAuctionFetchType(this.value);
-
-  factory InterestGroupAuctionFetchType.fromJson(String value) =>
-      InterestGroupAuctionFetchType.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 /// Enum of shared storage access scopes.
 enum SharedStorageAccessScope {
   window('window'),
   sharedStorageWorklet('sharedStorageWorklet'),
-  protectedAudienceWorklet('protectedAudienceWorklet'),
   header('header');
 
   final String value;

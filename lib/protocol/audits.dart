@@ -443,7 +443,6 @@ enum MixedContentResolutionStatus {
 }
 
 enum MixedContentResourceType {
-  attributionSrc('AttributionSrc'),
   audio('Audio'),
   beacon('Beacon'),
   cspReport('CSPReport'),
@@ -951,46 +950,6 @@ class CorsIssueDetails {
   }
 }
 
-enum AttributionReportingIssueType {
-  permissionPolicyDisabled('PermissionPolicyDisabled'),
-  untrustworthyReportingOrigin('UntrustworthyReportingOrigin'),
-  insecureContext('InsecureContext'),
-  invalidHeader('InvalidHeader'),
-  invalidRegisterTriggerHeader('InvalidRegisterTriggerHeader'),
-  sourceAndTriggerHeaders('SourceAndTriggerHeaders'),
-  sourceIgnored('SourceIgnored'),
-  triggerIgnored('TriggerIgnored'),
-  osSourceIgnored('OsSourceIgnored'),
-  osTriggerIgnored('OsTriggerIgnored'),
-  invalidRegisterOsSourceHeader('InvalidRegisterOsSourceHeader'),
-  invalidRegisterOsTriggerHeader('InvalidRegisterOsTriggerHeader'),
-  webAndOsHeaders('WebAndOsHeaders'),
-  noWebOrOsSupport('NoWebOrOsSupport'),
-  navigationRegistrationWithoutTransientUserActivation(
-    'NavigationRegistrationWithoutTransientUserActivation',
-  ),
-  invalidInfoHeader('InvalidInfoHeader'),
-  noRegisterSourceHeader('NoRegisterSourceHeader'),
-  noRegisterTriggerHeader('NoRegisterTriggerHeader'),
-  noRegisterOsSourceHeader('NoRegisterOsSourceHeader'),
-  noRegisterOsTriggerHeader('NoRegisterOsTriggerHeader'),
-  navigationRegistrationUniqueScopeAlreadySet(
-    'NavigationRegistrationUniqueScopeAlreadySet',
-  );
-
-  final String value;
-
-  const AttributionReportingIssueType(this.value);
-
-  factory AttributionReportingIssueType.fromJson(String value) =>
-      AttributionReportingIssueType.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 enum SharedDictionaryError {
   useErrorCrossOriginNoCorsRequest('UseErrorCrossOriginNoCorsRequest'),
   useErrorDictionaryLoadFailure('UseErrorDictionaryLoadFailure'),
@@ -1130,51 +1089,6 @@ enum ConnectionAllowlistError {
 
   @override
   String toString() => value.toString();
-}
-
-/// Details for issues around "Attribution Reporting API" usage.
-/// Explainer: https://github.com/WICG/attribution-reporting-api
-class AttributionReportingIssueDetails {
-  final AttributionReportingIssueType violationType;
-
-  final AffectedRequest? request;
-
-  final dom.BackendNodeId? violatingNodeId;
-
-  final String? invalidParameter;
-
-  AttributionReportingIssueDetails({
-    required this.violationType,
-    this.request,
-    this.violatingNodeId,
-    this.invalidParameter,
-  });
-
-  factory AttributionReportingIssueDetails.fromJson(Map<String, dynamic> json) {
-    return AttributionReportingIssueDetails(
-      violationType: AttributionReportingIssueType.fromJson(
-        json['violationType'] as String,
-      ),
-      request: json.containsKey('request')
-          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
-          : null,
-      violatingNodeId: json.containsKey('violatingNodeId')
-          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
-          : null,
-      invalidParameter: json.containsKey('invalidParameter')
-          ? json['invalidParameter'] as String
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'violationType': violationType.toJson(),
-      if (request != null) 'request': request!.toJson(),
-      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
-      if (invalidParameter != null) 'invalidParameter': invalidParameter,
-    };
-  }
 }
 
 /// Details for issues about documents in Quirks Mode
@@ -2359,6 +2273,36 @@ class SelectivePermissionsInterventionIssueDetails {
   }
 }
 
+/// Details for issues about lazy-loaded images without explicit dimensions.
+class LazyLoadImageIssueDetails {
+  /// DOM node of the problematic HTMLImageElement.
+  final dom.BackendNodeId nodeId;
+
+  /// URL or src attribute of the image.
+  final String url;
+
+  /// Frame containing the image.
+  final page.FrameId frameId;
+
+  LazyLoadImageIssueDetails({
+    required this.nodeId,
+    required this.url,
+    required this.frameId,
+  });
+
+  factory LazyLoadImageIssueDetails.fromJson(Map<String, dynamic> json) {
+    return LazyLoadImageIssueDetails(
+      nodeId: dom.BackendNodeId.fromJson(json['nodeId'] as int),
+      url: json['url'] as String,
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'nodeId': nodeId.toJson(), 'url': url, 'frameId': frameId.toJson()};
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -2370,7 +2314,6 @@ enum InspectorIssueCode {
   contentSecurityPolicyIssue('ContentSecurityPolicyIssue'),
   sharedArrayBufferIssue('SharedArrayBufferIssue'),
   corsIssue('CorsIssue'),
-  attributionReportingIssue('AttributionReportingIssue'),
   quirksModeIssue('QuirksModeIssue'),
   partitioningBlobUrlIssue('PartitioningBlobURLIssue'),
   navigatorUserAgentIssue('NavigatorUserAgentIssue'),
@@ -2394,7 +2337,8 @@ enum InspectorIssueCode {
   selectivePermissionsInterventionIssue(
     'SelectivePermissionsInterventionIssue',
   ),
-  emailVerificationRequestIssue('EmailVerificationRequestIssue');
+  emailVerificationRequestIssue('EmailVerificationRequestIssue'),
+  lazyLoadImageIssue('LazyLoadImageIssue');
 
   final String value;
 
@@ -2426,8 +2370,6 @@ class InspectorIssueDetails {
   final SharedArrayBufferIssueDetails? sharedArrayBufferIssueDetails;
 
   final CorsIssueDetails? corsIssueDetails;
-
-  final AttributionReportingIssueDetails? attributionReportingIssueDetails;
 
   final QuirksModeIssueDetails? quirksModeIssueDetails;
 
@@ -2475,6 +2417,8 @@ class InspectorIssueDetails {
   final EmailVerificationRequestIssueDetails?
   emailVerificationRequestIssueDetails;
 
+  final LazyLoadImageIssueDetails? lazyLoadImageIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2483,7 +2427,6 @@ class InspectorIssueDetails {
     this.contentSecurityPolicyIssueDetails,
     this.sharedArrayBufferIssueDetails,
     this.corsIssueDetails,
-    this.attributionReportingIssueDetails,
     this.quirksModeIssueDetails,
     this.partitioningBlobURLIssueDetails,
     this.genericIssueDetails,
@@ -2505,6 +2448,7 @@ class InspectorIssueDetails {
     this.performanceIssueDetails,
     this.selectivePermissionsInterventionIssueDetails,
     this.emailVerificationRequestIssueDetails,
+    this.lazyLoadImageIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2545,12 +2489,6 @@ class InspectorIssueDetails {
       corsIssueDetails: json.containsKey('corsIssueDetails')
           ? CorsIssueDetails.fromJson(
               json['corsIssueDetails'] as Map<String, dynamic>,
-            )
-          : null,
-      attributionReportingIssueDetails:
-          json.containsKey('attributionReportingIssueDetails')
-          ? AttributionReportingIssueDetails.fromJson(
-              json['attributionReportingIssueDetails'] as Map<String, dynamic>,
             )
           : null,
       quirksModeIssueDetails: json.containsKey('quirksModeIssueDetails')
@@ -2676,6 +2614,11 @@ class InspectorIssueDetails {
                   as Map<String, dynamic>,
             )
           : null,
+      lazyLoadImageIssueDetails: json.containsKey('lazyLoadImageIssueDetails')
+          ? LazyLoadImageIssueDetails.fromJson(
+              json['lazyLoadImageIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2698,9 +2641,6 @@ class InspectorIssueDetails {
             .toJson(),
       if (corsIssueDetails != null)
         'corsIssueDetails': corsIssueDetails!.toJson(),
-      if (attributionReportingIssueDetails != null)
-        'attributionReportingIssueDetails': attributionReportingIssueDetails!
-            .toJson(),
       if (quirksModeIssueDetails != null)
         'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
       if (partitioningBlobURLIssueDetails != null)
@@ -2755,6 +2695,8 @@ class InspectorIssueDetails {
       if (emailVerificationRequestIssueDetails != null)
         'emailVerificationRequestIssueDetails':
             emailVerificationRequestIssueDetails!.toJson(),
+      if (lazyLoadImageIssueDetails != null)
+        'lazyLoadImageIssueDetails': lazyLoadImageIssueDetails!.toJson(),
     };
   }
 }
