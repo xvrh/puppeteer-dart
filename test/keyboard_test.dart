@@ -33,7 +33,8 @@ void main() {
     expect(Key.allKeys['Control'], Key.control);
     expect(Key.allKeys['notexist'], isNull);
     expect(Key.allKeys[''], isNull);
-    expect(Key.allKeys[null], isNull);
+    String? nullKey;
+    expect(Key.allKeys[nullKey], isNull);
 
     for (var key in Key.allKeys.values) {
       expect(key.toString(), isNotNull);
