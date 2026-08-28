@@ -1385,9 +1385,9 @@ class NavigatedWithinDocumentEvent {
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return NavigatedWithinDocumentEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
-      url: json['url'] as String,
+      url: json['url'] as String? ?? '',
       navigationType: NavigatedWithinDocumentEventNavigationType.fromJson(
-        json['navigationType'] as String,
+        json['navigationType'] as String? ?? 'other',
       ),
     );
   }
