@@ -2131,7 +2131,8 @@
                         "TokenVerificationKbInvalidNonce",
                         "TokenVerificationKbInvalidSdHash",
                         "TokenVerificationKbMissingCnf",
-                        "TokenVerificationKbSignatureFailed"
+                        "TokenVerificationKbSignatureFailed",
+                        "CrossOriginIframeNotSupported"
                     ]
                 },
                 {
@@ -11477,6 +11478,17 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "viewportMeta",
+                            "description": "Viewport meta tag behavior. Default: `default`. Note: if `mobile` is `true`,\nthe viewport meta tag is always enabled.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "string",
+                            "enum": [
+                                "enable",
+                                "default"
+                            ]
                         }
                     ]
                 },
