@@ -487,6 +487,8 @@ class BaseAudioContext {
   /// Context sample rate.
   final num sampleRate;
 
+  final num renderQuantumSize;
+
   BaseAudioContext({
     required this.contextId,
     required this.contextType,
@@ -495,6 +497,7 @@ class BaseAudioContext {
     required this.callbackBufferSize,
     required this.maxOutputChannelCount,
     required this.sampleRate,
+    required this.renderQuantumSize,
   });
 
   factory BaseAudioContext.fromJson(Map<String, dynamic> json) {
@@ -510,6 +513,7 @@ class BaseAudioContext {
       callbackBufferSize: json['callbackBufferSize'] as num,
       maxOutputChannelCount: json['maxOutputChannelCount'] as num,
       sampleRate: json['sampleRate'] as num,
+      renderQuantumSize: json['renderQuantumSize'] as num,
     );
   }
 
@@ -521,6 +525,7 @@ class BaseAudioContext {
       'callbackBufferSize': callbackBufferSize,
       'maxOutputChannelCount': maxOutputChannelCount,
       'sampleRate': sampleRate,
+      'renderQuantumSize': renderQuantumSize,
       if (realtimeData != null) 'realtimeData': realtimeData!.toJson(),
     };
   }

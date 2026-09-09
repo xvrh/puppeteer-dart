@@ -82,6 +82,7 @@ class DebuggerApi {
   /// [generatePreview] Whether preview should be generated for the result.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
+  /// [scopeNumber] Specifies the scope number to evaluate the expression in (default: 0, innermost scope).
   Future<EvaluateOnCallFrameResult> evaluateOnCallFrame(
     CallFrameId callFrameId,
     String expression, {
@@ -92,6 +93,7 @@ class DebuggerApi {
     bool? generatePreview,
     bool? throwOnSideEffect,
     runtime.TimeDelta? timeout,
+    int? scopeNumber,
   }) async {
     var result = await _client.send('Debugger.evaluateOnCallFrame', {
       'callFrameId': callFrameId,
@@ -103,6 +105,7 @@ class DebuggerApi {
       'generatePreview': ?generatePreview,
       'throwOnSideEffect': ?throwOnSideEffect,
       'timeout': ?timeout,
+      'scopeNumber': ?scopeNumber,
     });
     return EvaluateOnCallFrameResult.fromJson(result);
   }
@@ -424,19 +427,14 @@ class DebuggerApi {
     await _client.send('Debugger.setReturnValue', {'newValue': newValue});
   }
 
-  /// Edits JavaScript source live.
-  ///
-  /// In general, functions that are currently on the stack can not be edited with
-  /// a single exception: If the edited function is the top-most stack frame and
-  /// that is the only activation of that function on the stack. In this case
-  /// the live edit will be successful and a `Debugger.restartFrame` for the
-  /// top-most function is automatically triggered.
+  /// Live edit is no longer supported and this command always fails with a "no longer available" error.
   /// [scriptId] Id of the script to edit.
   /// [scriptSource] New content of the script.
   /// [dryRun] If true the change will not actually be applied. Dry run may be used to get result
   /// description without actually modifying the code.
   /// [allowTopFrameEditing] If true, then `scriptSource` is allowed to change the function on top of the stack
   /// as long as the top-most stack frame is the only activation of that function.
+  @Deprecated('This command is deprecated')
   Future<SetScriptSourceResult> setScriptSource(
     runtime.ScriptId scriptId,
     String scriptSource, {

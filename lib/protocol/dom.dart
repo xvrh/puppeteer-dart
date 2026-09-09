@@ -849,6 +849,17 @@ class DOMApi {
         .map((e) => NodeId.fromJson(e as int))
         .toList();
   }
+
+  /// When enabling, this API forces an element to gain interest in its target,
+  /// keeping interest active until disabled.
+  /// [nodeId] Id of the interest invoker HTMLElement.
+  /// [enable] If true, opens and holds interest. If false, releases forced interest.
+  Future<void> forceShowInterest(NodeId nodeId, bool enable) async {
+    await _client.send('DOM.forceShowInterest', {
+      'nodeId': nodeId,
+      'enable': enable,
+    });
+  }
 }
 
 class AttributeModifiedEvent {

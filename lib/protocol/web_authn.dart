@@ -318,11 +318,14 @@ enum Ctap2Version {
   String toString() => value.toString();
 }
 
+/// LINT.IfChange(AuthenticatorTransport)
 enum AuthenticatorTransport {
   usb('usb'),
   nfc('nfc'),
   ble('ble'),
   cable('cable'),
+  hybrid('hybrid'),
+  smartCard('smart-card'),
   internal('internal');
 
   final String value;
@@ -518,7 +521,7 @@ class Credential {
   /// If -1, the credential won't have an associated signature counter, and
   /// every assertion operation will report a value of 0.
   /// See https://w3c.github.io/webauthn/#signature-counter
-  final int? signCount;
+  final int signCount;
 
   /// The large blob associated with the credential.
   /// See https://w3c.github.io/webauthn/#sctn-large-blob-extension
@@ -558,7 +561,7 @@ class Credential {
     this.rpId,
     required this.privateKey,
     this.userHandle,
-    this.signCount,
+    required this.signCount,
     this.largeBlob,
     this.backupEligibility,
     this.backupState,
@@ -578,9 +581,7 @@ class Credential {
       userHandle: json.containsKey('userHandle')
           ? json['userHandle'] as String
           : null,
-      signCount: json.containsKey('signCount')
-          ? json['signCount'] as int
-          : null,
+      signCount: json['signCount'] as int,
       largeBlob: json.containsKey('largeBlob')
           ? json['largeBlob'] as String
           : null,
@@ -614,9 +615,9 @@ class Credential {
       'credentialId': credentialId,
       'isResidentCredential': isResidentCredential,
       'privateKey': privateKey,
+      'signCount': signCount,
       if (rpId != null) 'rpId': rpId,
       if (userHandle != null) 'userHandle': userHandle,
-      if (signCount != null) 'signCount': signCount,
       if (largeBlob != null) 'largeBlob': largeBlob,
       if (backupEligibility != null) 'backupEligibility': backupEligibility,
       if (backupState != null) 'backupState': backupState,
