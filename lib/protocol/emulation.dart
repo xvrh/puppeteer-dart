@@ -89,6 +89,20 @@ class EmulationApi {
     });
   }
 
+  /// Overrides virtual keyboard geometry in CSS pixels, relative to the top-level viewport. The
+  /// provided rect is used for navigator.virtualKeyboard.boundingRect, geometrychange events, and
+  /// env(keyboard-inset-*) values on the inspected frame. The override applies independently of
+  /// navigator.virtualKeyboard.overlaysContent so clients can preview overlay geometry without
+  /// mutating page state. Values are rounded to the nearest CSS pixel. Omitting the rect clears the
+  /// override.
+  Future<void> setVirtualKeyboardGeometryOverride({
+    dom.Rect? keyboardRect,
+  }) async {
+    await _client.send('Emulation.setVirtualKeyboardGeometryOverride', {
+      'keyboardRect': ?keyboardRect,
+    });
+  }
+
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
   /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
   /// query results).
@@ -483,6 +497,26 @@ class EmulationApi {
   Future<void> setHardwareConcurrencyOverride(int hardwareConcurrency) async {
     await _client.send('Emulation.setHardwareConcurrencyOverride', {
       'hardwareConcurrency': hardwareConcurrency,
+    });
+  }
+
+  /// Overrides the value of navigator.cpuPerformance
+  /// [performanceTier] Override value. Omitting the parameter disables the override.
+  Future<void> setCPUPerformanceOverride({
+    @Enum(['unknown', 'low', 'mid', 'high', 'ultra']) String? performanceTier,
+  }) async {
+    assert(
+      performanceTier == null ||
+          const [
+            'unknown',
+            'low',
+            'mid',
+            'high',
+            'ultra',
+          ].contains(performanceTier),
+    );
+    await _client.send('Emulation.setCPUPerformanceOverride', {
+      'performanceTier': ?performanceTier,
     });
   }
 

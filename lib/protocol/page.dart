@@ -835,6 +835,33 @@ class PageApi {
     });
   }
 
+  /// Starts screencast video recording.
+  /// [maxWidth] Maximum frame width in pixels.
+  /// [maxHeight] Maximum frame height in pixels.
+  /// [frameRate] Maximum frame rate in frames per second.
+  /// Returns: A handle of the stream that holds resulting screencast data.
+  Future<io.StreamHandle> startScreenRecording({
+    bool? audio,
+    int? maxWidth,
+    int? maxHeight,
+    int? frameRate,
+  }) async {
+    var result = await _client.send('Page.startScreenRecording', {
+      'audio': ?audio,
+      'maxWidth': ?maxWidth,
+      'maxHeight': ?maxHeight,
+      'frameRate': ?frameRate,
+    });
+    return io.StreamHandle.fromJson(result['stream'] as String);
+  }
+
+  /// Stops screencast video recording.
+  /// Returns: A handle of the stream that holds resulting screencast data.
+  Future<io.StreamHandle> stopScreenRecording() async {
+    var result = await _client.send('Page.stopScreenRecording');
+    return io.StreamHandle.fromJson(result['stream'] as String);
+  }
+
   /// Force the page stop all navigations and pending resource fetches.
   Future<void> stopLoading() async {
     await _client.send('Page.stopLoading');
@@ -1843,7 +1870,6 @@ enum PermissionsPolicyFeature {
   identityCredentialsGet('identity-credentials-get'),
   idleDetection('idle-detection'),
   interestCohort('interest-cohort'),
-  joinAdInterestGroup('join-ad-interest-group'),
   keyboardMap('keyboard-map'),
   languageDetector('language-detector'),
   languageModel('language-model'),
@@ -1860,14 +1886,11 @@ enum PermissionsPolicyFeature {
   otpCredentials('otp-credentials'),
   payment('payment'),
   pictureInPicture('picture-in-picture'),
-  privateAggregation('private-aggregation'),
   privateStateTokenIssuance('private-state-token-issuance'),
   privateStateTokenRedemption('private-state-token-redemption'),
   publickeyCredentialsCreate('publickey-credentials-create'),
   publickeyCredentialsGet('publickey-credentials-get'),
-  recordAdAuctionEvents('record-ad-auction-events'),
   rewriter('rewriter'),
-  runAdAuction('run-ad-auction'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
   sharedStorage('shared-storage'),
@@ -3096,8 +3119,6 @@ class FileHandler {
 
   final String name;
 
-  final List<ImageResource>? icons;
-
   /// Mimic a map, name is the key, accepts is the value.
   final List<FileFilter>? accepts;
 
@@ -3108,7 +3129,6 @@ class FileHandler {
   FileHandler({
     required this.action,
     required this.name,
-    this.icons,
     this.accepts,
     required this.launchType,
   });
@@ -3117,11 +3137,6 @@ class FileHandler {
     return FileHandler(
       action: json['action'] as String,
       name: json['name'] as String,
-      icons: json.containsKey('icons')
-          ? (json['icons'] as List)
-                .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
-                .toList()
-          : null,
       accepts: json.containsKey('accepts')
           ? (json['accepts'] as List)
                 .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
@@ -3136,7 +3151,6 @@ class FileHandler {
       'action': action,
       'name': name,
       'launchType': launchType,
-      if (icons != null) 'icons': icons!.map((e) => e.toJson()).toList(),
       if (accepts != null) 'accepts': accepts!.map((e) => e.toJson()).toList(),
     };
   }
@@ -3733,6 +3747,7 @@ enum BackForwardCacheNotRestoredReason {
     'EmbedderExtensionSentMessageToCachedFrame',
   ),
   embedderExtensionFrame('EmbedderExtensionFrame'),
+  embedderPrivilegedWebContents('EmbedderPrivilegedWebContents'),
   requestedByWebViewClient('RequestedByWebViewClient'),
   postMessageByWebViewClient('PostMessageByWebViewClient'),
   cacheControlNoStoreDeviceBoundSessionTerminated(

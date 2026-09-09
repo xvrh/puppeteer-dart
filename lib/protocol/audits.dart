@@ -1076,7 +1076,12 @@ enum ConnectionAllowlistError {
   itemNotInnerList('ItemNotInnerList'),
   invalidAllowlistItemType('InvalidAllowlistItemType'),
   reportingEndpointNotToken('ReportingEndpointNotToken'),
-  invalidUrlPattern('InvalidUrlPattern');
+  invalidUrlPattern('InvalidUrlPattern'),
+  iFrameAttributeLoosensEmbeddingRequirement(
+    'IFrameAttributeLoosensEmbeddingRequirement',
+  ),
+  invalidAllowConnectionAllowlistFrom('InvalidAllowConnectionAllowlistFrom'),
+  embeddingRequirementNotSatisfied('EmbeddingRequirementNotSatisfied');
 
   final String value;
 
@@ -1534,6 +1539,9 @@ enum FederatedAuthRequestIssueReason {
   tooManyRequests('TooManyRequests'),
   wellKnownHttpNotFound('WellKnownHttpNotFound'),
   wellKnownNoResponse('WellKnownNoResponse'),
+  wellKnownBlockedByConnectionAllowlist(
+    'WellKnownBlockedByConnectionAllowlist',
+  ),
   wellKnownInvalidResponse('WellKnownInvalidResponse'),
   wellKnownListEmpty('WellKnownListEmpty'),
   wellKnownInvalidContentType('WellKnownInvalidContentType'),
@@ -1541,6 +1549,7 @@ enum FederatedAuthRequestIssueReason {
   wellKnownTooBig('WellKnownTooBig'),
   configHttpNotFound('ConfigHttpNotFound'),
   configNoResponse('ConfigNoResponse'),
+  configBlockedByConnectionAllowlist('ConfigBlockedByConnectionAllowlist'),
   configInvalidResponse('ConfigInvalidResponse'),
   configInvalidContentType('ConfigInvalidContentType'),
   idpNotPotentiallyTrustworthy('IdpNotPotentiallyTrustworthy'),
@@ -1550,11 +1559,13 @@ enum FederatedAuthRequestIssueReason {
   invalidSigninResponse('InvalidSigninResponse'),
   accountsHttpNotFound('AccountsHttpNotFound'),
   accountsNoResponse('AccountsNoResponse'),
+  accountsBlockedByConnectionAllowlist('AccountsBlockedByConnectionAllowlist'),
   accountsInvalidResponse('AccountsInvalidResponse'),
   accountsListEmpty('AccountsListEmpty'),
   accountsInvalidContentType('AccountsInvalidContentType'),
   idTokenHttpNotFound('IdTokenHttpNotFound'),
   idTokenNoResponse('IdTokenNoResponse'),
+  idTokenBlockedByConnectionAllowlist('IdTokenBlockedByConnectionAllowlist'),
   idTokenInvalidResponse('IdTokenInvalidResponse'),
   idTokenIdpErrorResponse('IdTokenIdpErrorResponse'),
   idTokenCrossSiteIdpErrorResponse('IdTokenCrossSiteIdpErrorResponse'),

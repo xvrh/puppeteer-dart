@@ -628,6 +628,7 @@ enum PrefetchStatus {
   prefetchNotEligibleBrowserContextOffTheRecord(
     'PrefetchNotEligibleBrowserContextOffTheRecord',
   ),
+  prefetchNotEligibleCrossOrigin('PrefetchNotEligibleCrossOrigin'),
   prefetchNotEligibleDataSaverEnabled('PrefetchNotEligibleDataSaverEnabled'),
   prefetchNotEligibleExistingProxy('PrefetchNotEligibleExistingProxy'),
   prefetchNotEligibleHostIsNonUnique('PrefetchNotEligibleHostIsNonUnique'),

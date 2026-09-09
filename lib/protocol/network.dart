@@ -39,13 +39,6 @@ class NetworkApi {
       .where((event) => event.name == 'Network.loadingFinished')
       .map((event) => LoadingFinishedEvent.fromJson(event.parameters));
 
-  /// Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
-  /// mocked.
-  /// Deprecated, use Fetch.requestPaused instead.
-  Stream<RequestInterceptedEvent> get onRequestIntercepted => _client.onEvent
-      .where((event) => event.name == 'Network.requestIntercepted')
-      .map((event) => RequestInterceptedEvent.fromJson(event.parameters));
-
   /// Fired if request ended up loading from cache.
   Stream<RequestId> get onRequestServedFromCache => _client.onEvent
       .where((event) => event.name == 'Network.requestServedFromCache')
@@ -340,19 +333,6 @@ class NetworkApi {
             DeviceBoundSessionEventOccurredEvent.fromJson(event.parameters),
       );
 
-  /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
-  /// [encodings] List of accepted content encodings.
-  Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
-    await _client.send('Network.setAcceptedEncodings', {
-      'encodings': [...encodings],
-    });
-  }
-
-  /// Clears accepted encodings set by setAcceptedEncodings
-  Future<void> clearAcceptedEncodingsOverride() async {
-    await _client.send('Network.clearAcceptedEncodingsOverride');
-  }
-
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
   @Deprecated('This command is deprecated')
@@ -385,49 +365,6 @@ class NetworkApi {
   /// Clears browser cookies.
   Future<void> clearBrowserCookies() async {
     await _client.send('Network.clearBrowserCookies');
-  }
-
-  /// Response to Network.requestIntercepted which either modifies the request to continue with any
-  /// modifications, or blocks it, or completes it with the provided response bytes. If a network
-  /// fetch occurs as a result which encounters a redirect an additional Network.requestIntercepted
-  /// event will be sent with the same InterceptionId.
-  /// Deprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead.
-  /// [errorReason] If set this causes the request to fail with the given reason. Passing `Aborted` for requests
-  /// marked with `isNavigationRequest` also cancels the navigation. Must not be set in response
-  /// to an authChallenge.
-  /// [rawResponse] If set the requests completes using with the provided base64 encoded raw response, including
-  /// HTTP status line and headers etc... Must not be set in response to an authChallenge.
-  /// [url] If set the request url will be modified in a way that's not observable by page. Must not be
-  /// set in response to an authChallenge.
-  /// [method] If set this allows the request method to be overridden. Must not be set in response to an
-  /// authChallenge.
-  /// [postData] If set this allows postData to be set. Must not be set in response to an authChallenge.
-  /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
-  /// authChallenge.
-  /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  @Deprecated(
-    'use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead',
-  )
-  Future<void> continueInterceptedRequest(
-    InterceptionId interceptionId, {
-    ErrorReason? errorReason,
-    String? rawResponse,
-    String? url,
-    String? method,
-    String? postData,
-    Headers? headers,
-    AuthChallengeResponse? authChallengeResponse,
-  }) async {
-    await _client.send('Network.continueInterceptedRequest', {
-      'interceptionId': interceptionId,
-      'errorReason': ?errorReason,
-      'rawResponse': ?rawResponse,
-      'url': ?url,
-      'method': ?method,
-      'postData': ?postData,
-      'headers': ?headers,
-      'authChallengeResponse': ?authChallengeResponse,
-    });
   }
 
   /// Deletes browser cookies with matching name and url or domain/path/partitionKey pair.
@@ -638,31 +575,6 @@ class NetworkApi {
     return GetRequestPostDataResult.fromJson(result);
   }
 
-  /// Returns content served for the given currently intercepted request.
-  /// [interceptionId] Identifier for the intercepted request to get body for.
-  Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
-    InterceptionId interceptionId,
-  ) async {
-    var result = await _client.send('Network.getResponseBodyForInterception', {
-      'interceptionId': interceptionId,
-    });
-    return GetResponseBodyForInterceptionResult.fromJson(result);
-  }
-
-  /// Returns a handle to the stream representing the response body. Note that after this command,
-  /// the intercepted request can't be continued as is -- you either need to cancel it or to provide
-  /// the response body. The stream only supports sequential read, IO.read will fail if the position
-  /// is specified.
-  Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
-    InterceptionId interceptionId,
-  ) async {
-    var result = await _client.send(
-      'Network.takeResponseBodyForInterceptionAsStream',
-      {'interceptionId': interceptionId},
-    );
-    return io.StreamHandle.fromJson(result['stream'] as String);
-  }
-
   /// This method sends a new XMLHttpRequest which is identical to the original one. The following
   /// parameters should be identical: method, url, async, request body, extra headers, withCredentials
   /// attribute, user, password.
@@ -790,17 +702,6 @@ class NetworkApi {
   /// [enabled] Whether to attach a page script stack for debugging purpose.
   Future<void> setAttachDebugStack(bool enabled) async {
     await _client.send('Network.setAttachDebugStack', {'enabled': enabled});
-  }
-
-  /// Sets the requests to intercept that match the provided patterns and optionally resource types.
-  /// Deprecated, please use Fetch.enable instead.
-  /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
-  /// continueInterceptedRequest call.
-  @Deprecated('use Fetch.enable instead')
-  Future<void> setRequestInterception(List<RequestPattern> patterns) async {
-    await _client.send('Network.setRequestInterception', {
-      'patterns': [...patterns],
-    });
   }
 
   /// Allows overriding user agent with the given string.
@@ -1046,99 +947,6 @@ class LoadingFinishedEvent {
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       encodedDataLength: json['encodedDataLength'] as num,
-    );
-  }
-}
-
-class RequestInterceptedEvent {
-  /// Each request the page makes will have a unique id, however if any redirects are encountered
-  /// while processing that fetch, they will be reported with the same id as the original fetch.
-  /// Likewise if HTTP authentication is needed then the same fetch id will be used.
-  final InterceptionId interceptionId;
-
-  final RequestData request;
-
-  /// The id of the frame that initiated the request.
-  final page.FrameId frameId;
-
-  /// How the requested resource will be used.
-  final ResourceType resourceType;
-
-  /// Whether this is a navigation request, which can abort the navigation completely.
-  final bool isNavigationRequest;
-
-  /// Set if the request is a navigation that will result in a download.
-  /// Only present after response is received from the server (i.e. HeadersReceived stage).
-  final bool? isDownload;
-
-  /// Redirect location, only sent if a redirect was intercepted.
-  final String? redirectUrl;
-
-  /// Details of the Authorization Challenge encountered. If this is set then
-  /// continueInterceptedRequest must contain an authChallengeResponse.
-  final AuthChallenge? authChallenge;
-
-  /// Response error if intercepted at response stage or if redirect occurred while intercepting
-  /// request.
-  final ErrorReason? responseErrorReason;
-
-  /// Response code if intercepted at response stage or if redirect occurred while intercepting
-  /// request or auth retry occurred.
-  final int? responseStatusCode;
-
-  /// Response headers if intercepted at the response stage or if redirect occurred while
-  /// intercepting request or auth retry occurred.
-  final Headers? responseHeaders;
-
-  /// If the intercepted request had a corresponding requestWillBeSent event fired for it, then
-  /// this requestId will be the same as the requestId present in the requestWillBeSent event.
-  final RequestId? requestId;
-
-  RequestInterceptedEvent({
-    required this.interceptionId,
-    required this.request,
-    required this.frameId,
-    required this.resourceType,
-    required this.isNavigationRequest,
-    this.isDownload,
-    this.redirectUrl,
-    this.authChallenge,
-    this.responseErrorReason,
-    this.responseStatusCode,
-    this.responseHeaders,
-    this.requestId,
-  });
-
-  factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
-    return RequestInterceptedEvent(
-      interceptionId: InterceptionId.fromJson(json['interceptionId'] as String),
-      request: RequestData.fromJson(json['request'] as Map<String, dynamic>),
-      frameId: page.FrameId.fromJson(json['frameId'] as String),
-      resourceType: ResourceType.fromJson(json['resourceType'] as String),
-      isNavigationRequest: json['isNavigationRequest'] as bool? ?? false,
-      isDownload: json.containsKey('isDownload')
-          ? json['isDownload'] as bool
-          : null,
-      redirectUrl: json.containsKey('redirectUrl')
-          ? json['redirectUrl'] as String
-          : null,
-      authChallenge: json.containsKey('authChallenge')
-          ? AuthChallenge.fromJson(
-              json['authChallenge'] as Map<String, dynamic>,
-            )
-          : null,
-      responseErrorReason: json.containsKey('responseErrorReason')
-          ? ErrorReason.fromJson(json['responseErrorReason'] as String)
-          : null,
-      responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode'] as int
-          : null,
-      responseHeaders: json.containsKey('responseHeaders')
-          ? Headers.fromJson(json['responseHeaders'] as Map<String, dynamic>)
-          : null,
-      requestId: json.containsKey('requestId')
-          ? RequestId.fromJson(json['requestId'] as String)
-          : null,
     );
   }
 }
@@ -1663,7 +1471,7 @@ class DirectTCPSocketOpenedEvent {
 class DirectTCPSocketAbortedEvent {
   final RequestId identifier;
 
-  final String errorMessage;
+  final ErrorReason errorMessage;
 
   final MonotonicTime timestamp;
 
@@ -1676,7 +1484,7 @@ class DirectTCPSocketAbortedEvent {
   factory DirectTCPSocketAbortedEvent.fromJson(Map<String, dynamic> json) {
     return DirectTCPSocketAbortedEvent(
       identifier: RequestId.fromJson(json['identifier'] as String),
-      errorMessage: json['errorMessage'] as String,
+      errorMessage: ErrorReason.fromJson(json['errorMessage'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
@@ -1859,7 +1667,7 @@ class DirectUDPSocketOpenedEvent {
 class DirectUDPSocketAbortedEvent {
   final RequestId identifier;
 
-  final String errorMessage;
+  final ErrorReason errorMessage;
 
   final MonotonicTime timestamp;
 
@@ -1872,7 +1680,7 @@ class DirectUDPSocketAbortedEvent {
   factory DirectUDPSocketAbortedEvent.fromJson(Map<String, dynamic> json) {
     return DirectUDPSocketAbortedEvent(
       identifier: RequestId.fromJson(json['identifier'] as String),
-      errorMessage: json['errorMessage'] as String,
+      errorMessage: ErrorReason.fromJson(json['errorMessage'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
@@ -2308,28 +2116,6 @@ class GetRequestPostDataResult {
   }
 }
 
-class GetResponseBodyForInterceptionResult {
-  /// Response body.
-  final String body;
-
-  /// True, if content was sent as base64.
-  final bool base64Encoded;
-
-  GetResponseBodyForInterceptionResult({
-    required this.body,
-    required this.base64Encoded,
-  });
-
-  factory GetResponseBodyForInterceptionResult.fromJson(
-    Map<String, dynamic> json,
-  ) {
-    return GetResponseBodyForInterceptionResult(
-      body: json['body'] as String,
-      base64Encoded: json['base64Encoded'] as bool? ?? false,
-    );
-  }
-}
-
 /// Resource type as it was perceived by the rendering engine.
 enum ResourceType {
   document('Document'),
@@ -2377,13 +2163,6 @@ extension type LoaderId(String value) {
 /// a network request.
 extension type RequestId(String value) {
   factory RequestId.fromJson(String value) => RequestId(value);
-
-  String toJson() => value;
-}
-
-/// Unique intercepted request identifier.
-extension type InterceptionId(String value) {
-  factory InterceptionId.fromJson(String value) => InterceptionId(value);
 
   String toJson() => value;
 }
@@ -4433,63 +4212,6 @@ enum AuthChallengeResponseResponse {
   String toString() => value.toString();
 }
 
-/// Stages of the interception to begin intercepting. Request will intercept before the request is
-/// sent. Response will intercept after the response is received.
-enum InterceptionStage {
-  request('Request'),
-  headersReceived('HeadersReceived');
-
-  final String value;
-
-  const InterceptionStage(this.value);
-
-  factory InterceptionStage.fromJson(String value) =>
-      InterceptionStage.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
-/// Request pattern for interception.
-class RequestPattern {
-  /// Wildcards (`'*'` -> zero or more, `'?'` -> exactly one) are allowed. Escape character is
-  /// backslash. Omitting is equivalent to `"*"`.
-  final String? urlPattern;
-
-  /// If set, only requests for matching resource types will be intercepted.
-  final ResourceType? resourceType;
-
-  /// Stage at which to begin intercepting requests. Default is Request.
-  final InterceptionStage? interceptionStage;
-
-  RequestPattern({this.urlPattern, this.resourceType, this.interceptionStage});
-
-  factory RequestPattern.fromJson(Map<String, dynamic> json) {
-    return RequestPattern(
-      urlPattern: json.containsKey('urlPattern')
-          ? json['urlPattern'] as String
-          : null,
-      resourceType: json.containsKey('resourceType')
-          ? ResourceType.fromJson(json['resourceType'] as String)
-          : null,
-      interceptionStage: json.containsKey('interceptionStage')
-          ? InterceptionStage.fromJson(json['interceptionStage'] as String)
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      if (urlPattern != null) 'urlPattern': urlPattern,
-      if (resourceType != null) 'resourceType': resourceType!.toJson(),
-      if (interceptionStage != null)
-        'interceptionStage': interceptionStage!.toJson(),
-    };
-  }
-}
-
 /// Information about a signed exchange signature.
 /// https://wicg.github.io/webpackage/draft-yasskin-httpbis-origin-signed-exchanges-impl.html#rfc.section.3.1
 class SignedExchangeSignature {
@@ -4740,26 +4462,6 @@ class SignedExchangeInfo {
       if (errors != null) 'errors': errors!.map((e) => e.toJson()).toList(),
     };
   }
-}
-
-/// List of content encodings supported by the backend.
-enum ContentEncoding {
-  deflate('deflate'),
-  gzip('gzip'),
-  br('br'),
-  zstd('zstd');
-
-  final String value;
-
-  const ContentEncoding(this.value);
-
-  factory ContentEncoding.fromJson(String value) =>
-      ContentEncoding.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
 }
 
 class NetworkConditions {
@@ -5992,7 +5694,9 @@ enum DeviceBoundSessionFetchResult {
     'InvalidPreProvisionedKeyInitiatorMissing',
   ),
   preProvisionedKeyAccessNotGranted('PreProvisionedKeyAccessNotGranted'),
-  preProvisionedKeyNotFound('PreProvisionedKeyNotFound');
+  preProvisionedKeyNotFound('PreProvisionedKeyNotFound'),
+  attestationCertificationError('AttestationCertificationError'),
+  attestationSigningError('AttestationSigningError');
 
   final String value;
 
@@ -6104,8 +5808,10 @@ class CreationEventDetails {
 /// Session event details specific to refresh.
 class RefreshEventDetails {
   /// The result of a refresh.
+  /// LINT.IfChange(DeviceBoundSessionRefreshResult)
   final RefreshEventDetailsRefreshResult refreshResult;
 
+  /// LINT.ThenChange(//net/device_bound_sessions/refresh_result.h:DeviceBoundSessionRefreshResult,//content/browser/devtools/protocol/network_handler.cc:DeviceBoundSessionRefreshResult)
   /// If there was a fetch attempt, the result of that.
   final DeviceBoundSessionFetchResult? fetchResult;
 
@@ -6172,7 +5878,8 @@ enum RefreshEventDetailsRefreshResult {
   fatalError('FatalError'),
   signingQuotaExceeded('SigningQuotaExceeded'),
   refreshedAsWaiter('RefreshedAsWaiter'),
-  transientSigningError('TransientSigningError');
+  transientSigningError('TransientSigningError'),
+  inScopeRefreshNotYetNeeded('InScopeRefreshNotYetNeeded');
 
   final String value;
 
