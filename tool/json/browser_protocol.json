@@ -1030,8 +1030,18 @@
                         },
                         {
                             "name": "currentTime",
-                            "description": "Set the current time of each animation.",
+                            "description": "Set each animation to the same time.",
+                            "optional": true,
                             "type": "number"
+                        },
+                        {
+                            "name": "currentTimes",
+                            "description": "Set each animation to a different time. If set, should have the same\nlength as animations. Exactly one of currentTime or currentTimes should\nbe set.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
                         }
                     ]
                 },
@@ -2406,6 +2416,33 @@
                     ]
                 },
                 {
+                    "id": "WebInstallIssueReason",
+                    "type": "string",
+                    "enum": [
+                        "ManifestParsingOrNetworkError",
+                        "StartUrlInvalid",
+                        "ManifestMissingNameOrShortName",
+                        "ManifestMissingId",
+                        "NoManifest"
+                    ]
+                },
+                {
+                    "id": "WebInstallIssueDetails",
+                    "description": "This issue reports a failure involving a web app manifest used by a Web\nInstall operation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "manifestUrl",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "reason",
+                            "$ref": "WebInstallIssueReason"
+                        }
+                    ]
+                },
+                {
                     "id": "SelectivePermissionsInterventionIssueDetails",
                     "description": "The issue warns about blocked calls to privacy sensitive APIs via the\nSelective Permissions Intervention.",
                     "type": "object",
@@ -2484,7 +2521,8 @@
                         "PerformanceIssue",
                         "SelectivePermissionsInterventionIssue",
                         "EmailVerificationRequestIssue",
-                        "LazyLoadImageIssue"
+                        "LazyLoadImageIssue",
+                        "WebInstallIssue"
                     ]
                 },
                 {
@@ -2642,6 +2680,11 @@
                             "name": "lazyLoadImageIssueDetails",
                             "optional": true,
                             "$ref": "LazyLoadImageIssueDetails"
+                        },
+                        {
+                            "name": "webInstallIssueDetails",
+                            "optional": true,
+                            "$ref": "WebInstallIssueDetails"
                         }
                     ]
                 },
@@ -8974,6 +9017,28 @@
                     ]
                 },
                 {
+                    "name": "getImplicitAnchorCandidates",
+                    "description": "Returns candidate nodes that are configured as triggers for the given popover.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the popover HTMLElement.",
+                            "$ref": "NodeId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "backendNodeIds",
+                            "description": "Candidate elements that can invoke this popover.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BackendNodeId"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "forceShowInterest",
                     "description": "When enabling, this API forces an element to gain interest in its target,\nkeeping interest active until disabled.",
                     "experimental": true,
@@ -8989,6 +9054,55 @@
                             "type": "boolean"
                         }
                     ]
+                },
+                {
+                    "name": "setTextMarker",
+                    "description": "Sets a spelling or grammar error marker on the given range of text.\nSee https://github.com/Igalia/explainers/blob/main/force-spelling-grammar-markers/README.md\nNote: exactly one between nodeId, backendNodeId and objectId should be passed\nto identify the node.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the node.",
+                            "optional": true,
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Identifier of the backend node.",
+                            "optional": true,
+                            "$ref": "BackendNodeId"
+                        },
+                        {
+                            "name": "objectId",
+                            "description": "JavaScript object id of the node wrapper.",
+                            "optional": true,
+                            "$ref": "Runtime.RemoteObjectId"
+                        },
+                        {
+                            "name": "type",
+                            "description": "The type of marker to set on the given range of text.",
+                            "type": "string",
+                            "enum": [
+                                "spelling",
+                                "grammar"
+                            ]
+                        },
+                        {
+                            "name": "start",
+                            "description": "Start offset into the element's rendered text in UTF-16 code units.\nFor a text control, an offset into the control's value.\nOffsets count text in DOM order and do not enter shadow trees.\nTo mark text inside a shadow tree, pass the element inside the shadow tree.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "end",
+                            "description": "End offset (exclusive) in the same units and space as start.",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "clearTextMarkers",
+                    "description": "Clears the spelling and grammar error text markers overlapping the ranges\nset by setTextMarker in this session. These markers are also removed when\nthe DOM domain is disabled or the session ends.",
+                    "experimental": true
                 }
             ],
             "events": [
@@ -18302,7 +18416,8 @@
                                 "ServerRequested",
                                 "InvalidSessionParams",
                                 "RefreshFatalError",
-                                "DevTools"
+                                "DevTools",
+                                "Replaced"
                             ]
                         }
                     ]
@@ -26472,7 +26587,7 @@
                 },
                 {
                     "id": "ServiceWorkerRouterCondition",
-                    "description": "Mostly corresponds to `RouterCondition` in ServiceWorker spec\n(https://www.w3.org/TR/service-workers/#dictdef-routercondition) while this\ncurrently lacks support for the nested conditions (\"or\" and \"not\").\nTODO(crbug.com/540469610): Support recursive conditions.",
+                    "description": "Mostly corresponds to `RouterCondition` in ServiceWorker spec\n(https://www.w3.org/TR/service-workers/#dictdef-routercondition)",
                     "type": "object",
                     "properties": [
                         {
@@ -26500,6 +26615,19 @@
                             "name": "runningStatus",
                             "optional": true,
                             "$ref": "ServiceWorkerVersionRunningStatus"
+                        },
+                        {
+                            "name": "or",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "ServiceWorkerRouterCondition"
+                            }
+                        },
+                        {
+                            "name": "not",
+                            "optional": true,
+                            "$ref": "ServiceWorkerRouterCondition"
                         }
                     ]
                 },
