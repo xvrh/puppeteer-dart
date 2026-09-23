@@ -155,16 +155,27 @@ class Annotation {
   /// A hint indicating that the tool output may contain untrusted content, ex: UGC, 3rd party data.
   final bool? untrustedContent;
 
+  /// A hint indicating that executing the tool will result in consequential actions, ex: booking a flight, transferring money.
+  final bool? consequential;
+
   /// If the declarative tool was declared with the autosubmit attribute.
   final bool? autosubmit;
 
-  Annotation({this.readOnly, this.untrustedContent, this.autosubmit});
+  Annotation({
+    this.readOnly,
+    this.untrustedContent,
+    this.consequential,
+    this.autosubmit,
+  });
 
   factory Annotation.fromJson(Map<String, dynamic> json) {
     return Annotation(
       readOnly: json.containsKey('readOnly') ? json['readOnly'] as bool : null,
       untrustedContent: json.containsKey('untrustedContent')
           ? json['untrustedContent'] as bool
+          : null,
+      consequential: json.containsKey('consequential')
+          ? json['consequential'] as bool
           : null,
       autosubmit: json.containsKey('autosubmit')
           ? json['autosubmit'] as bool
@@ -176,6 +187,7 @@ class Annotation {
     return {
       if (readOnly != null) 'readOnly': readOnly,
       if (untrustedContent != null) 'untrustedContent': untrustedContent,
+      if (consequential != null) 'consequential': consequential,
       if (autosubmit != null) 'autosubmit': autosubmit,
     };
   }

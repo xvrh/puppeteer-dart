@@ -1,6 +1,8 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'network.dart' as network;
 import 'page.dart' as page;
+import 'runtime.dart' as runtime;
 
 /// A domain for ad-related metrics and data.
 class AdsApi {
@@ -12,6 +14,16 @@ class AdsApi {
   Future<AdMetrics> getAdMetrics() async {
     var result = await _client.send('Ads.getAdMetrics');
     return AdMetrics.fromJson(result['metrics'] as Map<String, dynamic>);
+  }
+
+  /// Retrieves ad scripts for the current page. To minimize payload size, this
+  /// only returns the newly tracked ad scripts since the last call to
+  /// getAdScripts (i.e., the delta).
+  Future<List<AdScript>> getAdScripts() async {
+    var result = await _client.send('Ads.getAdScripts');
+    return (result['newScripts'] as List)
+        .map((e) => AdScript.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
 
@@ -127,5 +139,34 @@ class AdMetrics {
       'updateAdFrames': updateAdFrames.map((e) => e.toJson()).toList(),
       'removeAdFrames': removeAdFrames.map((e) => e.toJson()).toList(),
     };
+  }
+}
+
+/// An ad script.
+/// Note: when the script is a transitive ad script, we only fill in the
+/// immediate ancestor script in the provenance's adScriptAncestry field (as its
+/// first entry), rather than filling in the full ancestry. This saves work for
+/// the backend, and the frontend can reconstruct the full ancestry if
+/// necessary.
+class AdScript {
+  /// The script ID.
+  final runtime.ScriptId scriptId;
+
+  /// The ad provenance.
+  final network.AdProvenance provenance;
+
+  AdScript({required this.scriptId, required this.provenance});
+
+  factory AdScript.fromJson(Map<String, dynamic> json) {
+    return AdScript(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      provenance: network.AdProvenance.fromJson(
+        json['provenance'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'scriptId': scriptId.toJson(), 'provenance': provenance.toJson()};
   }
 }

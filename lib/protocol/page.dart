@@ -817,13 +817,21 @@ class PageApi {
   /// [quality] Compression quality from range [0..100].
   /// [maxWidth] Maximum screenshot width.
   /// [maxHeight] Maximum screenshot height.
-  /// [everyNthFrame] Send every n-th frame.
+  /// [everyNthFrame] Send every n-th frame. Must be a positive integer.
+  /// [maxFramesInFlight] Maximum number of frames sent until screencastFrameAck is required.
+  /// Defaults to 3. Must be a positive integer.
+  /// [sendLastFrame] By default, after screencastFrameAck arrives, the next produced frame is sent.
+  /// Passing this flag enables storing the last produced frame in memory, which is
+  /// immediately sent upon screencastFrameAck. This way, overall performance is
+  /// traded for a better latency.
   Future<void> startScreencast({
     @Enum(['jpeg', 'png']) String? format,
     int? quality,
     int? maxWidth,
     int? maxHeight,
     int? everyNthFrame,
+    int? maxFramesInFlight,
+    bool? sendLastFrame,
   }) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
     await _client.send('Page.startScreencast', {
@@ -832,6 +840,8 @@ class PageApi {
       'maxWidth': ?maxWidth,
       'maxHeight': ?maxHeight,
       'everyNthFrame': ?everyNthFrame,
+      'maxFramesInFlight': ?maxFramesInFlight,
+      'sendLastFrame': ?sendLastFrame,
     });
   }
 
@@ -1866,6 +1876,7 @@ enum PermissionsPolicyFeature {
   gamepad('gamepad'),
   geolocation('geolocation'),
   gyroscope('gyroscope'),
+  haptics('haptics'),
   hid('hid'),
   identityCredentialsGet('identity-credentials-get'),
   idleDetection('idle-detection'),
