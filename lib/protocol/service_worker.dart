@@ -199,6 +199,167 @@ enum ServiceWorkerVersionStatus {
   String toString() => value.toString();
 }
 
+/// Mostly corresponds to `RouterCondition` in ServiceWorker spec
+/// (https://www.w3.org/TR/service-workers/#dictdef-routercondition) while this
+/// currently lacks support for the nested conditions ("or" and "not").
+/// TODO(crbug.com/540469610): Support recursive conditions.
+class ServiceWorkerRouterCondition {
+  /// Plain text, or JSON serialization of URLPatternInit or URLPattern
+  final String? urlPattern;
+
+  final String? requestMethod;
+
+  final String? requestMode;
+
+  final String? requestDestination;
+
+  final ServiceWorkerVersionRunningStatus? runningStatus;
+
+  ServiceWorkerRouterCondition({
+    this.urlPattern,
+    this.requestMethod,
+    this.requestMode,
+    this.requestDestination,
+    this.runningStatus,
+  });
+
+  factory ServiceWorkerRouterCondition.fromJson(Map<String, dynamic> json) {
+    return ServiceWorkerRouterCondition(
+      urlPattern: json.containsKey('urlPattern')
+          ? json['urlPattern'] as String
+          : null,
+      requestMethod: json.containsKey('requestMethod')
+          ? json['requestMethod'] as String
+          : null,
+      requestMode: json.containsKey('requestMode')
+          ? json['requestMode'] as String
+          : null,
+      requestDestination: json.containsKey('requestDestination')
+          ? json['requestDestination'] as String
+          : null,
+      runningStatus: json.containsKey('runningStatus')
+          ? ServiceWorkerVersionRunningStatus.fromJson(
+              json['runningStatus'] as String,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (urlPattern != null) 'urlPattern': urlPattern,
+      if (requestMethod != null) 'requestMethod': requestMethod,
+      if (requestMode != null) 'requestMode': requestMode,
+      if (requestDestination != null) 'requestDestination': requestDestination,
+      if (runningStatus != null) 'runningStatus': runningStatus!.toJson(),
+    };
+  }
+}
+
+enum ServiceWorkerRouterSourceType {
+  cache('cache'),
+  fetchEvent('fetchEvent'),
+  network('network'),
+  raceNetworkAndFetchHandler('raceNetworkAndFetchHandler'),
+  raceNetworkAndCache('raceNetworkAndCache'),
+  sourceDict('sourceDict');
+
+  final String value;
+
+  const ServiceWorkerRouterSourceType(this.value);
+
+  factory ServiceWorkerRouterSourceType.fromJson(String value) =>
+      ServiceWorkerRouterSourceType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// https://www.w3.org/TR/service-workers/#dictdef-routersourcedict
+class ServiceWorkerRouterSourceDict {
+  final String cacheName;
+
+  ServiceWorkerRouterSourceDict({required this.cacheName});
+
+  factory ServiceWorkerRouterSourceDict.fromJson(Map<String, dynamic> json) {
+    return ServiceWorkerRouterSourceDict(
+      cacheName: json['cacheName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'cacheName': cacheName};
+  }
+}
+
+/// Corresponds to `RouterSource` in the spec while the representation is different as follows.
+/// (https://www.w3.org/TR/service-workers/#typedefdef-routersource)
+/// - `RouterSourceEnum`: `type` equals `cache`, `sourceDict` is null.
+/// - `RouterSourceDict`: `type` equals `sourceDict`, `sourceDict` has valid value.
+class ServiceWorkerRouterSource {
+  final ServiceWorkerRouterSourceType type;
+
+  /// Non-empty iff `type` equals "sourceDict".
+  final ServiceWorkerRouterSourceDict? sourceDict;
+
+  ServiceWorkerRouterSource({required this.type, this.sourceDict});
+
+  factory ServiceWorkerRouterSource.fromJson(Map<String, dynamic> json) {
+    return ServiceWorkerRouterSource(
+      type: ServiceWorkerRouterSourceType.fromJson(json['type'] as String),
+      sourceDict: json.containsKey('sourceDict')
+          ? ServiceWorkerRouterSourceDict.fromJson(
+              json['sourceDict'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.toJson(),
+      if (sourceDict != null) 'sourceDict': sourceDict!.toJson(),
+    };
+  }
+}
+
+class ServiceWorkerRouterRule {
+  final ServiceWorkerRouterCondition condition;
+
+  final ServiceWorkerRouterSource source;
+
+  /// Rule ID assigned by the browser. Unique within each ServiceWorkerVersion.
+  final int id;
+
+  ServiceWorkerRouterRule({
+    required this.condition,
+    required this.source,
+    required this.id,
+  });
+
+  factory ServiceWorkerRouterRule.fromJson(Map<String, dynamic> json) {
+    return ServiceWorkerRouterRule(
+      condition: ServiceWorkerRouterCondition.fromJson(
+        json['condition'] as Map<String, dynamic>,
+      ),
+      source: ServiceWorkerRouterSource.fromJson(
+        json['source'] as Map<String, dynamic>,
+      ),
+      id: json['id'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'condition': condition.toJson(),
+      'source': source.toJson(),
+      'id': id,
+    };
+  }
+}
+
 /// ServiceWorker version.
 class ServiceWorkerVersion {
   final String versionId;
@@ -222,7 +383,12 @@ class ServiceWorkerVersion {
 
   final target.TargetID? targetId;
 
+  /// Migration to `typedRouterRules` is in progress. The browser sends either
+  /// `routerRules` or `typedRouterRules`.
+  /// TODO(crbug.com/540469610): Remove `routerRules` after the migration.
   final String? routerRules;
+
+  final List<ServiceWorkerRouterRule>? typedRouterRules;
 
   ServiceWorkerVersion({
     required this.versionId,
@@ -235,6 +401,7 @@ class ServiceWorkerVersion {
     this.controlledClients,
     this.targetId,
     this.routerRules,
+    this.typedRouterRules,
   });
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
@@ -263,6 +430,15 @@ class ServiceWorkerVersion {
       routerRules: json.containsKey('routerRules')
           ? json['routerRules'] as String
           : null,
+      typedRouterRules: json.containsKey('typedRouterRules')
+          ? (json['typedRouterRules'] as List)
+                .map(
+                  (e) => ServiceWorkerRouterRule.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
     );
   }
 
@@ -279,6 +455,8 @@ class ServiceWorkerVersion {
         'controlledClients': controlledClients!.map((e) => e.toJson()).toList(),
       if (targetId != null) 'targetId': targetId!.toJson(),
       if (routerRules != null) 'routerRules': routerRules,
+      if (typedRouterRules != null)
+        'typedRouterRules': typedRouterRules!.map((e) => e.toJson()).toList(),
     };
   }
 }

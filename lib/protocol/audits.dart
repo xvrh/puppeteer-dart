@@ -1759,7 +1759,8 @@ enum EmailVerificationRequestIssueReason {
   tokenVerificationKbInvalidNonce('TokenVerificationKbInvalidNonce'),
   tokenVerificationKbInvalidSdHash('TokenVerificationKbInvalidSdHash'),
   tokenVerificationKbMissingCnf('TokenVerificationKbMissingCnf'),
-  tokenVerificationKbSignatureFailed('TokenVerificationKbSignatureFailed');
+  tokenVerificationKbSignatureFailed('TokenVerificationKbSignatureFailed'),
+  crossOriginIframeNotSupported('CrossOriginIframeNotSupported');
 
   final String value;
 

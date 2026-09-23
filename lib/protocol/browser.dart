@@ -135,6 +135,16 @@ class BrowserApi {
     return (result['arguments'] as List).map((e) => e as String).toList();
   }
 
+  /// Adds or updates a mock camera in the shared video capture device list for
+  /// test automation. The mock camera is not scoped to a particular page or
+  /// frame and is removed when the DevTools session that created it disconnects.
+  /// [deviceId] Required non-empty identifier for the mock camera. This is mapped to an
+  /// internal virtual-device identifier and is not the MediaDeviceInfo.deviceId
+  /// exposed to the page.
+  Future<void> addMockCamera(String deviceId) async {
+    await _client.send('Browser.addMockCamera', {'deviceId': deviceId});
+  }
+
   /// Get Chrome histograms.
   /// [query] Requested substring in name. Only histograms which have query as a
   /// substring in their name are extracted. An empty or absent query returns
@@ -236,6 +246,22 @@ class BrowserApi {
     await _client.send('Browser.addPrivacySandboxEnrollmentOverride', {
       'url': url,
     });
+  }
+
+  /// Gets the current globally-applied privacy control status
+  /// See https://www.w3.org/TR/gpc/#get-global-privacy-control
+  Future<bool> getGlobalPrivacyControl() async {
+    var result = await _client.send('Browser.getGlobalPrivacyControl');
+    return result['gpc'] as bool;
+  }
+
+  /// Sets and then gets the current globally-applied privacy control status
+  /// See https://www.w3.org/TR/gpc/#set-global-privacy-control
+  Future<bool> setGlobalPrivacyControl(bool gpc) async {
+    var result = await _client.send('Browser.setGlobalPrivacyControl', {
+      'gpc': gpc,
+    });
+    return result['gpc'] as bool;
   }
 }
 

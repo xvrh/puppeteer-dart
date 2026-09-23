@@ -177,7 +177,7 @@ class WebAuthnApi {
     bool? backupState,
     int? activeCmtgKeyIndex,
     bool? generateCmtgKeyOnNextOperation,
-    int? signCount,
+    num? signCount,
   }) async {
     await _client.send('WebAuthn.setCredentialProperties', {
       'authenticatorId': authenticatorId,
@@ -521,7 +521,7 @@ class Credential {
   /// If -1, the credential won't have an associated signature counter, and
   /// every assertion operation will report a value of 0.
   /// See https://w3c.github.io/webauthn/#signature-counter
-  final int signCount;
+  final num signCount;
 
   /// The large blob associated with the credential.
   /// See https://w3c.github.io/webauthn/#sctn-large-blob-extension
@@ -581,7 +581,7 @@ class Credential {
       userHandle: json.containsKey('userHandle')
           ? json['userHandle'] as String
           : null,
-      signCount: json['signCount'] as int,
+      signCount: json['signCount'] as num,
       largeBlob: json.containsKey('largeBlob')
           ? json['largeBlob'] as String
           : null,
