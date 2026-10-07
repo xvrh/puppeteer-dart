@@ -1092,6 +1092,7 @@ enum RemoteObjectSubtype {
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
   wasmvalue('wasmvalue'),
+  deferredmodule('deferredmodule'),
   trustedtype('trustedtype');
 
   final String value;
@@ -1241,6 +1242,7 @@ enum ObjectPreviewSubtype {
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
   wasmvalue('wasmvalue'),
+  deferredmodule('deferredmodule'),
   trustedtype('trustedtype');
 
   final String value;
@@ -1349,6 +1351,7 @@ enum PropertyPreviewSubtype {
   dataview('dataview'),
   webassemblymemory('webassemblymemory'),
   wasmvalue('wasmvalue'),
+  deferredmodule('deferredmodule'),
   trustedtype('trustedtype');
 
   final String value;

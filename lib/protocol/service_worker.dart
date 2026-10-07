@@ -200,9 +200,7 @@ enum ServiceWorkerVersionStatus {
 }
 
 /// Mostly corresponds to `RouterCondition` in ServiceWorker spec
-/// (https://www.w3.org/TR/service-workers/#dictdef-routercondition) while this
-/// currently lacks support for the nested conditions ("or" and "not").
-/// TODO(crbug.com/540469610): Support recursive conditions.
+/// (https://www.w3.org/TR/service-workers/#dictdef-routercondition)
 class ServiceWorkerRouterCondition {
   /// Plain text, or JSON serialization of URLPatternInit or URLPattern
   final String? urlPattern;
@@ -215,12 +213,18 @@ class ServiceWorkerRouterCondition {
 
   final ServiceWorkerVersionRunningStatus? runningStatus;
 
+  final List<ServiceWorkerRouterCondition>? or;
+
+  final ServiceWorkerRouterCondition? not;
+
   ServiceWorkerRouterCondition({
     this.urlPattern,
     this.requestMethod,
     this.requestMode,
     this.requestDestination,
     this.runningStatus,
+    this.or,
+    this.not,
   });
 
   factory ServiceWorkerRouterCondition.fromJson(Map<String, dynamic> json) {
@@ -242,6 +246,20 @@ class ServiceWorkerRouterCondition {
               json['runningStatus'] as String,
             )
           : null,
+      or: json.containsKey('or')
+          ? (json['or'] as List)
+                .map(
+                  (e) => ServiceWorkerRouterCondition.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
+      not: json.containsKey('not')
+          ? ServiceWorkerRouterCondition.fromJson(
+              json['not'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -252,6 +270,8 @@ class ServiceWorkerRouterCondition {
       if (requestMode != null) 'requestMode': requestMode,
       if (requestDestination != null) 'requestDestination': requestDestination,
       if (runningStatus != null) 'runningStatus': runningStatus!.toJson(),
+      if (or != null) 'or': or!.map((e) => e.toJson()).toList(),
+      if (not != null) 'not': not!.toJson(),
     };
   }
 }

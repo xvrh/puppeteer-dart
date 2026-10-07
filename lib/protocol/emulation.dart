@@ -126,6 +126,8 @@ class EmulationApi {
   /// orientation changes via screenOrientationLockChanged events. This is
   /// useful for emulating mobile device orientation lock behavior in
   /// responsive design mode.
+  /// [viewportMeta] Viewport meta tag behavior. Default: `default`. Note: if `mobile` is `true`,
+  /// the viewport meta tag is always enabled.
   Future<void> setDeviceMetricsOverride(
     int width,
     int height,
@@ -145,10 +147,15 @@ class EmulationApi {
     DevicePosture? devicePosture,
     @Enum(['overlay', 'default']) String? scrollbarType,
     bool? screenOrientationLockEmulation,
+    @Enum(['enable', 'default']) String? viewportMeta,
   }) async {
     assert(
       scrollbarType == null ||
           const ['overlay', 'default'].contains(scrollbarType),
+    );
+    assert(
+      viewportMeta == null ||
+          const ['enable', 'default'].contains(viewportMeta),
     );
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
@@ -167,6 +174,7 @@ class EmulationApi {
       'devicePosture': ?devicePosture,
       'scrollbarType': ?scrollbarType,
       'screenOrientationLockEmulation': ?screenOrientationLockEmulation,
+      'viewportMeta': ?viewportMeta,
     });
   }
 
