@@ -1582,7 +1582,8 @@ enum FederatedAuthRequestIssueReason {
   typeNotMatching('TypeNotMatching'),
   uiDismissedNoEmbargo('UiDismissedNoEmbargo'),
   corsError('CorsError'),
-  suppressedBySegmentationPlatform('SuppressedBySegmentationPlatform');
+  suppressedBySegmentationPlatform('SuppressedBySegmentationPlatform'),
+  popupBlockedByConnectionAllowlist('PopupBlockedByConnectionAllowlist');
 
   final String value;
 
@@ -2242,6 +2243,52 @@ class PermissionElementIssueDetails {
   }
 }
 
+enum WebInstallIssueReason {
+  manifestParsingOrNetworkError('ManifestParsingOrNetworkError'),
+  startUrlInvalid('StartUrlInvalid'),
+  manifestMissingNameOrShortName('ManifestMissingNameOrShortName'),
+  manifestMissingId('ManifestMissingId'),
+  noManifest('NoManifest');
+
+  final String value;
+
+  const WebInstallIssueReason(this.value);
+
+  factory WebInstallIssueReason.fromJson(String value) =>
+      WebInstallIssueReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue reports a failure involving a web app manifest used by a Web
+/// Install operation.
+class WebInstallIssueDetails {
+  final String? manifestUrl;
+
+  final WebInstallIssueReason reason;
+
+  WebInstallIssueDetails({this.manifestUrl, required this.reason});
+
+  factory WebInstallIssueDetails.fromJson(Map<String, dynamic> json) {
+    return WebInstallIssueDetails(
+      manifestUrl: json.containsKey('manifestUrl')
+          ? json['manifestUrl'] as String
+          : null,
+      reason: WebInstallIssueReason.fromJson(json['reason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reason': reason.toJson(),
+      if (manifestUrl != null) 'manifestUrl': manifestUrl,
+    };
+  }
+}
+
 /// The issue warns about blocked calls to privacy sensitive APIs via the
 /// Selective Permissions Intervention.
 class SelectivePermissionsInterventionIssueDetails {
@@ -2350,7 +2397,8 @@ enum InspectorIssueCode {
     'SelectivePermissionsInterventionIssue',
   ),
   emailVerificationRequestIssue('EmailVerificationRequestIssue'),
-  lazyLoadImageIssue('LazyLoadImageIssue');
+  lazyLoadImageIssue('LazyLoadImageIssue'),
+  webInstallIssue('WebInstallIssue');
 
   final String value;
 
@@ -2431,6 +2479,8 @@ class InspectorIssueDetails {
 
   final LazyLoadImageIssueDetails? lazyLoadImageIssueDetails;
 
+  final WebInstallIssueDetails? webInstallIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2461,6 +2511,7 @@ class InspectorIssueDetails {
     this.selectivePermissionsInterventionIssueDetails,
     this.emailVerificationRequestIssueDetails,
     this.lazyLoadImageIssueDetails,
+    this.webInstallIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2631,6 +2682,11 @@ class InspectorIssueDetails {
               json['lazyLoadImageIssueDetails'] as Map<String, dynamic>,
             )
           : null,
+      webInstallIssueDetails: json.containsKey('webInstallIssueDetails')
+          ? WebInstallIssueDetails.fromJson(
+              json['webInstallIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2709,6 +2765,8 @@ class InspectorIssueDetails {
             emailVerificationRequestIssueDetails!.toJson(),
       if (lazyLoadImageIssueDetails != null)
         'lazyLoadImageIssueDetails': lazyLoadImageIssueDetails!.toJson(),
+      if (webInstallIssueDetails != null)
+        'webInstallIssueDetails': webInstallIssueDetails!.toJson(),
     };
   }
 }

@@ -1198,12 +1198,20 @@ class Scope {
   /// Location in the source code where scope ends
   final Location? endLocation;
 
+  /// True if the scope does not declare any variables or have a runtime context.
+  /// Only present if true.
+  /// Empty scopes are retained in the scope chain because
+  /// they can be targeted via `evaluateOnCallFrame` (using `scopeNumber`) or
+  /// matched against scopes in source maps.
+  final bool? empty;
+
   Scope({
     required this.type,
     required this.object,
     this.name,
     this.startLocation,
     this.endLocation,
+    this.empty,
   });
 
   factory Scope.fromJson(Map<String, dynamic> json) {
@@ -1219,6 +1227,7 @@ class Scope {
       endLocation: json.containsKey('endLocation')
           ? Location.fromJson(json['endLocation'] as Map<String, dynamic>)
           : null,
+      empty: json.containsKey('empty') ? json['empty'] as bool : null,
     );
   }
 
@@ -1229,6 +1238,7 @@ class Scope {
       if (name != null) 'name': name,
       if (startLocation != null) 'startLocation': startLocation!.toJson(),
       if (endLocation != null) 'endLocation': endLocation!.toJson(),
+      if (empty != null) 'empty': empty,
     };
   }
 }

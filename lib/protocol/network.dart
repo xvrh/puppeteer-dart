@@ -5928,7 +5928,8 @@ enum TerminationEventDetailsDeletionReason {
   serverRequested('ServerRequested'),
   invalidSessionParams('InvalidSessionParams'),
   refreshFatalError('RefreshFatalError'),
-  devTools('DevTools');
+  devTools('DevTools'),
+  replaced('Replaced');
 
   final String value;
 
