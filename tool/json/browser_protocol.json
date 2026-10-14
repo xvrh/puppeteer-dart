@@ -1876,7 +1876,8 @@
                         "FormModelContextMissingToolName",
                         "FormModelContextMissingToolDescription",
                         "FormModelContextRequiredParameterMissingName",
-                        "FormModelContextParameterMissingName"
+                        "FormModelContextParameterMissingName",
+                        "GeolocationPromptWithoutUserGesture"
                     ]
                 },
                 {
@@ -13569,6 +13570,7 @@
                 {
                     "name": "resolveBlob",
                     "description": "Return UUID of Blob object specified by a remote object id.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "objectId",
@@ -19455,6 +19457,13 @@
                             "name": "encodedDataLength",
                             "description": "Total number of bytes received for this request.",
                             "type": "number"
+                        },
+                        {
+                            "name": "encodedBodyLength",
+                            "description": "Size of the response body before removing content encodings.\nIncludes cached bodies, but excludes headers and transfer framing.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "number"
                         }
                     ]
                 },
@@ -22136,8 +22145,6 @@
                         "rewriter",
                         "screen-wake-lock",
                         "serial",
-                        "shared-storage",
-                        "shared-storage-select-url",
                         "smart-card",
                         "speaker-selection",
                         "storage-access",
@@ -22146,6 +22153,7 @@
                         "sync-xhr",
                         "tools",
                         "translator",
+                        "unbounded-element",
                         "unload",
                         "usb",
                         "usb-unrestricted",
@@ -24021,6 +24029,26 @@
                     ]
                 },
                 {
+                    "name": "getSpellCheckCustomDictionary",
+                    "description": "Returns the words that the frame's document added to its spell check custom\ndictionary with `document.spellCheckCustomDictionary.addWords()`, sorted.\nPage script cannot read the dictionary back; this lets developers inspect\nit.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "$ref": "FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "words",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "getFrameTree",
                     "description": "Returns present frame tree structure.",
                     "returns": [
@@ -25029,6 +25057,19 @@
                             "name": "content",
                             "description": "The annotated page content as a base64 encoded protobuf.\nThe format is defined by the `AnnotatedPageContent` message in\ncomponents/optimization_guide/proto/features/common_quality_data.proto (Encoded as a base64 string when passed over JSON)",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "setInputVisualization",
+                    "description": "Configures input visualization on the page.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "clicks",
+                            "description": "Whether to enable click visualization.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 }
