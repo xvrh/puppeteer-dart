@@ -369,11 +369,27 @@ class PageApi {
     return result['primaryIcon'] as String;
   }
 
-  /// Returns the unique (PWA) app id.
+  /// Returns the unique (PWA) app id, along with IWA bundle ID and parent app info.
   /// Only returns values if the feature flag 'WebAppEnableManifestId' is enabled
   Future<GetAppIdResult> getAppId() async {
     var result = await _client.send('Page.getAppId');
     return GetAppIdResult.fromJson(result);
+  }
+
+  /// Returns the list of installed child Sub-Apps for the inspected parent app.
+  Future<List<SubApp>> getSubApps() async {
+    var result = await _client.send('Page.getSubApps');
+    return (result['subApps'] as List)
+        .map((e) => SubApp.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Returns the list of sibling Sub-Apps sharing the same parent app if the inspected context is a Sub-App.
+  Future<List<SubApp>> getSiblingSubApps() async {
+    var result = await _client.send('Page.getSiblingSubApps');
+    return (result['subApps'] as List)
+        .map((e) => SubApp.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns: The ancestry chain of ad script identifiers leading to this frame's
@@ -1544,13 +1560,30 @@ class GetAppIdResult {
   /// Recommendation for manifest's id attribute to match current id computed from start_url
   final String? recommendedId;
 
-  GetAppIdResult({this.appId, this.recommendedId});
+  /// The bundle ID for an Isolated Web App (IWA)
+  final String? bundleId;
+
+  /// The name of the parent app if this app is a Sub-App
+  final String? parentAppName;
+
+  GetAppIdResult({
+    this.appId,
+    this.recommendedId,
+    this.bundleId,
+    this.parentAppName,
+  });
 
   factory GetAppIdResult.fromJson(Map<String, dynamic> json) {
     return GetAppIdResult(
       appId: json.containsKey('appId') ? json['appId'] as String : null,
       recommendedId: json.containsKey('recommendedId')
           ? json['recommendedId'] as String
+          : null,
+      bundleId: json.containsKey('bundleId')
+          ? json['bundleId'] as String
+          : null,
+      parentAppName: json.containsKey('parentAppName')
+          ? json['parentAppName'] as String
           : null,
     );
   }
@@ -1901,6 +1934,9 @@ enum PermissionsPolicyFeature {
   privateStateTokenRedemption('private-state-token-redemption'),
   publickeyCredentialsCreate('publickey-credentials-create'),
   publickeyCredentialsGet('publickey-credentials-get'),
+  publickeyCredentialsRemoteClientDataJson(
+    'publickey-credentials-remote-client-data-json',
+  ),
   rewriter('rewriter'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
@@ -2591,6 +2627,9 @@ class ScreencastFrameMetadata {
   /// Frame swap timestamp.
   final network.TimeSinceEpoch? timestamp;
 
+  /// Frame swap timestamp as monotonic time.
+  final network.MonotonicTime? monotonicTimestamp;
+
   ScreencastFrameMetadata({
     required this.offsetTop,
     required this.pageScaleFactor,
@@ -2599,6 +2638,7 @@ class ScreencastFrameMetadata {
     required this.scrollOffsetX,
     required this.scrollOffsetY,
     this.timestamp,
+    this.monotonicTimestamp,
   });
 
   factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
@@ -2612,6 +2652,9 @@ class ScreencastFrameMetadata {
       timestamp: json.containsKey('timestamp')
           ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
           : null,
+      monotonicTimestamp: json.containsKey('monotonicTimestamp')
+          ? network.MonotonicTime.fromJson(json['monotonicTimestamp'] as num)
+          : null,
     );
   }
 
@@ -2624,6 +2667,8 @@ class ScreencastFrameMetadata {
       'scrollOffsetX': scrollOffsetX,
       'scrollOffsetY': scrollOffsetY,
       if (timestamp != null) 'timestamp': timestamp!.toJson(),
+      if (monotonicTimestamp != null)
+        'monotonicTimestamp': monotonicTimestamp!.toJson(),
     };
   }
 }
@@ -3563,6 +3608,45 @@ class WebAppManifest {
         'shortcuts': shortcuts!.map((e) => e.toJson()).toList(),
       if (startUrl != null) 'startUrl': startUrl,
       if (themeColor != null) 'themeColor': themeColor,
+    };
+  }
+}
+
+class SubApp {
+  /// Display name of the sub-app.
+  final String name;
+
+  /// Scope of the sub-app.
+  final String scope;
+
+  /// Manifest id of the sub-app.
+  final String manifestId;
+
+  /// Start URL of the sub-app.
+  final String startUrl;
+
+  SubApp({
+    required this.name,
+    required this.scope,
+    required this.manifestId,
+    required this.startUrl,
+  });
+
+  factory SubApp.fromJson(Map<String, dynamic> json) {
+    return SubApp(
+      name: json['name'] as String,
+      scope: json['scope'] as String,
+      manifestId: json['manifestId'] as String,
+      startUrl: json['startUrl'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'scope': scope,
+      'manifestId': manifestId,
+      'startUrl': startUrl,
     };
   }
 }

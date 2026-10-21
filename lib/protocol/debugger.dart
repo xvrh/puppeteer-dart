@@ -1198,7 +1198,7 @@ class Scope {
   /// Location in the source code where scope ends
   final Location? endLocation;
 
-  /// True if the scope does not declare any variables or have a runtime context.
+  /// True if the scope does not declare any variables.
   /// Only present if true.
   /// Empty scopes are retained in the scope chain because
   /// they can be targeted via `evaluateOnCallFrame` (using `scopeNumber`) or

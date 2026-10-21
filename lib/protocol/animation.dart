@@ -83,11 +83,19 @@ class AnimationApi {
 
   /// Seek a set of animations to a particular time within each animation.
   /// [animations] List of animation ids to seek.
-  /// [currentTime] Set the current time of each animation.
-  Future<void> seekAnimations(List<String> animations, num currentTime) async {
+  /// [currentTime] Set each animation to the same time.
+  /// [currentTimes] Set each animation to a different time. If set, should have the same
+  /// length as animations. Exactly one of currentTime or currentTimes should
+  /// be set.
+  Future<void> seekAnimations(
+    List<String> animations, {
+    num? currentTime,
+    List<num>? currentTimes,
+  }) async {
     await _client.send('Animation.seekAnimations', {
       'animations': [...animations],
-      'currentTime': currentTime,
+      'currentTime': ?currentTime,
+      if (currentTimes != null) 'currentTimes': [...currentTimes],
     });
   }
 

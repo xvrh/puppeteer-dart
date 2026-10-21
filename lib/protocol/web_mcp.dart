@@ -158,6 +158,9 @@ class Annotation {
   /// A hint indicating that executing the tool will result in consequential actions, ex: booking a flight, transferring money.
   final bool? consequential;
 
+  /// If true, indicates that the tool is intended for debugging and developer tooling rather than end-user interactions.
+  final bool? debugging;
+
   /// If the declarative tool was declared with the autosubmit attribute.
   final bool? autosubmit;
 
@@ -165,6 +168,7 @@ class Annotation {
     this.readOnly,
     this.untrustedContent,
     this.consequential,
+    this.debugging,
     this.autosubmit,
   });
 
@@ -177,6 +181,9 @@ class Annotation {
       consequential: json.containsKey('consequential')
           ? json['consequential'] as bool
           : null,
+      debugging: json.containsKey('debugging')
+          ? json['debugging'] as bool
+          : null,
       autosubmit: json.containsKey('autosubmit')
           ? json['autosubmit'] as bool
           : null,
@@ -188,6 +195,7 @@ class Annotation {
       if (readOnly != null) 'readOnly': readOnly,
       if (untrustedContent != null) 'untrustedContent': untrustedContent,
       if (consequential != null) 'consequential': consequential,
+      if (debugging != null) 'debugging': debugging,
       if (autosubmit != null) 'autosubmit': autosubmit,
     };
   }
