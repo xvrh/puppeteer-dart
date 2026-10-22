@@ -808,6 +808,114 @@ enum ContrastAlgorithm {
   String toString() => value.toString();
 }
 
+/// Configuration for Inset-Modified Containing Block (IMCB) and CSS Anchor Positioning highlight.
+class ImcbHighlightConfig {
+  /// Border color for the Inset-Modified Containing Block (default: transparent).
+  final dom.RGBA? imcbBorderColor;
+
+  /// Background fill color for the Inset-Modified Containing Block (default: transparent).
+  final dom.RGBA? imcbBackgroundColor;
+
+  /// Fill color for the inset modifiers area (difference between CB and IMCB).
+  final dom.RGBA? insetsBackgroundColor;
+
+  /// Hatch color for the inset modifiers area.
+  final dom.RGBA? insetsHatchColor;
+
+  /// Border color for the referenced target anchor element(s) (when element is anchor-positioned).
+  final dom.RGBA? anchorBorderColor;
+
+  /// Background fill color for the referenced target anchor element(s) (when element is anchor-positioned).
+  final dom.RGBA? anchorBackgroundColor;
+
+  /// Whether to render the 3x3 position-area grid lines when position-area is used.
+  final bool? showPositionAreaGrid;
+
+  /// Line color for the 3x3 position-area grid lines.
+  final dom.RGBA? positionAreaGridLineColor;
+
+  /// Fill color for the active region within the position-area grid.
+  final dom.RGBA? positionAreaActiveRegionColor;
+
+  ImcbHighlightConfig({
+    this.imcbBorderColor,
+    this.imcbBackgroundColor,
+    this.insetsBackgroundColor,
+    this.insetsHatchColor,
+    this.anchorBorderColor,
+    this.anchorBackgroundColor,
+    this.showPositionAreaGrid,
+    this.positionAreaGridLineColor,
+    this.positionAreaActiveRegionColor,
+  });
+
+  factory ImcbHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return ImcbHighlightConfig(
+      imcbBorderColor: json.containsKey('imcbBorderColor')
+          ? dom.RGBA.fromJson(json['imcbBorderColor'] as Map<String, dynamic>)
+          : null,
+      imcbBackgroundColor: json.containsKey('imcbBackgroundColor')
+          ? dom.RGBA.fromJson(
+              json['imcbBackgroundColor'] as Map<String, dynamic>,
+            )
+          : null,
+      insetsBackgroundColor: json.containsKey('insetsBackgroundColor')
+          ? dom.RGBA.fromJson(
+              json['insetsBackgroundColor'] as Map<String, dynamic>,
+            )
+          : null,
+      insetsHatchColor: json.containsKey('insetsHatchColor')
+          ? dom.RGBA.fromJson(json['insetsHatchColor'] as Map<String, dynamic>)
+          : null,
+      anchorBorderColor: json.containsKey('anchorBorderColor')
+          ? dom.RGBA.fromJson(json['anchorBorderColor'] as Map<String, dynamic>)
+          : null,
+      anchorBackgroundColor: json.containsKey('anchorBackgroundColor')
+          ? dom.RGBA.fromJson(
+              json['anchorBackgroundColor'] as Map<String, dynamic>,
+            )
+          : null,
+      showPositionAreaGrid: json.containsKey('showPositionAreaGrid')
+          ? json['showPositionAreaGrid'] as bool
+          : null,
+      positionAreaGridLineColor: json.containsKey('positionAreaGridLineColor')
+          ? dom.RGBA.fromJson(
+              json['positionAreaGridLineColor'] as Map<String, dynamic>,
+            )
+          : null,
+      positionAreaActiveRegionColor:
+          json.containsKey('positionAreaActiveRegionColor')
+          ? dom.RGBA.fromJson(
+              json['positionAreaActiveRegionColor'] as Map<String, dynamic>,
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (imcbBorderColor != null) 'imcbBorderColor': imcbBorderColor!.toJson(),
+      if (imcbBackgroundColor != null)
+        'imcbBackgroundColor': imcbBackgroundColor!.toJson(),
+      if (insetsBackgroundColor != null)
+        'insetsBackgroundColor': insetsBackgroundColor!.toJson(),
+      if (insetsHatchColor != null)
+        'insetsHatchColor': insetsHatchColor!.toJson(),
+      if (anchorBorderColor != null)
+        'anchorBorderColor': anchorBorderColor!.toJson(),
+      if (anchorBackgroundColor != null)
+        'anchorBackgroundColor': anchorBackgroundColor!.toJson(),
+      if (showPositionAreaGrid != null)
+        'showPositionAreaGrid': showPositionAreaGrid,
+      if (positionAreaGridLineColor != null)
+        'positionAreaGridLineColor': positionAreaGridLineColor!.toJson(),
+      if (positionAreaActiveRegionColor != null)
+        'positionAreaActiveRegionColor': positionAreaActiveRegionColor!
+            .toJson(),
+    };
+  }
+}
+
 /// Configuration data for the highlighting of page elements.
 class HighlightConfig {
   /// Whether the node info tooltip should be shown (default: false).
@@ -868,6 +976,9 @@ class HighlightConfig {
   final ContainerQueryContainerHighlightConfig?
   containerQueryContainerHighlightConfig;
 
+  /// The IMCB highlight configuration (default: all transparent).
+  final ImcbHighlightConfig? imcbHighlightConfig;
+
   HighlightConfig({
     this.showInfo,
     this.showStyles,
@@ -888,6 +999,7 @@ class HighlightConfig {
     this.flexItemHighlightConfig,
     this.contrastAlgorithm,
     this.containerQueryContainerHighlightConfig,
+    this.imcbHighlightConfig,
   });
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
@@ -958,6 +1070,11 @@ class HighlightConfig {
                   as Map<String, dynamic>,
             )
           : null,
+      imcbHighlightConfig: json.containsKey('imcbHighlightConfig')
+          ? ImcbHighlightConfig.fromJson(
+              json['imcbHighlightConfig'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -991,6 +1108,8 @@ class HighlightConfig {
       if (containerQueryContainerHighlightConfig != null)
         'containerQueryContainerHighlightConfig':
             containerQueryContainerHighlightConfig!.toJson(),
+      if (imcbHighlightConfig != null)
+        'imcbHighlightConfig': imcbHighlightConfig!.toJson(),
     };
   }
 }

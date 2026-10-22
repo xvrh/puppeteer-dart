@@ -49,6 +49,11 @@ class StorageApi {
       .where((event) => event.name == 'Storage.storageBucketDeleted')
       .map((event) => event.parameters['bucketId'] as String);
 
+  /// Private Verification Tokens have been stored or deleted.
+  Stream<void> get onPrivateVerificationTokensUpdated => _client.onEvent.where(
+    (event) => event.name == 'Storage.privateVerificationTokensUpdated',
+  );
+
   /// Returns a storage key given a frame id.
   /// Deprecated. Please use Storage.getStorageKey instead.
   @Deprecated('use Storage.getStorageKey instead')
@@ -234,6 +239,54 @@ class StorageApi {
     return result['didDeleteTokens'] as bool;
   }
 
+  /// Returns all stored Private Verification Tokens for the current browsing
+  /// context.
+  Future<List<PrivateVerificationToken>> getPrivateVerificationTokens() async {
+    var result = await _client.send('Storage.getPrivateVerificationTokens');
+    return (result['tokens'] as List)
+        .map(
+          (e) => PrivateVerificationToken.fromJson(e as Map<String, dynamic>),
+        )
+        .toList();
+  }
+
+  /// Returns the configured Private Verification Tokens issuers and their redeemer
+  /// origins.
+  Future<List<PrivateVerificationTokensIssuerConfig>>
+  getPrivateVerificationTokensIssuerConfigs() async {
+    var result = await _client.send(
+      'Storage.getPrivateVerificationTokensIssuerConfigs',
+    );
+    return (result['configs'] as List)
+        .map(
+          (e) => PrivateVerificationTokensIssuerConfig.fromJson(
+            e as Map<String, dynamic>,
+          ),
+        )
+        .toList();
+  }
+
+  /// Removes all Private Verification Tokens issued by the provided issuerOrigin.
+  Future<void> clearPrivateVerificationTokens(String issuerOrigin) async {
+    await _client.send('Storage.clearPrivateVerificationTokens', {
+      'issuerOrigin': issuerOrigin,
+    });
+  }
+
+  /// Removes a specific Private Verification Token by its ID.
+  Future<void> deletePrivateVerificationToken(String tokenId) async {
+    await _client.send('Storage.deletePrivateVerificationToken', {
+      'tokenId': tokenId,
+    });
+  }
+
+  /// Set tracking for Private Verification Tokens.
+  Future<void> setPrivateVerificationTokensTracking(bool enable) async {
+    await _client.send('Storage.setPrivateVerificationTokensTracking', {
+      'enable': enable,
+    });
+  }
+
   /// Set tracking for a storage key's buckets.
   Future<void> setStorageBucketTracking(String storageKey, bool enable) async {
     await _client.send('Storage.setStorageBucketTracking', {
@@ -251,15 +304,6 @@ class StorageApi {
   Future<List<String>> runBounceTrackingMitigations() async {
     var result = await _client.send('Storage.runBounceTrackingMitigations');
     return (result['deletedSites'] as List).map((e) => e as String).toList();
-  }
-
-  /// Returns the effective Related Website Sets in use by this profile for the browser
-  /// session. The effective Related Website Sets will not change during a browser session.
-  Future<List<RelatedWebsiteSet>> getRelatedWebsiteSets() async {
-    var result = await _client.send('Storage.getRelatedWebsiteSets');
-    return (result['sets'] as List)
-        .map((e) => RelatedWebsiteSet.fromJson(e as Map<String, dynamic>))
-        .toList();
   }
 }
 
@@ -487,6 +531,98 @@ class TrustTokens {
   }
 }
 
+/// Details of a stored Private Verification Token.
+class PrivateVerificationToken {
+  /// Unique identifier of the token in the database.
+  final String id;
+
+  /// Origin of the token issuer.
+  final String issuerOrigin;
+
+  /// Public key ID used to issue the token.
+  final int keyId;
+
+  /// Expiration timestamp in seconds since the epoch.
+  final network.TimeSinceEpoch expiration;
+
+  /// Token creation timestamp in seconds since the epoch.
+  final network.TimeSinceEpoch creationTime;
+
+  /// Token protocol version.
+  final int version;
+
+  /// Base64-encoded serialized token.
+  final String token;
+
+  PrivateVerificationToken({
+    required this.id,
+    required this.issuerOrigin,
+    required this.keyId,
+    required this.expiration,
+    required this.creationTime,
+    required this.version,
+    required this.token,
+  });
+
+  factory PrivateVerificationToken.fromJson(Map<String, dynamic> json) {
+    return PrivateVerificationToken(
+      id: json['id'] as String,
+      issuerOrigin: json['issuerOrigin'] as String,
+      keyId: json['keyId'] as int,
+      expiration: network.TimeSinceEpoch.fromJson(json['expiration'] as num),
+      creationTime: network.TimeSinceEpoch.fromJson(
+        json['creationTime'] as num,
+      ),
+      version: json['version'] as int,
+      token: json['token'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'issuerOrigin': issuerOrigin,
+      'keyId': keyId,
+      'expiration': expiration.toJson(),
+      'creationTime': creationTime.toJson(),
+      'version': version,
+      'token': token,
+    };
+  }
+}
+
+/// Configuration for a Private Verification Tokens issuer.
+class PrivateVerificationTokensIssuerConfig {
+  /// Origin of the token issuer.
+  final String issuerOrigin;
+
+  /// Origins authorized to redeem tokens from this issuer.
+  final List<String> redeemerOrigins;
+
+  PrivateVerificationTokensIssuerConfig({
+    required this.issuerOrigin,
+    required this.redeemerOrigins,
+  });
+
+  factory PrivateVerificationTokensIssuerConfig.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return PrivateVerificationTokensIssuerConfig(
+      issuerOrigin: json['issuerOrigin'] as String,
+      redeemerOrigins: (json['redeemerOrigins'] as List)
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'issuerOrigin': issuerOrigin,
+      'redeemerOrigins': [...redeemerOrigins],
+    };
+  }
+}
+
 enum StorageBucketsDurability {
   relaxed('relaxed'),
   strict('strict');
@@ -568,46 +704,6 @@ class StorageBucketInfo {
       'quota': quota,
       'persistent': persistent,
       'durability': durability.toJson(),
-    };
-  }
-}
-
-/// A single Related Website Set object.
-class RelatedWebsiteSet {
-  /// The primary site of this set, along with the ccTLDs if there is any.
-  final List<String> primarySites;
-
-  /// The associated sites of this set, along with the ccTLDs if there is any.
-  final List<String> associatedSites;
-
-  /// The service sites of this set, along with the ccTLDs if there is any.
-  final List<String> serviceSites;
-
-  RelatedWebsiteSet({
-    required this.primarySites,
-    required this.associatedSites,
-    required this.serviceSites,
-  });
-
-  factory RelatedWebsiteSet.fromJson(Map<String, dynamic> json) {
-    return RelatedWebsiteSet(
-      primarySites: (json['primarySites'] as List)
-          .map((e) => e as String)
-          .toList(),
-      associatedSites: (json['associatedSites'] as List)
-          .map((e) => e as String)
-          .toList(),
-      serviceSites: (json['serviceSites'] as List)
-          .map((e) => e as String)
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'primarySites': [...primarySites],
-      'associatedSites': [...associatedSites],
-      'serviceSites': [...serviceSites],
     };
   }
 }
