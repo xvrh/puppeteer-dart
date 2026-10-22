@@ -25,6 +25,7 @@ import 'extensions.dart';
 import 'fed_cm.dart';
 import 'fetch.dart';
 import 'file_system.dart';
+import 'find_in_page.dart';
 import 'headless_experimental.dart';
 import 'heap_profiler.dart';
 import 'indexed_db.dart';
@@ -177,6 +178,10 @@ class DevTools {
 
   FileSystemApi get fileSystem => _fileSystem ??= FileSystemApi(client);
   FileSystemApi? _fileSystem;
+
+  /// This domain provides commands to trigger the "Find in page" feature.
+  FindInPageApi get findInPage => _findInPage ??= FindInPageApi(client);
+  FindInPageApi? _findInPage;
 
   /// This domain provides experimental commands only supported in headless mode.
   HeadlessExperimentalApi get headlessExperimental =>

@@ -141,6 +141,11 @@ class PrerenderStatusUpdatedEvent {
 
   final PreloadingStatus status;
 
+  /// The action currently performed by this attempt. This differs from
+  /// `key.action` after a prerender-until-script attempt is upgraded in place
+  /// to a full prerender.
+  final SpeculationAction? effectiveAction;
+
   final PrerenderFinalStatus? prerenderStatus;
 
   /// This is used to give users more information about the name of Mojo interface
@@ -153,6 +158,7 @@ class PrerenderStatusUpdatedEvent {
     required this.key,
     required this.pipelineId,
     required this.status,
+    this.effectiveAction,
     this.prerenderStatus,
     this.disallowedMojoInterface,
     this.mismatchedHeaders,
@@ -163,6 +169,9 @@ class PrerenderStatusUpdatedEvent {
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
       pipelineId: PreloadPipelineId.fromJson(json['pipelineId'] as String),
       status: PreloadingStatus.fromJson(json['status'] as String),
+      effectiveAction: json.containsKey('effectiveAction')
+          ? SpeculationAction.fromJson(json['effectiveAction'] as String)
+          : null,
       prerenderStatus: json.containsKey('prerenderStatus')
           ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
           : null,

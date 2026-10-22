@@ -166,9 +166,6 @@ enum CookieExclusionReason {
   excludeSameSiteLax('ExcludeSameSiteLax'),
   excludeSameSiteStrict('ExcludeSameSiteStrict'),
   excludeDomainNonAscii('ExcludeDomainNonASCII'),
-  excludeThirdPartyCookieBlockedInFirstPartySet(
-    'ExcludeThirdPartyCookieBlockedInFirstPartySet',
-  ),
   excludeThirdPartyPhaseout('ExcludeThirdPartyPhaseout'),
   excludePortMismatch('ExcludePortMismatch'),
   excludeSchemeMismatch('ExcludeSchemeMismatch');

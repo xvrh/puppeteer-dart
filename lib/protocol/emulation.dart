@@ -128,6 +128,8 @@ class EmulationApi {
   /// responsive design mode.
   /// [viewportMeta] Viewport meta tag behavior. Default: `default`. Note: if `mobile` is `true`,
   /// the viewport meta tag is always enabled.
+  /// [textLayoutMode] Text layout mode. Default: `default`. Note: if `mobile` is `true`,
+  /// mobile text layout mode (text autosizing) is always enabled.
   Future<void> setDeviceMetricsOverride(
     int width,
     int height,
@@ -148,6 +150,7 @@ class EmulationApi {
     @Enum(['overlay', 'default']) String? scrollbarType,
     bool? screenOrientationLockEmulation,
     @Enum(['enable', 'default']) String? viewportMeta,
+    @Enum(['mobile', 'default']) String? textLayoutMode,
   }) async {
     assert(
       scrollbarType == null ||
@@ -156,6 +159,10 @@ class EmulationApi {
     assert(
       viewportMeta == null ||
           const ['enable', 'default'].contains(viewportMeta),
+    );
+    assert(
+      textLayoutMode == null ||
+          const ['mobile', 'default'].contains(textLayoutMode),
     );
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
@@ -175,6 +182,7 @@ class EmulationApi {
       'scrollbarType': ?scrollbarType,
       'screenOrientationLockEmulation': ?screenOrientationLockEmulation,
       'viewportMeta': ?viewportMeta,
+      'textLayoutMode': ?textLayoutMode,
     });
   }
 
