@@ -1,3 +1,20 @@
+## 3.27.0
+- Update to Chrome 156.0.8078.73.
+- Regenerating the protocol against Chrome 156 drops some low-level
+  `page.devTools` members that Chrome itself removed. The high-level API is
+  unaffected (in particular `page.setRequestInterception`, which goes through
+  the `Fetch` domain):
+  - `Network`: the deprecated request-interception flow
+    (`onRequestIntercepted`, `continueInterceptedRequest`,
+    `getResponseBodyForInterception`,
+    `takeResponseBodyForInterceptionAsStream`, the protocol-level
+    `setRequestInterception` and `RequestPattern`), plus
+    `setAcceptedEncodings` and `clearAcceptedEncodingsOverride`.
+  - `Storage`: the Shared Storage commands, events and types, and
+    `getRelatedWebsiteSets`.
+- Add the `FindInPage` domain (`page.devTools.findInPage`) with `findFirst`,
+  `findNext`, `findPrev` and `stop`.
+
 ## 3.26.0
 - Update to Chrome 152.0.7977.42.
 
