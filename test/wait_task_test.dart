@@ -276,6 +276,7 @@ void main() {
     });
 
     test('should run in specified frame', () async {
+      await page.goto(server.emptyPage);
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
@@ -488,6 +489,7 @@ void main() {
       );
     });
     test('should run in specified frame', () async {
+      await page.goto(server.emptyPage);
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
