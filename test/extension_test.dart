@@ -49,6 +49,7 @@ void main() {
       expect(extension.version, '1.2.3');
       expect(extension.path, _extensionPath);
       expect(extension.enabled, isTrue);
+      expect('$extension', 'Extension($id, Test extension 1.2.3)');
     });
 
     test('evaluate in the service worker', () async {
@@ -100,6 +101,18 @@ void main() {
       await popupTarget;
 
       await context.close();
+    });
+
+    test('triggerAction on a closed page', () async {
+      var id = await browser.installExtension(_extensionPath);
+      var extension = (await browser.extensions)[id]!;
+      var page = await browser.newPage();
+      await page.close();
+
+      await expectLater(
+        () => extension.triggerAction(page),
+        throwsA(predicate((e) => '$e'.contains('Could not find the tab'))),
+      );
     });
 
     test('uninstallExtension', () async {
@@ -172,6 +185,16 @@ void main() {
       } finally {
         await browser.close();
       }
+    });
+
+    test('rejects extensions when they are disabled', () async {
+      await expectLater(
+        () => puppeteer.launch(
+          enableExtensions: false,
+          extensions: [_extensionPath],
+        ),
+        throwsArgumentError,
+      );
     });
 
     test('disables extensions by default', () async {
