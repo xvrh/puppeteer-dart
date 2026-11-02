@@ -154,6 +154,29 @@ class TargetManager {
     return _attachedTargetsByTargetId;
   }
 
+  Set<TargetID> get discoveredTargetIds =>
+      _discoveredTargetsByTargetId.keys.toSet();
+
+  /// When an extension is uninstalled, or replaced by a new install, Chrome
+  /// doesn't emit `Target.targetDestroyed` for its service worker if a session
+  /// is attached to it (e.g. through [Target.worker]). Drop those targets
+  /// ourselves. When [among] is given, only these targets are dropped.
+  void destroyExtensionServiceWorkers(
+    String extensionId, {
+    Set<TargetID>? among,
+  }) {
+    var stale = _discoveredTargetsByTargetId.values.where(
+      (info) =>
+          info.type == 'service_worker' &&
+          info.url.startsWith('chrome-extension://$extensionId/') &&
+          (among == null || among.contains(info.targetId)),
+    );
+    for (var info in stale.toList()) {
+      _ignoredTargets.add(info.targetId);
+      _onTargetDestroyed(info.targetId);
+    }
+  }
+
   void addTargetInterceptor(Client client, TargetInterceptor interceptor) {
     final interceptors = _targetInterceptors[client] ?? [];
     interceptors.add(interceptor);
@@ -289,8 +312,19 @@ class TargetManager {
     if (targetInfo.type == 'service_worker' &&
         _connection.isAutoAttached(targetInfo.targetId)) {
       _finishInitializationIfReady(targetInfo.targetId);
+      var wasDiscovered = _discoveredTargetsByTargetId.containsKey(
+        targetInfo.targetId,
+      );
       await silentDetach();
       if (_attachedTargetsByTargetId.containsKey(targetInfo.targetId)) {
+        return;
+      }
+      // The worker was destroyed before we got here, or while we were
+      // detaching (short-lived workers, such as the one of an extension
+      // uninstalled right after its install).
+      if (_ignoredTargets.contains(targetInfo.targetId) ||
+          (wasDiscovered &&
+              !_discoveredTargetsByTargetId.containsKey(targetInfo.targetId))) {
         return;
       }
       final target = _targetFactory(targetInfo, null);

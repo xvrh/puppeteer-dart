@@ -12,6 +12,8 @@
   * [browser.close](#browserclose)
   * [browser.createIncognitoBrowserContext](#browsercreateincognitobrowsercontext)
   * [browser.defaultBrowserContext](#browserdefaultbrowsercontext)
+  * [browser.extensions](#browserextensions)
+  * [browser.installExtension](#browserinstallextension)
   * [browser.newPage](#browsernewpage)
   * [browser.onTargetChanged](#browserontargetchanged)
   * [browser.onTargetCreated](#browserontargetcreated)
@@ -19,6 +21,7 @@
   * [browser.pages](#browserpages)
   * [browser.target](#browsertarget)
   * [browser.targets](#browsertargets)
+  * [browser.uninstallExtension](#browseruninstallextensionstring-id)
   * [browser.userAgent](#browseruseragent)
   * [browser.version](#browserversion)
   * [browser.waitForTarget](#browserwaitfortarget)
@@ -109,6 +112,7 @@
   * [page.tap](#pagetapstring-selector)
   * [page.target](#pagetarget)
   * [page.title](#pagetitle)
+  * [page.triggerExtensionAction](#pagetriggerextensionactionextension-extension)
   * [page.type](#pagetype)
   * [page.url](#pageurl)
   * [page.waitForFileChooser](#pagewaitforfilechooserduration-timeout)
@@ -336,9 +340,17 @@ Parameters:
  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
  - `waitForInitialPage`: Whether to wait for the initial page to be ready.
     Useful when a user explicitly disables that (e.g. `--no-startup-window` for Chrome).
+ - `enableExtensions`: Whether to allow extensions. When `false`, the
+    browser is started with `--disable-extensions`. Defaults to `true`
+    when `extensions` is given, `false` otherwise.
+ - `extensions`: Paths of unpacked extensions to install after launch, with
+    [Browser.installExtension]. Works in headless mode and with branded
+    Chrome.
+ - `extensionsEnabledInIncognito`: The paths, among `extensions`, of the
+    extensions to enable in incognito browser contexts.
 
 ```dart
-puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout, bool? waitForInitialPage}) → Future<Browser> 
+puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout, bool? waitForInitialPage, bool? enableExtensions, List<String>? extensions, List<String>? extensionsEnabledInIncognito}) → Future<Browser> 
 ```
 
 #### puppeteer.userCachePath
@@ -418,6 +430,36 @@ be closed.
 browser.defaultBrowserContext → BrowserContext
 ```
 
+#### browser.extensions
+The unpacked extensions installed in the browser, by id.
+
+```dart
+browser.extensions → Future<Map<String, Extension>>
+```
+
+#### browser.installExtension(...)
+Installs the unpacked extension in the directory at [path] and returns
+its id. [path] must be absolute.
+
+The browser must be started without the `--disable-extensions` flag, for
+example with `puppeteer.launch(enableExtensions: true)`. This works in
+headless mode and with branded Chrome, which ignores the
+`--load-extension` flag.
+
+```dart
+void main() async {
+  var browser = await puppeteer.launch(enableExtensions: true);
+  var id = await browser.installExtension('/path/to/extension');
+  var extension = (await browser.extensions)[id]!;
+  print('Installed ${extension.name}');
+  await browser.close();
+}
+```
+
+```dart
+browser.installExtension(String path, {bool? enabledInIncognito}) → Future<String> 
+```
+
 #### browser.newPage()
 Future which resolves to a new Page object. The Page is created in a
 default browser context.
@@ -482,6 +524,13 @@ all browser contexts.
 
 ```dart
 browser.targets → List<Target>
+```
+
+#### browser.uninstallExtension(String id)
+Uninstalls the unpacked extension with the given [id].
+
+```dart
+browser.uninstallExtension(String id) → Future<void> 
 ```
 
 #### browser.userAgent
@@ -1943,6 +1992,14 @@ Shortcut for [Page.mainFrame.title].
 
 ```dart
 page.title → Future<String?>
+```
+
+#### page.triggerExtensionAction(Extension extension)
+Runs the action of [extension] on this page, as if the user clicked the
+extension's toolbar icon. See [Extension.triggerAction].
+
+```dart
+page.triggerExtensionAction(Extension extension) → Future<void> 
 ```
 
 #### page.type(...)

@@ -3,9 +3,11 @@ import 'package:async/async.dart';
 import 'package:pool/pool.dart';
 import '../plugin.dart';
 import '../protocol/browser.dart';
+import '../protocol/extensions.dart';
 import '../protocol/system_info.dart';
 import '../protocol/target.dart';
 import 'connection.dart';
+import 'extension.dart';
 import 'io/io.dart';
 import 'page/emulation_manager.dart';
 import 'page/page.dart';
@@ -265,6 +267,61 @@ class Browser {
       onTargetCreated,
       onTargetChanged,
     ]).where(predicate).first.timeout(timeout);
+  }
+
+  /// Installs the unpacked extension in the directory at [path] and returns
+  /// its id. [path] must be absolute.
+  ///
+  /// The browser must be started without the `--disable-extensions` flag, for
+  /// example with `puppeteer.launch(enableExtensions: true)`. This works in
+  /// headless mode and with branded Chrome, which ignores the
+  /// `--load-extension` flag.
+  ///
+  /// ```dart
+  /// void main() async {
+  ///   var browser = await puppeteer.launch(enableExtensions: true);
+  ///   var id = await browser.installExtension('/path/to/extension');
+  ///   var extension = (await browser.extensions)[id]!;
+  ///   print('Installed ${extension.name}');
+  ///   await browser.close();
+  /// }
+  /// ```
+  Future<String> installExtension(
+    String path, {
+    bool? enabledInIncognito,
+  }) async {
+    var existingTargets = _targetManager.discoveredTargetIds;
+    var extensionsApi = ExtensionsApi(connection);
+    var id = await extensionsApi.loadUnpacked(
+      path,
+      enableInIncognito: enabledInIncognito,
+    );
+    // With `--disable-extensions`, Chrome returns an id but doesn't install
+    // the extension.
+    var installed = await extensionsApi.getExtensions();
+    if (!installed.any((e) => e.id == id)) {
+      throw Exception(
+        'The extension at $path was not installed. Make sure the browser was '
+        'launched with `enableExtensions: true`.',
+      );
+    }
+    // Installing over the same extension replaces its service worker.
+    _targetManager.destroyExtensionServiceWorkers(id, among: existingTargets);
+    return id;
+  }
+
+  /// Uninstalls the unpacked extension with the given [id].
+  Future<void> uninstallExtension(String id) async {
+    await ExtensionsApi(connection).uninstall(id);
+    _targetManager.destroyExtensionServiceWorkers(id);
+  }
+
+  /// The unpacked extensions installed in the browser, by id.
+  Future<Map<String, Extension>> get extensions async {
+    var extensions = await ExtensionsApi(connection).getExtensions();
+    return {
+      for (var info in extensions) info.id: Extension.fromInfo(this, info),
+    };
   }
 
   /// For headless Chrome, this is similar to HeadlessChrome/61.0.3153.0. For
