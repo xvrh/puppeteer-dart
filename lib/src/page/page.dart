@@ -15,6 +15,7 @@ import '../../protocol/runtime.dart';
 import '../../protocol/target.dart';
 import '../browser.dart';
 import '../connection.dart';
+import '../extension.dart';
 import '../io/io.dart';
 import '../target.dart';
 import '../utils/take_until.dart';
@@ -293,6 +294,11 @@ class Page {
 
   /// Get the browser context that the page belongs to.
   BrowserContext get browserContext => target.browserContext;
+
+  /// Runs the action of [extension] on this page, as if the user clicked the
+  /// extension's toolbar icon. See [Extension.triggerAction].
+  Future<void> triggerExtensionAction(Extension extension) =>
+      extension.triggerAction(this);
 
   void _dispose(String reason) {
     session.dispose(reason: reason);

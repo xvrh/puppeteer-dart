@@ -36,7 +36,6 @@ final _defaultArgs = <String>[
   '--disable-component-update',
   '--disable-default-apps',
   '--disable-dev-shm-usage',
-  '--disable-extensions',
   '--disable-features=${_disabledFeatures.join(',')}',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
@@ -132,6 +131,14 @@ class Puppeteer {
   ///  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
   ///  - `waitForInitialPage`: Whether to wait for the initial page to be ready.
   ///     Useful when a user explicitly disables that (e.g. `--no-startup-window` for Chrome).
+  ///  - `enableExtensions`: Whether to allow extensions. When `false`, the
+  ///     browser is started with `--disable-extensions`. Defaults to `true`
+  ///     when `extensions` is given, `false` otherwise.
+  ///  - `extensions`: Paths of unpacked extensions to install after launch, with
+  ///     [Browser.installExtension]. Works in headless mode and with branded
+  ///     Chrome.
+  ///  - `extensionsEnabledInIncognito`: The paths, among `extensions`, of the
+  ///     extensions to enable in incognito browser contexts.
   Future<Browser> launch({
     String? executablePath,
     bool? headless,
@@ -147,11 +154,21 @@ class Puppeteer {
     List<Plugin>? plugins,
     Duration? timeout,
     bool? waitForInitialPage,
+    bool? enableExtensions,
+    List<String>? extensions,
+    List<String>? extensionsEnabledInIncognito,
   }) async {
     devTools ??= false;
     headless ??= !devTools;
     timeout ??= Duration(seconds: 30);
     waitForInitialPage ??= true;
+    extensions ??= const [];
+    enableExtensions ??= extensions.isNotEmpty;
+    if (!enableExtensions && extensions.isNotEmpty) {
+      throw ArgumentError(
+        'enableExtensions cannot be false when extensions are given',
+      );
+    }
 
     var chromeArgs = <String>[];
     var defaultArguments = defaultArgs(
@@ -160,6 +177,7 @@ class Puppeteer {
       devTools: devTools,
       headless: headless,
       noSandboxFlag: noSandboxFlag,
+      enableExtensions: enableExtensions,
     );
     if (ignoreDefaultArgs == null) {
       chromeArgs.addAll(defaultArguments);
@@ -246,13 +264,19 @@ class Puppeteer {
 
       await attachBrowser(browser);
 
-      if (waitForInitialPage) {
-        try {
+      try {
+        if (waitForInitialPage) {
           await initialWait;
-        } catch (e) {
-          await browser.close();
-          rethrow;
         }
+        for (var path in extensions) {
+          await browser.installExtension(
+            p.absolute(path),
+            enabledInIncognito: extensionsEnabledInIncognito?.contains(path),
+          );
+        }
+      } catch (e) {
+        await browser.close();
+        rethrow;
       }
 
       return browser;
@@ -339,14 +363,17 @@ class Puppeteer {
     List<String>? args,
     String? userDataDir,
     bool? noSandboxFlag,
+    bool? enableExtensions,
   }) {
     devTools ??= false;
     headless ??= !devTools;
+    enableExtensions ??= false;
     // In docker environment we want to force the '--no-sandbox' flag automatically
     noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
 
     return [
       ..._defaultArgs,
+      if (!enableExtensions) '--disable-extensions',
       if (userDataDir != null)
         '--user-data-dir=${p.join(Directory.current.path, userDataDir)}',
       if (noSandboxFlag) '--no-sandbox',

@@ -36,6 +36,7 @@ See [limitations with Flutter](#limitations-with-flutter) section.
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
 * [Use locators to interact with the page](#use-locators-to-interact-with-the-page)
+* [Test a Chrome extension](#test-a-chrome-extension)
 * [Execute JavaScript code](#execute-javascript-code)
 
 ### Launch Chrome
@@ -320,6 +321,40 @@ void main() async {
   var browser = await puppeteer.launch(headless: false);
   // Do something...
   await browser.newPage();
+  await browser.close();
+}
+```
+
+### Test a Chrome extension
+Pass the paths of unpacked extensions to `puppeteer.launch(extensions: [...])`, or install them later with
+`browser.installExtension(path)` on a browser launched with `enableExtensions: true`.
+
+Extensions are installed through the DevTools protocol, so this works in headless mode and with branded Google Chrome,
+which ignores the `--load-extension` flag since Chrome 137.
+
+```dart
+import 'package:puppeteer/puppeteer.dart';
+
+void main() async {
+  var browser = await puppeteer.launch(extensions: ['example/extension']);
+  var extension = (await browser.extensions).values.single;
+  var origin = 'chrome-extension://${extension.id}';
+
+  // The extension's service worker
+  var serviceWorker = await browser.waitForTarget(
+    (t) => t.type == 'service_worker' && t.url.startsWith(origin),
+  );
+  print(serviceWorker.url);
+
+  // Click the extension's toolbar icon and get its popup
+  var page = await browser.newPage();
+  var popupTarget = browser.waitForTarget((t) => t.url == '$origin/popup.html');
+  await page.triggerExtensionAction(extension);
+  var popup = await (await popupTarget).page;
+  var title = await popup.waitForSelector('h1');
+  print(await title!.evaluate('e => e.textContent'));
+  print(await popup.evaluate('() => chrome.runtime.getManifest().name'));
+
   await browser.close();
 }
 ```

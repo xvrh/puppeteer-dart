@@ -36,6 +36,7 @@ See [limitations with Flutter](#limitations-with-flutter) section.
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
 * [Use locators to interact with the page](#use-locators-to-interact-with-the-page)
+* [Test a Chrome extension](#test-a-chrome-extension)
 * [Execute JavaScript code](#execute-javascript-code)
 
 ### Launch Chrome
@@ -95,6 +96,17 @@ For better development & debugging, you can force "headful" mode with parameter 
 
 ```dart
 import 'example/headful.dart';
+```
+
+### Test a Chrome extension
+Pass the paths of unpacked extensions to `puppeteer.launch(extensions: [...])`, or install them later with
+`browser.installExtension(path)` on a browser launched with `enableExtensions: true`.
+
+Extensions are installed through the DevTools protocol, so this works in headless mode and with branded Google Chrome,
+which ignores the `--load-extension` flag since Chrome 137.
+
+```dart
+import 'example/extension.dart';
 ```
 
 

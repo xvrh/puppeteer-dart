@@ -64,6 +64,25 @@ void main() {
       //ignore: await_only_futures
       await main();
     });
+    test('installExtension', () async {
+      //---
+      Future<void> main() async {
+        var browser = await puppeteer.launch(enableExtensions: true);
+        var id = await browser.installExtension(
+          exampleValue(
+            Directory('test/assets/extension').absolute.path,
+            '/path/to/extension',
+          ),
+        );
+        var extension = (await browser.extensions)[id]!;
+        print('Installed ${extension.name}');
+        await browser.close();
+      }
+      //---
+
+      //ignore: await_only_futures
+      await main();
+    });
     test('createIncognitoBrowserContext', () async {
       //---
       Future<void> main() async {

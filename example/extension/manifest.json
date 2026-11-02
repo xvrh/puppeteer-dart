@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Example extension",
+  "version": "1.0",
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

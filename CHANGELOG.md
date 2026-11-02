@@ -1,3 +1,21 @@
+## 3.28.0
+- Update to Chrome 156.0.8078.80.
+- Add Chrome extension support, through the DevTools protocol instead of the
+  `--load-extension` flag, so it works in headless mode and with branded Google
+  Chrome (which ignores `--load-extension` since Chrome 137):
+  - `puppeteer.launch(enableExtensions: true)` starts Chrome without
+    `--disable-extensions`. `extensions: [...]` installs the given unpacked
+    extensions after launch, and `extensionsEnabledInIncognito` enables some of
+    them in incognito contexts.
+  - `browser.installExtension(path)`, `browser.uninstallExtension(id)` and
+    `browser.extensions`.
+  - New `Extension` class with `id`, `name`, `version`, `path`, `enabled`, its
+    running service `workers`, its open `pages`, and `triggerAction(page)`,
+    also available as `page.triggerExtensionAction(extension)`, to open the
+    extension's popup.
+- Fix a service worker target that was never removed from `browser.targets`
+  when the worker was destroyed while puppeteer was attaching to it.
+
 ## 3.27.0
 - Update to Chrome 156.0.8078.73.
 - Regenerating the protocol against Chrome 156 drops some low-level

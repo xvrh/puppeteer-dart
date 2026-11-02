@@ -20,6 +20,7 @@ import 'element_handle_test.dart' as element_handle_test;
 import 'emulation_test.dart' as emulation_test;
 import 'evaluation_test.dart' as evaluation_test;
 import 'examples_test.dart' as examples_test;
+import 'extension_test.dart' as extension_test;
 import 'frame_test.dart' as frame_test;
 import 'golden_utils_test.dart' as golden_utils_test;
 import 'headful_test.dart' as headful_test;
@@ -69,6 +70,7 @@ void main() {
   group('emulation_test', emulation_test.main);
   group('evaluation_test', evaluation_test.main);
   group('examples_test', examples_test.main);
+  group('extension_test', extension_test.main);
   group('frame_test', frame_test.main);
   group('golden_utils_test', golden_utils_test.main);
   group('headful_test', headful_test.main);
