@@ -5,15 +5,6 @@ import 'utils/utils.dart';
 
 final _extensionPath = p.absolute(p.join('test', 'assets', 'extension'));
 
-/// A service worker target can be reported before its script has run (and
-/// before the `chrome` APIs are defined). Wait for the script's globals.
-Future<void> _waitForScript(Worker worker) async {
-  await worker.evaluate('''() => new Promise((resolve) => {
-    const check = () => (self.hello ? resolve() : setTimeout(check, 10));
-    check();
-  })''');
-}
-
 void main() {
   late Server server;
   late Browser browser;
@@ -59,7 +50,6 @@ void main() {
       var extension = (await browser.extensions)[id]!;
       var workers = await extension.workers;
       expect(workers, hasLength(1));
-      await _waitForScript(workers.first);
       expect(
         await workers.first.evaluate<String>('() => hello()'),
         'Hello from $id',
@@ -138,7 +128,6 @@ void main() {
       // Chrome doesn't destroy the target of a service worker that has a
       // session attached.
       var worker = (await serviceWorker.worker)!;
-      await _waitForScript(worker);
       expect(await worker.evaluate<String>('() => hello()'), 'Hello from $id');
       var destroyed = browser.onTargetDestroyed.firstWhere(
         (t) => t == serviceWorker,
@@ -217,14 +206,9 @@ void main() {
       );
       try {
         var id = (await browser.extensions).keys.single;
-        var serviceWorker = await browser.waitForTarget(
-          (t) => isServiceWorker(t, id),
-        );
-        var worker = (await serviceWorker.worker)!;
-        await _waitForScript(worker);
-        expect(
-          await worker.evaluate<bool>('() => self.devtoolsPageLoaded'),
-          isTrue,
+        // The devtools_page messages the service worker, which opens a tab.
+        await browser.waitForTarget(
+          (t) => t.url == 'chrome-extension://$id/popup.html?devtools_page',
         );
       } finally {
         await browser.close();
