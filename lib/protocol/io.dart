@@ -31,6 +31,7 @@ class IOApi {
   /// Return UUID of Blob object specified by a remote object id.
   /// [objectId] Object id of a Blob object wrapper.
   /// Returns: UUID of the specified Blob.
+  @Deprecated('This command is deprecated')
   Future<String> resolveBlob(runtime.RemoteObjectId objectId) async {
     var result = await _client.send('IO.resolveBlob', {'objectId': objectId});
     return result['uuid'] as String;

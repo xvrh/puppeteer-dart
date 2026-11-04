@@ -1313,7 +1313,8 @@ enum GenericIssueErrorType {
   formModelContextRequiredParameterMissingName(
     'FormModelContextRequiredParameterMissingName',
   ),
-  formModelContextParameterMissingName('FormModelContextParameterMissingName');
+  formModelContextParameterMissingName('FormModelContextParameterMissingName'),
+  geolocationPromptWithoutUserGesture('GeolocationPromptWithoutUserGesture');
 
   final String value;
 
