@@ -56,6 +56,32 @@ void main() {
       );
     });
 
+    test(
+      'resumes a service worker that starts during a manual attach',
+      () async {
+        // Attach to the worker (like `Target.worker` does) as it starts, so its
+        // auto-attach arrives while `Target.attachToTarget` is in flight.
+        var connection = browser.connection;
+        var session = connection.targetApi.onTargetCreated
+            .firstWhere((t) => t.type == 'service_worker')
+            .then(
+              (t) => connection.createSession(t, isAutoAttachEmulated: false),
+            );
+        var id = await browser.installExtension(_extensionPath);
+        var worker = Worker(
+          await session,
+          null,
+          onConsoleApiCalled: null,
+          onExceptionThrown: null,
+        );
+        expect(
+          await worker.evaluate<String>('() => hello()'),
+          'Hello from $id',
+        );
+        await (await session).detach();
+      },
+    );
+
     test('triggerExtensionAction opens the popup', () async {
       var id = await browser.installExtension(_extensionPath);
       var extension = (await browser.extensions)[id]!;
@@ -207,9 +233,14 @@ void main() {
       try {
         var id = (await browser.extensions).keys.single;
         // The devtools_page messages the service worker, which opens a tab.
-        await browser.waitForTarget(
+        var devtoolsPageTab = browser.waitForTarget(
           (t) => t.url == 'chrome-extension://$id/popup.html?devtools_page',
         );
+        // The DevTools window of the initial page can finish loading before
+        // the install, and then never loads the devtools_page. A new page's
+        // DevTools window does.
+        await browser.newPage();
+        await devtoolsPageTab;
       } finally {
         await browser.close();
       }
