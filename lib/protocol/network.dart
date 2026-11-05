@@ -936,10 +936,15 @@ class LoadingFinishedEvent {
   /// Total number of bytes received for this request.
   final num encodedDataLength;
 
+  /// Size of the response body before removing content encodings.
+  /// Includes cached bodies, but excludes headers and transfer framing.
+  final num? encodedBodyLength;
+
   LoadingFinishedEvent({
     required this.requestId,
     required this.timestamp,
     required this.encodedDataLength,
+    this.encodedBodyLength,
   });
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
@@ -947,6 +952,9 @@ class LoadingFinishedEvent {
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       encodedDataLength: json['encodedDataLength'] as num,
+      encodedBodyLength: json.containsKey('encodedBodyLength')
+          ? json['encodedBodyLength'] as num
+          : null,
     );
   }
 }

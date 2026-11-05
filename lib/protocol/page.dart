@@ -406,6 +406,17 @@ class PageApi {
     );
   }
 
+  /// Returns the words that the frame's document added to its spell check custom
+  /// dictionary with `document.spellCheckCustomDictionary.addWords()`, sorted.
+  /// Page script cannot read the dictionary back; this lets developers inspect
+  /// it.
+  Future<List<String>> getSpellCheckCustomDictionary(FrameId frameId) async {
+    var result = await _client.send('Page.getSpellCheckCustomDictionary', {
+      'frameId': frameId,
+    });
+    return (result['words'] as List).map((e) => e as String).toList();
+  }
+
   /// Returns present frame tree structure.
   /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
@@ -1033,6 +1044,12 @@ class PageApi {
       'includeActionableInformation': ?includeActionableInformation,
     });
     return result['content'] as String;
+  }
+
+  /// Configures input visualization on the page.
+  /// [clicks] Whether to enable click visualization.
+  Future<void> setInputVisualization({bool? clicks}) async {
+    await _client.send('Page.setInputVisualization', {'clicks': ?clicks});
   }
 }
 
@@ -1940,8 +1957,6 @@ enum PermissionsPolicyFeature {
   rewriter('rewriter'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
-  sharedStorage('shared-storage'),
-  sharedStorageSelectUrl('shared-storage-select-url'),
   smartCard('smart-card'),
   speakerSelection('speaker-selection'),
   storageAccess('storage-access'),

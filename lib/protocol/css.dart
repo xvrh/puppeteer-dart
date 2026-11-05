@@ -146,6 +146,17 @@ class CSSApi {
     });
   }
 
+  /// Forces a position-try option for the given node.
+  /// [nodeId] The element id for which to force the position-try option.
+  /// [index] The 1-based index of the position-try fallback option, 0 for base position (no fallback),
+  /// or omitted to clear the forced state.
+  Future<void> forcePositionTryOption(dom.NodeId nodeId, {int? index}) async {
+    await _client.send('CSS.forcePositionTryOption', {
+      'nodeId': nodeId,
+      'index': ?index,
+    });
+  }
+
   /// [nodeId] Id of the node to get background colors for.
   Future<GetBackgroundColorsResult> getBackgroundColors(
     dom.NodeId nodeId,
