@@ -498,9 +498,16 @@ class DebuggerApi {
 
   /// Steps over the statement.
   /// [skipList] The skipList specifies location ranges that should be skipped on step over.
-  Future<void> stepOver({List<LocationRange>? skipList}) async {
+  /// [enterRanges] Functions whose source range lies within one of the enterRanges are
+  /// entered as if by stepInto, even when they are called (directly or
+  /// indirectly) from a call that is stepped over.
+  Future<void> stepOver({
+    List<LocationRange>? skipList,
+    List<LocationRange>? enterRanges,
+  }) async {
     await _client.send('Debugger.stepOver', {
       if (skipList != null) 'skipList': [...skipList],
+      if (enterRanges != null) 'enterRanges': [...enterRanges],
     });
   }
 }
@@ -1198,12 +1205,12 @@ class Scope {
   /// Location in the source code where scope ends
   final Location? endLocation;
 
-  /// True if the scope does not declare any variables.
-  /// Only present if true.
+  /// Present if the scope has no variable values to show. Absent means that
+  /// the scope declares at least one variable with an available value.
   /// Empty scopes are retained in the scope chain because
   /// they can be targeted via `evaluateOnCallFrame` (using `scopeNumber`) or
   /// matched against scopes in source maps.
-  final bool? empty;
+  final ScopeEmptyReason? emptyReason;
 
   Scope({
     required this.type,
@@ -1211,7 +1218,7 @@ class Scope {
     this.name,
     this.startLocation,
     this.endLocation,
-    this.empty,
+    this.emptyReason,
   });
 
   factory Scope.fromJson(Map<String, dynamic> json) {
@@ -1227,7 +1234,9 @@ class Scope {
       endLocation: json.containsKey('endLocation')
           ? Location.fromJson(json['endLocation'] as Map<String, dynamic>)
           : null,
-      empty: json.containsKey('empty') ? json['empty'] as bool : null,
+      emptyReason: json.containsKey('emptyReason')
+          ? ScopeEmptyReason.fromJson(json['emptyReason'] as String)
+          : null,
     );
   }
 
@@ -1238,7 +1247,7 @@ class Scope {
       if (name != null) 'name': name,
       if (startLocation != null) 'startLocation': startLocation!.toJson(),
       if (endLocation != null) 'endLocation': endLocation!.toJson(),
-      if (empty != null) 'empty': empty,
+      if (emptyReason != null) 'emptyReason': emptyReason,
     };
   }
 }
@@ -1261,6 +1270,23 @@ enum ScopeType {
 
   factory ScopeType.fromJson(String value) =>
       ScopeType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum ScopeEmptyReason {
+  noVariables('no-variables'),
+  allUnavailable('all-unavailable');
+
+  final String value;
+
+  const ScopeEmptyReason(this.value);
+
+  factory ScopeEmptyReason.fromJson(String value) =>
+      ScopeEmptyReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
