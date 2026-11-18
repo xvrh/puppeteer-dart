@@ -1565,11 +1565,17 @@ class DirectTCPSocketChunkReceivedEvent {
 class DirectUDPSocketJoinedMulticastGroupEvent {
   final RequestId identifier;
 
+  /// Multicast group address.
   final String ipAddress;
+
+  /// Source address of a source-specific multicast (SSM) membership. Absent
+  /// for any-source multicast (ASM) memberships.
+  final String? sourceAddress;
 
   DirectUDPSocketJoinedMulticastGroupEvent({
     required this.identifier,
     required this.ipAddress,
+    this.sourceAddress,
   });
 
   factory DirectUDPSocketJoinedMulticastGroupEvent.fromJson(
@@ -1578,6 +1584,9 @@ class DirectUDPSocketJoinedMulticastGroupEvent {
     return DirectUDPSocketJoinedMulticastGroupEvent(
       identifier: RequestId.fromJson(json['identifier'] as String),
       ipAddress: json['IPAddress'] as String,
+      sourceAddress: json.containsKey('sourceAddress')
+          ? json['sourceAddress'] as String
+          : null,
     );
   }
 }
@@ -1585,11 +1594,17 @@ class DirectUDPSocketJoinedMulticastGroupEvent {
 class DirectUDPSocketLeftMulticastGroupEvent {
   final RequestId identifier;
 
+  /// Multicast group address.
   final String ipAddress;
+
+  /// Source address of a source-specific multicast (SSM) membership. Absent
+  /// for any-source multicast (ASM) memberships.
+  final String? sourceAddress;
 
   DirectUDPSocketLeftMulticastGroupEvent({
     required this.identifier,
     required this.ipAddress,
+    this.sourceAddress,
   });
 
   factory DirectUDPSocketLeftMulticastGroupEvent.fromJson(
@@ -1598,6 +1613,9 @@ class DirectUDPSocketLeftMulticastGroupEvent {
     return DirectUDPSocketLeftMulticastGroupEvent(
       identifier: RequestId.fromJson(json['identifier'] as String),
       ipAddress: json['IPAddress'] as String,
+      sourceAddress: json.containsKey('sourceAddress')
+          ? json['sourceAddress'] as String
+          : null,
     );
   }
 }
@@ -5705,7 +5723,8 @@ enum DeviceBoundSessionFetchResult {
   preProvisionedKeyAccessNotGranted('PreProvisionedKeyAccessNotGranted'),
   preProvisionedKeyNotFound('PreProvisionedKeyNotFound'),
   attestationCertificationError('AttestationCertificationError'),
-  attestationSigningError('AttestationSigningError');
+  attestationSigningError('AttestationSigningError'),
+  federatedRegistrationRedirected('FederatedRegistrationRedirected');
 
   final String value;
 
@@ -5888,7 +5907,8 @@ enum RefreshEventDetailsRefreshResult {
   signingQuotaExceeded('SigningQuotaExceeded'),
   refreshedAsWaiter('RefreshedAsWaiter'),
   transientSigningError('TransientSigningError'),
-  inScopeRefreshNotYetNeeded('InScopeRefreshNotYetNeeded');
+  inScopeRefreshNotYetNeeded('InScopeRefreshNotYetNeeded'),
+  canceled('Canceled');
 
   final String value;
 

@@ -575,7 +575,8 @@ enum PrerenderFinalStatus {
   browsingDataRemoved('BrowsingDataRemoved'),
   prerenderHostReused('PrerenderHostReused'),
   formSubmitWhenPrerendering('FormSubmitWhenPrerendering'),
-  crossDocumentRestart('CrossDocumentRestart');
+  crossDocumentRestart('CrossDocumentRestart'),
+  prefetchFailedCrossOriginSubframe('PrefetchFailedCrossOriginSubframe');
 
   final String value;
 
