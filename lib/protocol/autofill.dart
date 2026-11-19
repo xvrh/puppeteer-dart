@@ -16,6 +16,7 @@ class AutofillApi {
 
   /// Trigger autofill on a form identified by the fieldId.
   /// If the field and related form cannot be autofilled, returns an error.
+  /// Returns once the values have been applied to the form fields.
   /// [fieldId] Identifies a field that serves as an anchor for autofill.
   /// [frameId] Identifies the frame that field belongs to.
   /// [card] Credit card information to fill out the form. Credit card data is not saved.  Mutually exclusive with `address`.

@@ -138,9 +138,10 @@ class BrowserApi {
   /// Adds or updates a mock camera in the shared video capture device list for
   /// test automation. The mock camera is not scoped to a particular page or
   /// frame and is removed when the DevTools session that created it disconnects.
-  /// [deviceId] Required non-empty identifier for the mock camera. This is mapped to an
-  /// internal virtual-device identifier and is not the MediaDeviceInfo.deviceId
-  /// exposed to the page.
+  /// [deviceId] Required non-empty identifier for the mock camera within the current
+  /// DevTools session. Different sessions can use the same identifier
+  /// without replacing each other's cameras. This is not the
+  /// MediaDeviceInfo.deviceId exposed to the page.
   Future<void> addMockCamera(String deviceId) async {
     await _client.send('Browser.addMockCamera', {'deviceId': deviceId});
   }
