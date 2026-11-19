@@ -1965,6 +1965,7 @@ enum PermissionsPolicyFeature {
   syncXhr('sync-xhr'),
   tools('tools'),
   translator('translator'),
+  unboundedElement('unbounded-element'),
   unload('unload'),
   usb('usb'),
   usbUnrestricted('usb-unrestricted'),
