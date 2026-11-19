@@ -298,7 +298,18 @@ class TargetManager {
       }
     }
 
-    if (!_connection.isAutoAttached(targetInfo.targetId)) {
+    // `isAutoAttached` is false while a `Target.attachToTarget` to this target
+    // is in flight. But the target can be auto-attached in that window too, for
+    // example a service worker that (re)starts while `Target.worker` attaches
+    // to it. `Target.attachToTarget` is sent on the connection and never pauses
+    // the target: a session waiting for the debugger, or one reported to a
+    // child session, comes from auto-attach. Ignoring it would leave the target
+    // paused before its first script runs.
+    var isAutoAttached =
+        _connection.isAutoAttached(targetInfo.targetId) ||
+        event.waitingForDebugger ||
+        parentSession is Session;
+    if (!isAutoAttached) {
       return;
     }
 
@@ -309,8 +320,7 @@ class TargetManager {
     // `this.#connection.isAutoAttached(targetInfo.targetId)`. In the future, we
     // should determine if a target is auto-attached or not with the help of
     // CDP.
-    if (targetInfo.type == 'service_worker' &&
-        _connection.isAutoAttached(targetInfo.targetId)) {
+    if (targetInfo.type == 'service_worker') {
       _finishInitializationIfReady(targetInfo.targetId);
       var wasDiscovered = _discoveredTargetsByTargetId.containsKey(
         targetInfo.targetId,

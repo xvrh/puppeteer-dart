@@ -136,7 +136,9 @@ class Puppeteer {
   ///     when `extensions` is given, `false` otherwise.
   ///  - `extensions`: Paths of unpacked extensions to install after launch, with
   ///     [Browser.installExtension]. Works in headless mode and with branded
-  ///     Chrome.
+  ///     Chrome. With `devTools: true`, the DevTools window of the initial page
+  ///     can open before the install and then doesn't load the extensions'
+  ///     `devtools_page`. The DevTools windows of new pages do.
   ///  - `extensionsEnabledInIncognito`: The paths, among `extensions`, of the
   ///     extensions to enable in incognito browser contexts.
   Future<Browser> launch({
