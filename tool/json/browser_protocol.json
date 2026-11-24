@@ -2215,12 +2215,15 @@
                         "NonPhrasingContentOptionChild",
                         "InteractiveContentOptionChild",
                         "InteractiveContentLegendChild",
-                        "InteractiveContentSummaryDescendant"
+                        "InteractiveContentSummaryDescendant",
+                        "AnchorMenuDescendant",
+                        "InteractiveContentMenuDescendant",
+                        "TextMenuDescendant"
                     ]
                 },
                 {
                     "id": "ElementAccessibilityIssueDetails",
-                    "description": "This issue warns about errors in the select or summary element content model.",
+                    "description": "This issue warns about errors in the select, summary, or menu element content model.",
                     "type": "object",
                     "properties": [
                         {
@@ -11489,18 +11492,6 @@
                     ]
                 },
                 {
-                    "name": "setVirtualKeyboardGeometryOverride",
-                    "description": "Overrides virtual keyboard geometry in CSS pixels, relative to the top-level viewport. The\nprovided rect is used for navigator.virtualKeyboard.boundingRect, geometrychange events, and\nenv(keyboard-inset-*) values on the inspected frame. The override applies independently of\nnavigator.virtualKeyboard.overlaysContent so clients can preview overlay geometry without\nmutating page state. Values are rounded to the nearest CSS pixel. Omitting the rect clears the\noverride.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "keyboardRect",
-                            "optional": true,
-                            "$ref": "DOM.Rect"
-                        }
-                    ]
-                },
-                {
                     "name": "setDeviceMetricsOverride",
                     "description": "Overrides the values of device screen dimensions (window.screen.width, window.screen.height,\nwindow.innerWidth, window.innerHeight, and \"device-width\"/\"device-height\"-related CSS media\nquery results).",
                     "parameters": [
@@ -15967,6 +15958,7 @@
                         "CSPViolationReport",
                         "Preflight",
                         "FedCM",
+                        "EmailVerification",
                         "Other"
                     ]
                 },
@@ -16933,6 +16925,7 @@
                                 "SignedExchange",
                                 "preflight",
                                 "FedCM",
+                                "EmailVerification",
                                 "other"
                             ]
                         },
@@ -18350,7 +18343,8 @@
                         "PreProvisionedKeyNotFound",
                         "AttestationCertificationError",
                         "AttestationSigningError",
-                        "FederatedRegistrationRedirected"
+                        "FederatedRegistrationRedirected",
+                        "CrossSiteRefreshSessionConfig"
                     ]
                 },
                 {
@@ -24420,6 +24414,13 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "Network.LoaderId"
+                        },
+                        {
+                            "name": "checkForRepost",
+                            "description": "If true and the page has POST data, the browser shows the form\nresubmission dialog before the reload. The command returns after the\nuser responds to the dialog. If the user cancels the dialog, the\ncommand returns an error. The default value is false.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -28907,7 +28908,7 @@
                         },
                         {
                             "name": "subtype",
-                            "description": "Provides additional details for specific target types. For example, for\nthe type of \"page\", this may be set to \"prerender\".",
+                            "description": "Provides additional details for specific target types. For example, for\nthe type of \"page\", this may be set to \"prerender\", and for \"tab\", this\nmay be set to \"unloaded\". An unloaded tab has a history entry, but no\ndocument for it: for example, after the tab was discarded, after\nsession restore without load, or after the renderer crashed. The tab\nstays unloaded until a new document commits. A new tab that has not\nnavigated is not unloaded. Target.targetInfoChanged reports changes of\nthis value for tabs.",
                             "experimental": true,
                             "optional": true,
                             "type": "string"
